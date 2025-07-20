@@ -1,0 +1,444 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025-07-21--0001-currencies
+      author: vvsemenov
+      comment: Создание таблицы currencies
+      changes:
+        - createTable:
+            tableName: currencies
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: code
+                  type: varchar(3)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: symbol
+                  type: varchar(3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: integer
+
+  - changeSet:
+      id: 2025-07-21--0002-banks
+      author: vvsemenov
+      comment: Создание таблицы banks
+      changes:
+        - createTable:
+            tableName: banks
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: bic
+                  type: varchar(9)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: logo_url
+                  type: varchar(255)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: integer
+
+  - changeSet:
+      id: 2025-07-21--0003-users
+      author: vvsemenov
+      comment: Создание таблицы users
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: telegram_chat_id
+                  type: varchar(100)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: integer
+
+  - changeSet:
+      id: 2025-07-21--0004-categories
+      author: vvsemenov
+      comment: Создание таблицы categories
+      changes:
+        - createTable:
+            tableName: categories
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: color
+                  type: varchar(7)
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_categories_users
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: integer
+
+  - changeSet:
+      id: 2025-07-21--0005-bank_accounts
+      author: vvsemenov
+      comment: Создание таблицы bank_accounts
+      changes:
+        - createTable:
+            tableName: bank_accounts
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: account_number
+                  type: varchar(34)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: bank_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_accounts_banks
+                    references: banks(id)
+              - column:
+                  name: currency_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_accounts_currencies
+                    references: currencies(id)
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_accounts_users
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: integer
+
+  - changeSet:
+      id: 2025-07-21--0006-cards
+      author: vvsemenov
+      comment: Создание таблицы cards
+      changes:
+        - createTable:
+            tableName: cards
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: last_four_digits
+                  type: varchar(4)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: card_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: account_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_cards_accounts
+                    references: bank_accounts(id)
+              - column:
+                  name: issuer_bank_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_cards_banks
+                    references: banks(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: integer
+
+  - changeSet:
+      id: 2025-07-21--0007-budgets
+      author: vvsemenov
+      comment: Создание таблицы budgets
+      changes:
+        - createTable:
+            tableName: budgets
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: limit_amount
+                  type: numeric(19,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_budgets_categories
+                    references: categories(id)
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_budgets_users
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: integer
+
+  - changeSet:
+      id: 2025-07-21--0008-transactions
+      author: vvsemenov
+      comment: Создание таблицы transactions
+      changes:
+        - createTable:
+            tableName: transactions
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: numeric(19,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: operation_date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: hide
+                  type: boolean
+                  defaultValue: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: master
+                  type: boolean
+                  defaultValue: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: currency_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_transactions_currencies
+                    references: currencies(id)
+              - column:
+                  name: category_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_transactions_categories
+                    references: categories(id)
+              - column:
+                  name: card_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_transactions_cards
+                    references: cards(id)
+              - column:
+                  name: parent_transaction_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_transactions_parent
+                    references: transactions(id)
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_transactions_users
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: integer
+
+  - changeSet:
+      id: 2025-07-21--0009-indexes
+      author: vvsemenov
+      comment: Создание индексов для улучшения производительности
+      changes:
+        - createIndex:
+            indexName: idx_bank_account_user
+            tableName: bank_accounts
+            columns:
+              - column:
+                  name: user_id
+
+        - createIndex:
+            indexName: idx_transaction_date
+            tableName: transactions
+            columns:
+              - column:
+                  name: operation_date
+
+        - createIndex:
+            indexName: idx_transaction_user_date
+            tableName: transactions
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: operation_date
+
+        - createIndex:
+            indexName: idx_transaction_card
+            tableName: transactions
+            columns:
+              - column:
+                  name: card_id
+
+        - createIndex:
+            indexName: idx_transaction_category
+            tableName: transactions
+            columns:
+              - column:
+                  name: category_id
