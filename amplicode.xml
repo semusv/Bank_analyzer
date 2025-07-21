@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AmplicodeDatabaseMigrationSettings" lastSelectedDirectory="db/changelog/structure/1.0/#date(&quot;yyyy&quot;)/#date(&quot;MM&quot;)" liquibaseFileType="YAML" mainChangeLogDir="db/changelog/structure/1.0/#date(&quot;yyyy&quot;)/#date(&quot;MM&quot;)" mainChangeLogName="#date(&quot;dd&quot;)--#increment(1, 1, &quot;0000&quot;)-changelog" />
+  <component name="AmplicodePersistenceUnitSettings">
+    <persistence-units>
+      <persistence-unit name="Default" defaultIncludeChangeLogFile="src/main/resources/db/changelog/db.changelog-master.yaml" defaultSearchScope="Project">
+        <packages>
+          <package value="ru.vvsem.bank.analyzer" />
+        </packages>
+      </persistence-unit>
+    </persistence-units>
+  </component>
+</project>

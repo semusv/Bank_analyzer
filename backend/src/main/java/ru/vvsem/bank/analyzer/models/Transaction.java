@@ -3,6 +3,8 @@ package ru.vvsem.bank.analyzer.models;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -18,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import ru.vvsem.bank.analyzer.models.enums.OperationType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -69,6 +72,11 @@ public class Transaction extends AbstractBaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "card_id")
     private Card card;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "operation_type")
+    private OperationType operationType = OperationType.CARD;
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)

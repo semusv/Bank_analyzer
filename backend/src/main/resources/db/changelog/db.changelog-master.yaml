@@ -2,6 +2,9 @@ databaseChangeLog:
   # Структурные изменения
   - include:
       file: db/changelog/structure/1.0/2025-07-21--0001-init-schema.yaml
+  - includeAll:
+      path: db/changelog/structure/1.0/2025/07
+
 
   # Данные для инициализации
   - include:

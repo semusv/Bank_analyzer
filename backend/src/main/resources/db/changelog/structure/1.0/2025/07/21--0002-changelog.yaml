@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1753099873269-1
+      author: semva (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: patronymic
+                  type: VARCHAR(255)
+            tableName: users
+
