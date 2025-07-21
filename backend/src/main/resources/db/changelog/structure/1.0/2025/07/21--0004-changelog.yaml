@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1753124445562-1
+      author: Semenov V
+      comment: Добавил Логин
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: login
+                  type: VARCHAR(20)
+            tableName: users
+  - changeSet:
+      id: 1753124445562-2
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: login
+            tableName: users
+            defaultNullValue: ''
+  - changeSet:
+      id: 1753124445562-3
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: login
+            constraintName: UC_USERS_LOGIN
+            tableName: users
+

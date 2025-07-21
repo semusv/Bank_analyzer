@@ -32,6 +32,10 @@ public class User extends AbstractBaseEntity {
     private String name;
 
     @NotNull
+    @Column(name = "login", nullable = false, unique = true, length = 20)
+    private String login;
+
+    @NotNull
     @Column(name = "surname")
     private String surname;
 
