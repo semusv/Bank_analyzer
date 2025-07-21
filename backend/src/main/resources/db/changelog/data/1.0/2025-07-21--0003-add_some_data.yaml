@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025-07-21--0004-users-data
+      author: vvsemenov
+      context: dev
+      runOnChange: true
+      changes:
+        - loadData:
+            file: csv/2025-07-21--0004-users.csv
+            relativeToChangelogFile: true
+            separator: ";"
+            quotchar: '"'
+            encoding: UTF-8
+            tableName: users
+            primaryKey: id
+            columns:
+              - column:
+                  name: email
+              - column:
+                  name: password
+              - column:
+                  name: telegram_chat_id

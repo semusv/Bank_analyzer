@@ -1,0 +1,14 @@
+{
+  "Servers" : {
+    "1" : {
+      "Group" : "Servers",
+      "Name" : "postgres",
+      "Host" : "postgres",
+      "Port" : 5432,
+      "MaintenanceDB" : "bank_analyze",
+      "Username" : "admin",
+      "PassFile" : "/pgadmin4/pgpass",
+      "SSLMode" : "prefer"
+    }
+  }
+}
