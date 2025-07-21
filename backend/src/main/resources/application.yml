@@ -7,7 +7,10 @@ spring:
       enabled: ALWAYS
 
   datasource:
-    url: jdbc:h2:mem:bankdb
+    driver-class-name: org.postgresql.Driver
+    password: 123456*
+    username: admin
+    url: jdbc:postgresql://localhost/bank_analyze
 
   h2:
     console:

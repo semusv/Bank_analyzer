@@ -7,3 +7,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/data/1.0/2025-07-21--0002-init-data.yaml
       context: dev
+  - include:
+      file: db/changelog/data/1.0/2025-07-21--0003-add_some_data.yaml
+      context: dev
