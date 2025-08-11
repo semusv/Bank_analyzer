@@ -1,0 +1,4 @@
+docker compose -p bank-app -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+docker compose -p bank-app up -d
+
+

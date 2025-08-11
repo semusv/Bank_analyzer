@@ -1,8 +1,10 @@
 package ru.vvsem.bank.analyzer.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
@@ -28,7 +30,7 @@ import java.util.Set;
 public class User extends AbstractBaseEntity {
 
     @NotNull
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @NotNull
@@ -36,41 +38,43 @@ public class User extends AbstractBaseEntity {
     private String login;
 
     @NotNull
-    @Column(name = "surname")
+    @Column(name = "surname", nullable = false)
     private String surname;
 
     @Column(name = "patronymic")
     private String patronymic;
 
-    @Column(unique = true, name = "email")
     @NotNull
     @Email
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password")
     @NotNull
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "telegram_chat_id")
     private String telegramChatId;
 
-    //связи
+    /* ----------------- Навигации ----------------- */
     @ToString.Exclude
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.LAZY)
     private List<BankAccount> bankAccounts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
     @ToString.Exclude
-    private List<Transaction> transactions = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Transaction> transactions = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
     @ToString.Exclude
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Category> categories = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
     @ToString.Exclude
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Budget> budgets = new LinkedHashSet<>();
-
-
 }

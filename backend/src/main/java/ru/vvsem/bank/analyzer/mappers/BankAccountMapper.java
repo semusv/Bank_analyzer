@@ -14,7 +14,6 @@ import ru.vvsem.bank.analyzer.models.BankAccount;
 public interface BankAccountMapper {
     @Mapping(source = "userId", target = "user.id")
     @Mapping(source = "currencyCode", target = "currency.code")
-    @Mapping(source = "currencyId", target = "currency.id")
     BankAccount toEntity(BankAccountDto bankAccountDto);
 
     @AfterMapping

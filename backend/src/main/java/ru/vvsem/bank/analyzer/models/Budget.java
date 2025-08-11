@@ -27,18 +27,17 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class Budget extends AbstractBaseEntity {
 
-    @Column(name = "limit_amount", precision = 19, scale = 2)
     @NotNull
+    @Column(name = "limit_amount", precision = 19, scale = 2, nullable = false)
     private BigDecimal limitAmount;
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    @NotNull
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    @NotNull
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

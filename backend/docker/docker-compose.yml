@@ -1,0 +1,44 @@
+services:
+  pg-db:
+    image: postgres:16
+    container_name: pg-db-bank
+    restart: unless-stopped
+    networks:
+      - bank_analyzer-network               # ← дай сети имя
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin", "-d", "bank_analyze"]
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pg-admin-bank
+    restart: unless-stopped
+    depends_on:
+      - pg-db
+    networks:
+      - bank_analyzer-network                # ← тоже ссылка на сеть!
+    ports:
+      - "5050:80"                  # по умолчанию, можно переопределить в dev/prod
+    volumes:
+      - ./docker/pgadmin_data:/var/lib/pgadmin
+      - ./docker/pgadmin_data/servers.json:/pgadmin4/servers.json
+    healthcheck:
+      test: curl -f http://localhost:80/misc/ping
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+
+networks:
+  bank_analyzer-network:
+    driver: bridge
+
+volumes:
+  pgdata:
+  pgadmin_data:
+

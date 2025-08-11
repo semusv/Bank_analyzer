@@ -24,15 +24,15 @@ import java.util.List;
 public class Bank extends AbstractBaseEntity {
 
     @NotNull
-    @Column(name = "name" , unique = true)
+    @Column(name = "name", nullable = false, unique = true)
     private String name; // "Тинькофф", "Сбербанк"
 
     @NotNull
-    @Column(name = "bic", unique = true, length = 9)
+    @Column(name = "bic", nullable = false, unique = true, length = 9)
     private String bic; // БИК банка
 
-    @Column(name = "logoUrl")
-    private String logoUrl; // Ссылка на логотип
+    @Column(name = "logo_url")
+    private String logoUrl;
 
     @OneToMany(mappedBy = "bank")
     @ToString.Exclude

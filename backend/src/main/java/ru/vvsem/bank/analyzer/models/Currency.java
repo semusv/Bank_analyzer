@@ -22,14 +22,14 @@ import lombok.ToString;
 public class Currency extends AbstractBaseEntity {
 
     @NotNull
-    @Column(name = "code", unique = true, length = 3)
+    @Column(name = "code", nullable = false, unique = true, length = 3)
     private String code; // "USD", "EUR", "RUB"
 
     @NotNull
-    @Column(name = "symbol")
+    @Column(name = "symbol", nullable = false, length = 3)
     private String symbol; // "$", "€", "₽"
 
     @NotNull
-    @Column(name = "name")
+    @Column(name = "name", nullable = false, length = 100)
     private String name; // "Доллар США", "Евро"
 }

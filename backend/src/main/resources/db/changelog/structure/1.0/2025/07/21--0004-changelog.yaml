@@ -16,10 +16,15 @@ databaseChangeLog:
       author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
+        - update:
+            tableName: users
+            columns:
+              - column:
+                  name: login
+                  valueComputed: CONCAT('user_', id)
         - addNotNullConstraint:
             columnName: login
             tableName: users
-            defaultNullValue: ''
   - changeSet:
       id: 1753124445562-3
       author: Semenov V

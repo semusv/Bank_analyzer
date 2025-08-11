@@ -24,17 +24,16 @@ import lombok.ToString;
 @NoArgsConstructor
 public class Category extends AbstractBaseEntity {
 
-    @Column(name = "name")
     @NotNull
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "color")
+    @Column(name = "color", length = 7)          // HEX → 7 символов
     private String color; // HEX-код
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    @NotNull
+    @JoinColumn(name = "user_id", nullable = false)
     private User user; // Персональные категории
 
 }
