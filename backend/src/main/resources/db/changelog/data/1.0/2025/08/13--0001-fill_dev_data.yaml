@@ -1,0 +1,205 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025-08-13--0001-currencies-data
+      author: vvsemenov
+      context: dev
+      runOnChange: true
+      changes:
+        - loadData:
+            file: csv/2025-08-13--0001-currencies.csv
+            relativeToChangelogFile: true
+            separator: ";"
+            quotchar: '"'
+            encoding: UTF-8
+            tableName: currencies
+            primaryKey: id
+            columns:
+              - column:
+                  name: code
+              - column:
+                  name: symbol
+              - column:
+                  name: name
+
+  - changeSet:
+      id: 2025-08-13--0002-banks-data
+      author: vvsemenov
+      context: dev
+      runOnChange: true
+      changes:
+        - loadData:
+            file: csv/2025-08-13--0002-banks.csv
+            relativeToChangelogFile: true
+            separator: ";"
+            quotchar: '"'
+            encoding: UTF-8
+            tableName: banks
+            primaryKey: id
+            columns:
+              - column:
+                  name: name
+              - column:
+                  name: bic
+              - column:
+                  name: logo_url
+
+  - changeSet:
+      id: 2025-08-13--0003-users-data
+      author: vvsemenov
+      context: dev
+      runOnChange: true
+      changes:
+        - loadData:
+            file: csv/2025-08-13--0003-users.csv
+            relativeToChangelogFile: true
+            separator: ";"
+            quotchar: '"'
+            encoding: UTF-8
+            tableName: users
+            primaryKey: id
+            columns:
+              - column:
+                  name: name
+              - column:
+                  name: surname
+              - column:
+                  name: email
+              - column:
+                  name: password
+              - column:
+                  name: telegram_chat_id
+              - column:
+                  name: login
+
+  - changeSet:
+      id: 2025-08-13--0004-accounts-data
+      author: vvsemenov
+      context: dev
+      runOnChange: true
+      changes:
+        - loadData:
+            file: csv/2025-08-13--0004-accounts.csv
+            relativeToChangelogFile: true
+            separator: ";"
+            quotchar: '"'
+            encoding: UTF-8
+            tableName: bank_accounts
+            primaryKey: id
+            columns:
+              - column:
+                  name: name
+              - column:
+                  name: account_number
+              - column:
+                  name: bank_id
+              - column:
+                  name: currency_id
+              - column:
+                  name: user_id
+
+  - changeSet:
+      id: 2025-08-13--0005-cards-data
+      author: vvsemenov
+      context: dev
+      runOnChange: true
+      changes:
+        - loadData:
+            file: csv/2025-08-13--0005-cards.csv
+            relativeToChangelogFile: true
+            separator: ";"
+            quotchar: '"'
+            encoding: UTF-8
+            tableName: cards
+            primaryKey: id
+            columns:
+              - column:
+                  name: last_four_digits
+              - column:
+                  name: card_name
+              - column:
+                  name: account_id
+              - column:
+                  name: issuer_bank_id
+
+  - changeSet:
+      id: 2025-08-13--0006-categories-data
+      author: vvsemenov
+      context: dev
+      runOnChange: true
+      changes:
+        - loadData:
+            file: csv/2025-08-13--0006-categories.csv
+            relativeToChangelogFile: true
+            separator: ";"
+            quotchar: '"'
+            encoding: UTF-8
+            tableName: categories
+            primaryKey: id
+            columns:
+              - column:
+                  name: name
+              - column:
+                  name: color
+              - column:
+                  name: user_id
+
+  - changeSet:
+      id: 2025-08-13--0007-budgets-data
+      author: vvsemenov
+      context: dev
+      runOnChange: true
+      changes:
+        - loadData:
+            file: csv/2025-08-13--0007-budgets.csv
+            relativeToChangelogFile: true
+            separator: ";"
+            quotchar: '"'
+            encoding: UTF-8
+            tableName: budgets
+            primaryKey: id
+            columns:
+              - column:
+                  name: limit_amount
+              - column:
+                  name: category_id
+              - column:
+                  name: user_id
+
+  - changeSet:
+      id: 2025-08-13--0008-transactions-data
+      author: vvsemenov
+      context: dev
+      runOnChange: true
+      changes:
+        - loadData:
+            file: csv/2025-08-13--0008-transactions.csv
+            relativeToChangelogFile: true
+            separator: ";"
+            quotchar: '"'
+            encoding: UTF-8
+            tableName: transactions
+            primaryKey: id
+            usePreparedStatements: true
+            columns:
+              - column:
+                  name: description
+              - column:
+                  name: amount
+              - column:
+                  name: operation_time
+              - column:
+                  name: hide
+              - column:
+                  name: master
+              - column:
+                  name: currency_id
+              - column:
+                  name: category_id
+              - column:
+                  name: card_id
+              - column:
+                  name: parent_transaction_id
+              - column:
+                  name: user_id
+              - column:
+                  name: operation_type

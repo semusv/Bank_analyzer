@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Транзакции</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<div th:replace="~{fragments/navigation :: navigation}"></div>
+
+<main class="container">
+    <h1>Мои транзакции</h1>
+
+    <div class="actions">
+        <a href="/transactions/upload" class="btn">Загрузить выписку</a>
+    </div>
+
+    <table id="transactions-table">
+        <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Сумма</th>
+            <th>Описание</th>
+            <th>Категория</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Данные будут загружаться через Fetch API -->
+        </tbody>
+    </table>
+</main>
+
+<script>
+    // Загрузка данных через Fetch API
+    fetch('/api/transactions')
+        .then(response => response.json())
+        .then(data => {
+            const table = document.querySelector('#transactions-table tbody');
+            data.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(transaction.operationTime).toLocaleString()}</td>
+                    <td>${transaction.amount} ${transaction.currency.symbol}</td>
+                    <td>${transaction.description}</td>
+                    <td>${transaction.category?.name || 'Не указана'}</td>
+                `;
+                table.appendChild(row);
+            });
+        });
+</script>
+</body>
+</html>
