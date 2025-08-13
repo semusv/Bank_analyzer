@@ -1,18 +1,24 @@
 package ru.vvsem.bank.analyzer.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
+
 
 /**
  * DTO for {@link ru.vvsem.bank.analyzer.models.Currency}
  */
-@Value
+@Getter
+@Setter
 public class CurrencyDto {
-    Long id;
+    private  Long id;
+
     @NotNull
-    String code;
+    private   String code;
+
     @NotNull
-    String symbol;
+    private  String symbol;
+
     @NotNull
-    String name;
+    private  String name;
 }

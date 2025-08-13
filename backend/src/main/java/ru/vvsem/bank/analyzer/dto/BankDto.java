@@ -1,21 +1,22 @@
 package ru.vvsem.bank.analyzer.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * DTO for {@link ru.vvsem.bank.analyzer.models.Bank}
  */
-@Value
+@Getter
+@Setter
 public class BankDto {
-
-    Long id;
-
-    @NotNull
-    String name;
+    private Long id;
 
     @NotNull
-    String bic;
+    private  String name;
 
-    String logoUrl;
+    @NotNull
+    private  String bic;
+
+    private String logoUrl;
 }

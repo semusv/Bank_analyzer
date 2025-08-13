@@ -16,6 +16,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
 
+    @Override
     public UserDto getUserByLogin(String login) {
         return userRepository.findByLogin(login).map(userMapper::toUserDto).orElseThrow();
     }

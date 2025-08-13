@@ -1,25 +1,27 @@
 package ru.vvsem.bank.analyzer.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
 import ru.vvsem.bank.analyzer.models.Card;
 
 /**
  * DTO for {@link Card}
  */
-@Value
+@Getter
+@Setter
 public class CardDto {
-    Long id;
+    private Long id;
 
     @NotNull
-    String lastFourDigits;
+    private String lastFourDigits;
 
     @NotNull
-    String cardName;
+    private String cardName;
 
     @NotNull
-    BankAccountDto account;
+    private BankAccountDto account;
 
     @NotNull
-    BankDto issuerBank;
+    private BankDto issuerBank;
 }

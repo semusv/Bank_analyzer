@@ -2,7 +2,8 @@ package ru.vvsem.bank.analyzer.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
 import ru.vvsem.bank.analyzer.models.User;
 
 import java.util.List;
@@ -11,29 +12,30 @@ import java.util.Set;
 /**
  * DTO for {@link User}
  */
-@Value
+@Getter
+@Setter
 public class UserDto {
-    Long id;
+    private   Long id;
 
     @NotNull
-    String login;
+    private   String login;
 
     @NotNull
-    String name;
+    private   String name;
 
     @NotNull
-    String surname;
+    private   String surname;
 
-    String patronymic;
+    private   String patronymic;
 
     @NotNull
     @Email
-    String email;
+    private   String email;
 
-    List<BankAccountDto> bankAccounts;
+    private   List<BankAccountDto> bankAccounts;
 
-    Set<CategoryDto> categories;
+    private   Set<CategoryDto> categories;
 
-    Set<BudgetDto> budgets;
+    private   Set<BudgetDto> budgets;
 
 }

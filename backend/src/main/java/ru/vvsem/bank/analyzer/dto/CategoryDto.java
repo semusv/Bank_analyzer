@@ -1,17 +1,20 @@
 package ru.vvsem.bank.analyzer.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
+
 
 /**
  * DTO for {@link ru.vvsem.bank.analyzer.models.Category}
  */
-@Value
+@Getter
+@Setter
 public class CategoryDto {
-    Long id;
+    private  Long id;
 
     @NotNull
-    String name;
+    private  String name;
 
-    String color;
+    private  String color;
 }

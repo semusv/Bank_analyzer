@@ -8,14 +8,9 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    password: 123456*
-    username: admin
-    url: jdbc:postgresql://localhost/bank_analyze
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    url: ${SPRING_DATASOURCE_URL}
 
   liquibase:
     enabled: true

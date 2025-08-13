@@ -1,19 +1,23 @@
 package ru.vvsem.bank.analyzer.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Value;
-
+import lombok.Getter;
+import lombok.Setter;
 import java.math.BigDecimal;
 
 /**
  * DTO for {@link ru.vvsem.bank.analyzer.models.Budget}
  */
-@Value
+@Getter
+@Setter
 public class BudgetDto {
-    Long id;
+    private Long id;
+
     @NotNull
-    BigDecimal limitAmount;
+    private BigDecimal limitAmount;
+
     @NotNull
-    CategoryDto category;
-    Long userId;
+    private  CategoryDto category;
+
+    private Long userId;
 }

@@ -1,7 +1,8 @@
 package ru.vvsem.bank.analyzer.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
 
 import java.math.BigDecimal;
@@ -11,36 +12,37 @@ import java.util.List;
 /**
  * DTO for {@link ru.vvsem.bank.analyzer.models.Transaction}
  */
-@Value
+@Getter
+@Setter
 public class TransactionDto {
-    Long id;
+    private  Long id;
 
     @NotNull
-    String description;
+    private  String description;
 
     @NotNull
-    BigDecimal amount;
+    private  BigDecimal amount;
 
     @NotNull
-    LocalDateTime operationTime;
+    private  LocalDateTime operationTime;
 
-    boolean hide;
+    private  boolean hide;
 
-    boolean master;
-
-    @NotNull
-    CurrencyDto currency;
-
-    CategoryDto category;
-
-    CardDto card;
+    private   boolean master;
 
     @NotNull
-    OperationType operationType;
+    private  CurrencyDto currency;
 
-    Long userId;
+    private  CategoryDto category;
 
-    TransactionDto parentTransaction;
+    private  CardDto card;
 
-    List<TransactionDto> subTransactions;
+    @NotNull
+    private  OperationType operationType;
+
+    private  Long userId;
+
+    private  TransactionDto parentTransaction;
+
+    private  List<TransactionDto> subTransactions;
 }
