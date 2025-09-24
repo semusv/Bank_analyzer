@@ -1,0 +1,31 @@
+.card {
+    border-radius: .75rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, .06);
+}
+
+.card-header {
+    background: #f7f7f7;
+    border-bottom: none;
+    font-weight: 600;
+}
+
+.card-body h2,
+.card-body h5 {
+    color: #ffffff;
+}
+
+.card.bg-primary .card-body h5 {
+    color: #fff;
+}
+
+.card.bg-success .card-body h5 {
+    color: #fff;
+}
+
+.card.bg-danger .card-body h5 {
+    color: #fff;
+}
+
+.card.bg-warning .card-body h5 {
+    color: #ffffff;
+}

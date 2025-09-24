@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +37,10 @@ public class BankAccount extends AbstractBaseEntity {
             length = 34)
     private String accountNumber; // "40817810099910004321"
 
+    @NotNull
+    @Column(name = "balance", precision = 19, scale = 2, nullable = false)
+    private BigDecimal balance; // 100.00
+
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bank_id", nullable = false)
@@ -45,6 +50,7 @@ public class BankAccount extends AbstractBaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "currency_id", nullable = false)
     private Currency currency;
+
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)

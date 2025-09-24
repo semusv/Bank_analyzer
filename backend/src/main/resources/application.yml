@@ -1,6 +1,15 @@
 spring:
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
   application:
     name: bank-analyzer
+
+  thymeleaf:
+    cache: false
 
   output:
     ansi:

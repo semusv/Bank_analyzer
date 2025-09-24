@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.vvsem.bank.analyzer.models.BankAccount;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -37,4 +38,7 @@ public class BankAccountDto {
     private Long userId;
 
     private  List<CardDto> cards;
+
+    @NotNull
+    private BigDecimal balance;
 }

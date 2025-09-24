@@ -1,0 +1,27 @@
+/* Цветовые переменные (CSS‑custom‑properties) */
+:root {
+    --primary: #0d6efd;
+    --secondary: #6c757d;
+    --success: #28a745;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --info: #0dcaf0;
+    --light: #f8f9fa;
+    --dark: #212529;
+}
+
+/* Примеры использования переменных */
+.card.bg-primary {
+    background-color: var(--primary);
+}
+
+.card.bg-success {
+    background-color: var(--success);
+}
+
+/* Темная тема (если понадобится) */
+[data-theme="dark"] {
+    --primary: #0d6efd;
+    --background: #232323;
+    --text: #f8f9fa;
+}
