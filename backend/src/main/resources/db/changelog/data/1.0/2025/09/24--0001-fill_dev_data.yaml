@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025-09-24--0001-user-roles-data
+      author: vvsemenov
+      context: dev
+      runOnChange: true
+      changes:
+        - loadData:
+            file: csv/2025-09-24--0001-user-roles.csv
+            relativeToChangelogFile: true
+            separator: ";"
+            quotchar: '"'
+            encoding: UTF-8
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: role

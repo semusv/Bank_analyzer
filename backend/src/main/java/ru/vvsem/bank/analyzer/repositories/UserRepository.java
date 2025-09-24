@@ -7,6 +7,15 @@ import ru.vvsem.bank.analyzer.models.User;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+    boolean existsByLogin(String login);
+
+    boolean existsByEmail(String email);
+
+
+
     @EntityGraph("user-accounts-category-budget-graph")
-    Optional<User> findByLogin(String login);
+    Optional<User> findDataByLogin(String login);
+
+    @EntityGraph("user-roles-graph")
+    Optional<User> findByLogin(String Login);
 }

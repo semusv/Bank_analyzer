@@ -13,9 +13,9 @@ export async function fetchStats() {
 
 export async function fetchTransactionsRes() {
 
-    const response = await fetch('/api/dashboard/stats', {
+    const response = await fetch('/api/dashboard/recent-transactions?limit=8', {
         headers: {
-            'Accept': '/api/transactions?limit=5'
+            'Accept': 'application/json'
         }
     });
 

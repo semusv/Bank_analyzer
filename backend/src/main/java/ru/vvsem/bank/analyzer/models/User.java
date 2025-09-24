@@ -2,9 +2,14 @@ package ru.vvsem.bank.analyzer.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToMany;
@@ -16,8 +21,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import ru.vvsem.bank.analyzer.models.enums.Role;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +46,12 @@ import java.util.Set;
                 @NamedAttributeNode("categories"),
                 @NamedAttributeNode("budgets")
         })
-public class User extends AbstractBaseEntity {
+@NamedEntityGraph(
+        name = "user-roles-graph",
+        attributeNodes = {
+                @NamedAttributeNode("roles")
+        })
+public class User extends AbstractBaseEntity implements UserDetails {
 
     @NotNull
     @Column(name = "name", nullable = false)
@@ -66,6 +81,12 @@ public class User extends AbstractBaseEntity {
     @Column(name = "telegram_chat_id")
     private String telegramChatId;
 
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.LAZY)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", columnDefinition = "VARCHAR(20)")
+    private Set<Role> roles;
+
     /* ----------------- Навигации ----------------- */
     @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
@@ -86,4 +107,17 @@ public class User extends AbstractBaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
             orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Budget> budgets = new LinkedHashSet<>();
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles
+                .stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+                .toList();
+    }
+
+    @Override
+    public String getUsername() {
+        return login;
+    }
 }

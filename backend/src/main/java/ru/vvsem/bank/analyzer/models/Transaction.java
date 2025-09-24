@@ -55,7 +55,7 @@ public class Transaction extends AbstractBaseEntity {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "operation_type", nullable = false)
-    private OperationType operationType = OperationType.CARD;
+    private OperationType operationType ;
 
     /* FK‑связи */
     @ToString.Exclude

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class DashboardStats {
+public class DashboardStatsDto {
     private BigDecimal totalBalance;
     private BigDecimal monthlyIncome;
     private BigDecimal monthlyExpense;

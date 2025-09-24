@@ -4,10 +4,12 @@ import lombok.Getter;
 
 @Getter
 public enum OperationType {
-    CARD("Банковская карта"),
-    CASH("Наличные"),
+    DEPOSIT("Внесение средств на счет"),
+    EXPENSE("Трата средств"),
+    INCOME("Получение средств"),
+    OTHER("Прочее"),
     TRANSFER("Перевод между счетами"),
-    OTHER("Прочее");
+    WITHDRAWAL("Cнятие наличных");
 
     private final String description;
 

@@ -13,9 +13,13 @@ databaseChangeLog:
 
   - includeAll:
       path: db/changelog/structure/1.0/2025/07
-
+  - includeAll:
+      path: db/changelog/structure/1.0/2025/09
 
   # Данные для инициализации
   - include:
       file: db/changelog/data/1.0/2025/08/13--0001-fill_dev_data.yaml
+      context: dev
+  - include:
+      file: db/changelog/data/1.0/2025/09/24--0001-fill_dev_data.yaml
       context: dev

@@ -26,23 +26,23 @@ public class TransactionDto {
     @NotNull
     private  LocalDateTime operationTime;
 
-    private  boolean hide;
-
-    private   boolean master;
+//    private  boolean hide;
+//
+//    private   boolean master;
 
     @NotNull
     private  CurrencyDto currency;
 
     private  CategoryDto category;
 
-    private  CardDto card;
-
-    @NotNull
-    private  OperationType operationType;
-
+//    private  CardDto card;
+//
+//    @NotNull
+//    private  OperationType operationType;
+//
     private  Long userId;
-
-    private  TransactionDto parentTransaction;
-
-    private  List<TransactionDto> subTransactions;
+//
+//    private  TransactionDto parentTransaction;
+//
+//    private  List<TransactionDto> subTransactions;
 }
