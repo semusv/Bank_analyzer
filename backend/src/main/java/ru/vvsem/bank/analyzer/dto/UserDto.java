@@ -36,6 +36,4 @@ public class UserDto {
 
     private   Set<CategoryDto> categories;
 
-    private   Set<BudgetDto> budgets;
-
 }

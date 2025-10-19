@@ -23,10 +23,6 @@ public interface UserMapper {
         user.getCategories().forEach(category -> category.setUser(user));
     }
 
-    @AfterMapping
-    default void linkBudgets(@MappingTarget User user) {
-        user.getBudgets().forEach(budget -> budget.setUser(user));
-    }
 
     UserDto toUserDto(User user);
 }

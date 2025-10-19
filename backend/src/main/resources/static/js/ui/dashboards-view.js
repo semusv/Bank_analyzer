@@ -23,7 +23,6 @@ function renderStats(stats) {
     document.getElementById('totalBalance').textContent = stats.totalBalance + ' ₽';
     document.getElementById('monthlyIncome').textContent = stats.monthlyIncome + ' ₽';
     document.getElementById('monthlyExpense').textContent = stats.monthlyExpense + ' ₽';
-    document.getElementById('activeBudgets').textContent = stats.activeBudgets;
 }
 
 

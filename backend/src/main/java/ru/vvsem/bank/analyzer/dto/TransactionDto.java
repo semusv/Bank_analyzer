@@ -3,11 +3,9 @@ package ru.vvsem.bank.analyzer.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import ru.vvsem.bank.analyzer.models.enums.OperationType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * DTO for {@link ru.vvsem.bank.analyzer.models.Transaction}

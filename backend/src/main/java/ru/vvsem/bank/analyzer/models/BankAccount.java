@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +29,11 @@ import java.util.List;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@NamedEntityGraph(
+        name = "accounts-cards-graph",
+        attributeNodes = {
+                @NamedAttributeNode("cards"),
+        })
 public class BankAccount extends AbstractBaseEntity {
     @NotNull
     @Column(name = "name", nullable = false)

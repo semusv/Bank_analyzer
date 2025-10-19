@@ -1,4 +1,7 @@
 spring:
+  profiles:
+    active: no-security
+
   devtools:
     restart:
       enabled: true

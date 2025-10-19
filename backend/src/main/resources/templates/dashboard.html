@@ -14,7 +14,7 @@
             <nav class="sidebar collapse" th:replace="~{layout :: sidebar}">
             </nav>
 
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-3 main-content">
                 <!-- Заголовок и быстрые действия -->
                 <div
                     class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -28,7 +28,7 @@
 
                 <!-- Статистика -->
                 <div class="row">
-                    <div class="col-md-3 mb-4">
+                    <div class="col-md-4 mb-3">
                         <div class="card text-white bg-primary">
                             <div class="card-body">
                                 <h5 class="card-title">Общий баланс</h5>
@@ -36,7 +36,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3 mb-4">
+                    <div class="col-md-4 mb-3">
                         <div class="card text-white bg-success">
                             <div class="card-body">
                                 <h5 class="card-title">Доходы (мес)</h5>
@@ -44,19 +44,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3 mb-4">
+                    <div class="col-md-4 mb-3">
                         <div class="card text-white bg-danger">
                             <div class="card-body">
                                 <h5 class="card-title">Расходы (мес)</h5>
                                 <h2 id="monthlyExpense">0 ₽</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 mb-4">
-                        <div class="card text-white bg-warning">
-                            <div class="card-body">
-                                <h5 class="card-title">Бюджеты</h5>
-                                <h2 id="activeBudgets">0</h2>
                             </div>
                         </div>
                     </div>

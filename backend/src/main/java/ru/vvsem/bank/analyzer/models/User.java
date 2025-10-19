@@ -40,11 +40,10 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @NamedEntityGraph(
-        name = "user-accounts-category-budget-graph",
+        name = "user-accounts-category-graph",
         attributeNodes = {
                 @NamedAttributeNode("bankAccounts"),
                 @NamedAttributeNode("categories"),
-                @NamedAttributeNode("budgets")
         })
 @NamedEntityGraph(
         name = "user-roles-graph",
@@ -102,11 +101,6 @@ public class User extends AbstractBaseEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
             orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Category> categories = new LinkedHashSet<>();
-
-    @ToString.Exclude
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
-            orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<Budget> budgets = new LinkedHashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

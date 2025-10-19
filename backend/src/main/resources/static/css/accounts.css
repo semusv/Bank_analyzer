@@ -1,0 +1,28 @@
+/* cards.css */
+.account-card {
+    transition: transform 0.2s;
+    border: 1px solid #e0e0e0;
+}
+
+.account-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.balance-positive {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.balance-negative {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+
+/* Адаптивность для карточек */
+@media (max-width: 768px) {
+    .account-card .card-body {
+        padding: 1rem;
+    }
+}

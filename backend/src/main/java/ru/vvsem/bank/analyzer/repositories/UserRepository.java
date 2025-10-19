@@ -17,5 +17,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findDataByLogin(String login);
 
     @EntityGraph("user-roles-graph")
-    Optional<User> findByLogin(String Login);
+    Optional<User> findByLogin(String logn);
 }
