@@ -23,6 +23,6 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, Long> 
     @Query("SELECT SUM(b.balance) FROM BankAccount b WHERE b.user.id = :userId")
     BigDecimal calculateTotalBalanceByUserId(@Param("userId") Long userId);
 
-    @EntityGraph(attributePaths = {"cards", "user", "currency"})
+    @EntityGraph(attributePaths = {"cards", "user", "currency", "bank"})
     List<BankAccount> findWithCardsAndUserAndCurrencyByUserId(Long userId);
 }

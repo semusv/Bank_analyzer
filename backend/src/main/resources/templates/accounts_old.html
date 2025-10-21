@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+
+<head th:replace="~{layout :: head}">
+    <title>Счета и карты - Bank Analyzer</title>
+    <style>
+        .bank-group {
+            margin-bottom: 2rem;
+        }
+        .bank-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px 10px 0 0;
+            margin-bottom: 0;
+        }
+        .account-card {
+            border: none;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .card-header:hover {
+            background-color: #e9ecef;
+        }
+        .card-body {
+            padding: 1.25rem;
+        }
+        .balance-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .card-item {
+            border-left: 3px solid #007bff;
+            padding-left: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .card-item:last-child {
+            margin-bottom: 0;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+        }
+        .bank-logo {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+
+<body>
+<nav th:replace="~{layout :: topnav}"></nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Меню слева -->
+        <nav class="sidebar collapse" th:replace="~{layout :: sidebar}">
+        </nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-3 main-content">
+            <!-- Заголовок и кнопка добавления -->
+            <div
+                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">
+                    <i class="fas fa-credit-card"></i> Счета и карты
+                </h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <button class="btn btn-sm btn-primary" onclick="openAddAccountModal()">
+                        <i class="fas fa-plus"></i> Добавить счет
+                    </button>
+                </div>
+            </div>
+
+            <!-- Сообщения -->
+            <div id="alertContainer"></div>
+
+            <!-- Контейнер для банков и счетов -->
+            <div id="accountsContainer">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Загрузка счетов и карт...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Модальное окно добавления счета -->
+<div class="modal fade" id="addAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавить новый счет</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addAccountForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="accountName" class="form-label">Название счета *</label>
+                        <input type="text" class="form-control" id="accountName" required
+                               placeholder="Например: Основной счет RUB">
+                    </div>
+                    <div class="mb-3">
+                        <label for="accountNumber" class="form-label">Номер счета *</label>
+                        <input type="text" class="form-control" id="accountNumber" required
+                               placeholder="40817810000000000001">
+                    </div>
+                    <div class="mb-3">
+                        <label for="bankName" class="form-label">Банк *</label>
+                        <select class="form-select" id="bankName" required>
+                            <option value="">Выберите банк</option>
+                            <option value="Сбербанк">Сбербанк</option>
+                            <option value="Тинькофф">Тинькофф</option>
+                            <option value="ВТБ">ВТБ</option>
+                            <option value="Альфа-Банк">Альфа-Банк</option>
+                            <option value="Газпромбанк">Газпромбанк</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="initialBalance" class="form-label">Начальный баланс</label>
+                        <input type="number" step="0.01" class="form-control" id="initialBalance"
+                               value="0.00" placeholder="0.00">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Добавить счет</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно добавления карты -->
+<div class="modal fade" id="addCardModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавить карту к счету</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addCardForm">
+                <input type="hidden" id="cardAccountId">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="cardName" class="form-label">Название карты *</label>
+                        <input type="text" class="form-control" id="cardName" required
+                               placeholder="Например: Tinkoff Black">
+                    </div>
+                    <div class="mb-3">
+                        <label for="lastFourDigits" class="form-label">Последние 4 цифры *</label>
+                        <input type="text" class="form-control" id="lastFourDigits" required
+                               maxlength="4" pattern="[0-9]{4}" placeholder="1234">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Добавить карту</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="notification-container" id="notification-container"></div>
+
+<script type="module" src="../static/js/ui/accounts-view.js" th:src="@{/js/ui/accounts-view.js}"></script>
+</body>
+
+</html>

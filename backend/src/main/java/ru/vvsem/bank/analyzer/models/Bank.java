@@ -13,7 +13,6 @@ import lombok.Setter;
 import lombok.ToString;
 import java.util.List;
 
-@Builder
 @Entity
 @Table(name = "banks")
 @Getter

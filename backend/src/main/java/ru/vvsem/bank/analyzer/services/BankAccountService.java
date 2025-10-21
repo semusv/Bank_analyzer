@@ -2,7 +2,6 @@ package ru.vvsem.bank.analyzer.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.BankAccountDto;
@@ -10,12 +9,11 @@ import ru.vvsem.bank.analyzer.dto.UserDto;
 import ru.vvsem.bank.analyzer.mappers.BankAccountMapper;
 import ru.vvsem.bank.analyzer.mappers.UserMapper;
 import ru.vvsem.bank.analyzer.models.BankAccount;
-import ru.vvsem.bank.analyzer.models.Card;
+import ru.vvsem.bank.analyzer.models.BankAccountSimpleDto;
 import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
 import ru.vvsem.bank.analyzer.repositories.CardRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -51,11 +49,11 @@ public class BankAccountService {
     }
 
     @Transactional
-    public List<BankAccountDto> getUserAccountsWithCards(Long userId) {
+    public List<BankAccountSimpleDto> getUserAccountsWithCards(Long userId) {
         log.info("Getting accounts with cards for user: {}", userId);
         List<BankAccount> accounts = bankAccountRepository.findWithCardsAndUserAndCurrencyByUserId(userId);
         return accounts.stream()
-                .map(bankAccountMapper::toBankAccountDto).toList();
+                .map(bankAccountMapper::toBankAccountSimpleDto).toList();
 
     }
 

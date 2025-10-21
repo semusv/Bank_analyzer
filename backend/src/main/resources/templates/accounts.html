@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ru">
 
 <head th:replace="~{layout :: head}">
+
     <title>Счета и карты - Bank Analyzer</title>
 </head>
 
@@ -58,18 +59,29 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="accountName" class="form-label">Название счета *</label>
-                            <input type="text" class="form-control" id="accountName" required
+                            <input type="text" class="form-control" id="accountName" name="accountName" required
                                 placeholder="Например: Основной счет RUB">
                         </div>
                         <div class="mb-3">
                             <label for="accountNumber" class="form-label">Номер счета *</label>
-                            <input type="text" class="form-control" id="accountNumber" required
+                            <input type="text" class="form-control" id="accountNumber" name="accountNumber" required
                                 placeholder="40817810099910004321">
+                        </div>
+                        <div class="mb-3" id="">
+                            <label for="bank-list" class="form-label">Банк *</label>
+                            <select class="form-select" id="bank-list" required>
+                                <option value="">Выберите банк</option>
+                                <option value="Сбербанк">Сбербанк</option>
+                                <option value="Тинькофф">Тинькофф</option>
+                                <option value="ВТБ">ВТБ</option>
+                                <option value="Альфа-Банк">Альфа-Банк</option>
+                                <option value="Газпромбанк">Газпромбанк</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="initialBalance" class="form-label">Начальный баланс</label>
-                            <input type="number" step="0.01" class="form-control" id="initialBalance" value="0.00"
-                                placeholder="0.00">
+                            <input type="number" step="0.01" class="form-control" id="initialBalance"
+                                name="initialBalance" value="0.00" placeholder="0.00">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -90,17 +102,17 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form id="addCardForm">
-                    <input type="hidden" id="cardAccountId">
+                    <input type="hidden" id="cardAccountId" name="cardAccountId">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="cardName" class="form-label">Название карты *</label>
-                            <input type="text" class="form-control" id="cardName" required
+                            <input type="text" class="form-control" id="cardName" name="cardName" required
                                 placeholder="Например: Tinkoff Black">
                         </div>
                         <div class="mb-3">
                             <label for="lastFourDigits" class="form-label">Последние 4 цифры *</label>
-                            <input type="text" class="form-control" id="lastFourDigits" required maxlength="4"
-                                pattern="[0-9]{4}" placeholder="1234">
+                            <input type="text" class="form-control" id="lastFourDigits" name="lastFourDigits" required
+                                maxlength="4" pattern="[0-9]{4}" placeholder="1234">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -113,6 +125,10 @@
     </div>
 
     <div class="notification-container" id="notification-container"></div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script type="module" src="../static/js/ui/accounts-view.js" th:src="@{/js/ui/accounts-view.js}"></script>
 </body>

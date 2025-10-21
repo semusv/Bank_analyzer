@@ -9,8 +9,9 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 import ru.vvsem.bank.analyzer.dto.BankAccountDto;
 import ru.vvsem.bank.analyzer.models.BankAccount;
+import ru.vvsem.bank.analyzer.models.BankAccountSimpleDto;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {CardMapper.class})
 public interface BankAccountMapper {
     @Mapping(source = "userId", target = "user.id")
     @Mapping(source = "currencyCode", target = "currency.code")
@@ -23,4 +24,13 @@ public interface BankAccountMapper {
 
     @InheritInverseConfiguration(name = "toEntity")
     BankAccountDto toBankAccountDto(BankAccount bankAccount);
+
+    @Mapping(source = "currencySymbol", target = "currency.symbol")
+    @Mapping(source = "currencyCode", target = "currency.code")
+    @Mapping(source = "bankName", target = "bank.name")
+    @Mapping(source = "bankId", target = "bank.id")
+    BankAccount toEntity(BankAccountSimpleDto bankAccountSimpleDto);
+
+    @InheritInverseConfiguration(name = "toEntity")
+    BankAccountSimpleDto toBankAccountSimpleDto(BankAccount bankAccount);
 }

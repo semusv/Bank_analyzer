@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: no-security
+    active: security
 
   devtools:
     restart:

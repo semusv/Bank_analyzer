@@ -1,0 +1,255 @@
+import { fetchAccounts, createAccount, createCard } from "../modules/api/accounts-api.js";
+import { fetchBanks } from "../modules/api/banks-api.js";
+import { showErrorMessage, showSuccessMessage } from "../modules/utils.js";
+
+
+document.addEventListener('DOMContentLoaded', init);
+let banksCache = null;
+
+
+async function init() {
+    try {
+        await loadBanks();
+        await loadAccounts();
+        setupEventListeners();
+    } catch (error) {
+        console.error('Failed to initialize accounts page:', error);
+        showErrorMessage('Ошибка загрузки страницы: ' + error.message);
+    }
+}
+
+async function loadBanks() {
+    if (banksCache) {
+        return banksCache;
+    }
+
+    try {
+        banksCache = await fetchBanks();
+        renderBankList(banksCache);
+        return banksCache;
+    } catch (error) {
+        console.error('Failed to load banks:', error);
+        showErrorMessage('Ошибка загрузки списка банков');
+        return [];
+    }
+}
+
+async function loadAccounts() {
+    try {
+        const accounts = await fetchAccounts();
+        renderAccounts(accounts);
+    } catch (error) {
+        console.error('Failed to load accounts:', error);
+        showErrorMessage('Ошибка загрузки счетов: ' + error.message);
+        renderEmptyState();
+    }
+}
+
+function renderBankList(banks) {
+    const bankList = document.getElementById('bank-list');
+    bankList.innerHTML = '';
+
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = "";
+    placeholderOption.textContent = "Выберите банк";
+    placeholderOption.disabled = true;
+    placeholderOption.selected = true;
+    bankList.appendChild(placeholderOption);
+
+    banks.forEach(banks => {
+        const option = document.createElement('option');
+        option.value = banks.id;
+        option.textContent = banks.name;
+        bankList.appendChild(option);
+    });
+}
+
+
+function renderAccounts(accounts) {
+    const container = document.getElementById('accountsContainer');
+
+    if (accounts.length === 0) {
+        renderEmptyState();
+        return;
+    }
+
+    container.innerHTML = accounts.map(account => `
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card account-card h-100" data-bank="${account.bankName}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-university"></i> ${account.bankName}
+                    </h6>
+                    <span class="badge bg-primary">${account.currencyCode}</span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">${account.name}</h5>
+                    <p class="card-text text-muted small">
+                        <i class="fas fa-hashtag"></i> ${account.accountNumber}
+                    </p>
+                    <div class="balance-section">
+                        <div class="balance-amount">
+                            ${account.balance.toLocaleString('ru-RU')} ${account.currencySymbol}
+                        </div>
+                    </div>
+                    
+                    ${account.cards.length > 0 ? `
+                        <div class="cards-section mt-3">
+                            <h6 class="cards-title">
+                                <i class="fas fa-credit-card"></i> Карты (${account.cards.length})
+                            </h6>
+                            <div class="cards-list">
+                                ${account.cards.map(card => `
+                                    <div class="card-item">
+                                        <div class="card-info">
+                                            <span class="card-name">${card.cardName}</span>
+                                            <span class="card-number">**** ${card.lastFourDigits}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="no-cards mt-3">
+                            <button class="btn btn-sm btn-outline-primary" onclick="openAddCardModal(${account.id})">
+                                <i class="fas fa-plus"></i> Добавить карту
+                            </button>
+                        </div>
+                    `}
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group w-100" role="group">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="viewAccountDetails(${account.id})">
+                            <i class="fas fa-eye"></i> Подробнее
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary" onclick="openAddCardModal(${account.id})">
+                            <i class="fas fa-plus"></i> Карта
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderEmptyState() {
+    const container = document.getElementById('accountsContainer');
+    container.innerHTML = `
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">Нет счетов</h4>
+                <p class="text-muted">Добавьте свой первый счет для начала работы</p>
+                <button class="btn btn-primary" onclick="openAddAccountModal()">
+                    <i class="fas fa-plus"></i> Добавить счет
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function setupEventListeners() {
+    // Обработчик формы добавления счета
+    const addAccountForm = document.getElementById('addAccountForm');
+    if (addAccountForm) {
+        addAccountForm.addEventListener('submit', handleAddAccount);
+    }
+
+    // Обработчик формы добавления карты
+    const addCardForm = document.getElementById('addCardForm');
+    if (addCardForm) {
+        addCardForm.addEventListener('submit', handleAddCard);
+    }
+}
+
+async function handleAddAccount(event) {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+    const accountData = {
+        name: formData.get('accountName') || document.getElementById('accountName').value,
+        accountNumber: formData.get('accountNumber') || document.getElementById('accountNumber').value,
+        initialBalance: parseFloat(formData.get('initialBalance') || document.getElementById('initialBalance').value) || 0
+    };
+
+    try {
+        await createAccount(accountData);
+        showSuccessMessage('Счет успешно добавлен!');
+
+        // Закрыть модальное окно
+        if (typeof bootstrap !== 'undefined') {
+            const modalElement = document.getElementById('addAccountModal');
+            const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+            modal.hide();
+        }
+
+        // Очистить форму
+        event.target.reset();
+
+        // Перезагрузить список счетов
+        await loadAccounts();
+    } catch (error) {
+        console.error('Failed to create account:', error);
+        showErrorMessage('Ошибка создания счета: ' + error.message);
+    }
+}
+
+async function handleAddCard(event) {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+    const cardData = {
+        accountId: parseInt(document.getElementById('cardAccountId').value),
+        cardName: formData.get('cardName') || document.getElementById('cardName').value,
+        lastFourDigits: formData.get('lastFourDigits') || document.getElementById('lastFourDigits').value
+    };
+
+    try {
+        await createCard(cardData);
+        showSuccessMessage('Карта успешно добавлена!');
+
+        // Закрыть модальное окно
+        if (typeof bootstrap !== 'undefined') {
+            const modalElement = document.getElementById('addCardModal');
+            const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+            modal.hide();
+        }
+
+        // Очистить форму
+        event.target.reset();
+
+        // Перезагрузить список счетов
+        await loadAccounts();
+    } catch (error) {
+        console.error('Failed to create card:', error);
+        showErrorMessage('Ошибка создания карты: ' + error.message);
+    }
+}
+
+// Глобальные функции для вызова из HTML
+window.openAddAccountModal = function () {
+    if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap is not loaded');
+        showErrorMessage('Bootstrap не загружен. Проверьте подключение скриптов.');
+        return;
+    }
+    const modal = new bootstrap.Modal(document.getElementById('addAccountModal'));
+    modal.show();
+};
+
+window.openAddCardModal = function (accountId) {
+    if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap is not loaded');
+        showErrorMessage('Bootstrap не загружен. Проверьте подключение скриптов.');
+        return;
+    }
+    document.getElementById('cardAccountId').value = accountId;
+    const modal = new bootstrap.Modal(document.getElementById('addCardModal'));
+    modal.show();
+};
+
+window.viewAccountDetails = function (accountId) {
+    // TODO: Реализовать просмотр деталей счета
+    console.log('View account details:', accountId);
+    showSuccessMessage('Функция просмотра деталей счета будет реализована позже');
+};

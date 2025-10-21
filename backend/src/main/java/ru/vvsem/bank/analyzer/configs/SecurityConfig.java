@@ -29,7 +29,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
 
     @Bean
-    @Profile("!no-security")
+    @Profile("security")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(this::configureCsrf)
@@ -38,24 +38,22 @@ public class SecurityConfig {
                 .logout(this::configureLogout)
                 .sessionManagement(this::configureSessionManagement)
                 .userDetailsService(userDetailsService);
-
         return http.build();
     }
 
-
     @Bean
+    @Profile("!security")
     public SecurityFilterChain securityDisabled(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(this::configureAuthorization)
                 .httpBasic(Customizer.withDefaults()) // Включаем BASIC аутентификацию
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Делаем stateless
+//                .sessionManagement(session ->
+//                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Делаем stateless
+                .sessionManagement(this::configureSessionManagement);
 
         return http.build();
     }
-
-
-
 
     private void configureCsrf(AbstractHttpConfigurer<CsrfConfigurer<HttpSecurity>, HttpSecurity> csrf) {
         csrf.disable(); // Для простоты отключаем CSRF

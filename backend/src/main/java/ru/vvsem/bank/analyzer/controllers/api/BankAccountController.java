@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.vvsem.bank.analyzer.dto.BankAccountDto;
 import ru.vvsem.bank.analyzer.models.BankAccount;
+import ru.vvsem.bank.analyzer.models.BankAccountSimpleDto;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.services.BankAccountService;
 
@@ -22,10 +23,10 @@ public class BankAccountController {
     private final BankAccountService bankAccountService;
 
     @GetMapping
-    public ResponseEntity<List<BankAccountDto>> getUserAccounts(@AuthenticationPrincipal User user) {
+    public ResponseEntity<List<BankAccountSimpleDto>> getUserAccounts(@AuthenticationPrincipal User user) {
         try {
             log.info("GET /api/accounts for user: {}", user.getUsername());
-            List<BankAccountDto> accounts = bankAccountService.getUserAccountsWithCards(user.getId());
+            List<BankAccountSimpleDto> accounts = bankAccountService.getUserAccountsWithCards(user.getId());
             return ResponseEntity.ok(accounts);
         } catch (Exception e) {
             log.error("Error getting accounts for user: {}", user.getUsername(), e);

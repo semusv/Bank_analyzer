@@ -1,0 +1,35 @@
+package ru.vvsem.bank.analyzer.controllers.api;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.vvsem.bank.analyzer.dto.BankDto;
+import ru.vvsem.bank.analyzer.models.User;
+import ru.vvsem.bank.analyzer.services.BanksService;
+
+import java.util.List;
+
+@Slf4j
+@RestController
+@RequestMapping("/api/banks")
+@RequiredArgsConstructor
+public class BanksController {
+
+    private final BanksService banksService;
+
+    @GetMapping
+    public ResponseEntity<List<BankDto>> getUserAccounts(@AuthenticationPrincipal User user) {
+        try {
+            log.info("GET /api/banks");
+            List<BankDto> banks = banksService.getBanks();
+            return ResponseEntity.ok(banks);
+        } catch (Exception e) {
+            log.error("Error getting banks");
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+}
