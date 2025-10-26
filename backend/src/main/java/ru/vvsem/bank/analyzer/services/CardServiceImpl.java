@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.vvsem.bank.analyzer.dto.account.BankAccountSimpleDto;
 import ru.vvsem.bank.analyzer.dto.card.CardDto;
 import ru.vvsem.bank.analyzer.dto.card.NewCardDto;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;

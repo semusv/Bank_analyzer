@@ -2,20 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ru">
 
 <head th:replace="~{layout :: head}">
-
     <title>Счета и карты - Bank Analyzer</title>
 </head>
 
 <body>
-    <nav th:replace="~{layout :: topnav}"></nav>
+    <div th:replace="~{layout :: topnav}"></div>
 
     <div class="container-fluid">
         <div class="row">
-            <!-- Меню слева -->
-            <nav class="sidebar collapse" th:replace="~{layout :: sidebar}">
-            </nav>
+            <div th:replace="~{layout :: sidebar}"></div>
 
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-3 main-content">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
                 <!-- Заголовок и кнопка добавления -->
                 <div
                     class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -36,9 +33,9 @@
                 <div class="row" id="accountsContainer">
                     <div class="col-12">
                         <div class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Загрузка...</span>
-                            </div>
+                            <output class="spinner-border text-primary" aria-label="Загрузка данных">
+                                <span class="visually-hidden">Загрузка данных...</span>
+                            </output>
                             <p class="mt-2 text-muted">Загрузка счетов...</p>
                         </div>
                     </div>
@@ -69,13 +66,13 @@
                         </div>
                         <div class="mb-3">
                             <label for="bank-list" class="form-label">Банк *</label>
-                            <select class="form-select" id="bank-list" name = "bankId" required>
+                            <select class="form-select" id="bank-list" name="bankId" required>
                                 <option value="">Выберите банк</option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="currency-list" class="form-label">Валюта *</label>
-                            <select class="form-select" id="currency-list" name = "currencyId" required>
+                            <select class="form-select" id="currency-list" name="currencyId" required>
                                 <option value="">Выберите валюту счета</option>
                             </select>
                         </div>
@@ -128,11 +125,9 @@
 
     <div class="notification-container" id="notification-container"></div>
 
-    <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <div th:replace="~{layout :: scripts}"></div>
 
-    <script type="module" src="../static/js/ui/accounts-view.js" th:src="@{/js/ui/accounts-view.js}"></script>
+    <script type="module" th:src="@{/js/ui/accounts-view.js}"></script>
 </body>
 
 </html>

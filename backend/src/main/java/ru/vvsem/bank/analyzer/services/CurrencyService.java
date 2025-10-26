@@ -4,5 +4,5 @@ import ru.vvsem.bank.analyzer.dto.CurrencyDto;
 import java.util.List;
 
 public interface CurrencyService {
-    public List<CurrencyDto> getAllCurrencies();
+    List<CurrencyDto> getAllCurrencies();
 }

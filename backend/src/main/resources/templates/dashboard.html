@@ -6,15 +6,13 @@
 </head>
 
 <body>
-    <nav th:replace="~{layout :: topnav}"></nav>
+    <div th:replace="~{layout :: topnav}"></div>
 
     <div class="container-fluid">
         <div class="row">
-            <!-- Меню слева -->
-            <nav class="sidebar collapse" th:replace="~{layout :: sidebar}">
-            </nav>
+            <div th:replace="~{layout :: sidebar}"></div>
 
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-3 main-content">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
                 <!-- Заголовок и быстрые действия -->
                 <div
                     class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -95,10 +93,11 @@
         </div>
     </div>
 
-
     <div class="notification-container" id="notification-container"></div>
 
-    <script type="module" src="../static/js/ui/dashboards-view.js" th:src="@{/js/ui/dashboards-view.js}"></script>
+    <div th:replace="~{layout :: scripts}"></div>
+
+    <script type="module" th:src="@{/js/ui/dashboards-view.js}"></script>
 </body>
 
 </html>
