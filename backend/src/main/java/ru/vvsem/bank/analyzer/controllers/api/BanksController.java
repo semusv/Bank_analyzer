@@ -15,7 +15,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/banks")
+@RequestMapping("/api/bank")
 @RequiredArgsConstructor
 public class BanksController {
 
@@ -24,7 +24,7 @@ public class BanksController {
     @GetMapping
     public ResponseEntity<List<BankDto>> getUserAccounts(@AuthenticationPrincipal User user) {
         try {
-            log.info("GET /api/banks");
+            log.info("GET /api/bank");
             List<BankDto> banks = banksService.getBanks();
             return ResponseEntity.ok(banks);
         } catch (Exception e) {

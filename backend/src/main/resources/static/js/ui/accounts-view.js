@@ -1,20 +1,38 @@
 import { fetchAccounts, createAccount, createCard } from "../modules/api/accounts-api.js";
 import { fetchBanks } from "../modules/api/banks-api.js";
 import { showErrorMessage, showSuccessMessage } from "../modules/utils.js";
+import { fetchCurrencies } from "../modules/api/currency-api.js";
 
 
 document.addEventListener('DOMContentLoaded', init);
 let banksCache = null;
+let currenciesCache = null;
 
 
 async function init() {
     try {
         await loadBanks();
         await loadAccounts();
+        await loadCurrencies();
         setupEventListeners();
     } catch (error) {
         console.error('Failed to initialize accounts page:', error);
         showErrorMessage('Ошибка загрузки страницы: ' + error.message);
+    }
+}
+
+async function loadCurrencies() {
+    if (currenciesCache) {
+        return currenciesCache;
+    }
+
+    try {
+        currenciesCache = await fetchCurrencies();
+        renderCurrencies(currenciesCache);
+        return currenciesCache;
+    } catch (error) {
+        console.error('Failed to load currencies:', error);
+        showErrorMessage('Ошибка загрузки валют: ' + error.message);
     }
 }
 
@@ -44,6 +62,28 @@ async function loadAccounts() {
         renderEmptyState();
     }
 }
+
+function renderCurrencies(currencies) {
+
+    const currencySelect = document.getElementById('currency-list');
+    currencySelect.innerHTML = '';
+
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = "";
+    placeholderOption.textContent = "Выберите валюту";
+    placeholderOption.disabled = true;
+    placeholderOption.selected = true;
+    currencySelect.appendChild(placeholderOption);
+
+
+    currencies.forEach(currency => {
+        const option = document.createElement('option');
+        option.value = currency.id;
+        option.textContent = `${currency.code} (${currency.name})`;
+        currencySelect.appendChild(option);
+    });
+}
+
 
 function renderBankList(banks) {
     const bankList = document.getElementById('bank-list');
@@ -164,12 +204,20 @@ function setupEventListeners() {
 
 async function handleAddAccount(event) {
     event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
 
-    const formData = new FormData(event.target);
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
     const accountData = {
         name: formData.get('accountName') || document.getElementById('accountName').value,
         accountNumber: formData.get('accountNumber') || document.getElementById('accountNumber').value,
-        initialBalance: parseFloat(formData.get('initialBalance') || document.getElementById('initialBalance').value) || 0
+        initialBalance: parseFloat(formData.get('initialBalance') || document.getElementById('initialBalance').value) || 0,
+        bankId: formData.get('bankId'),
+        currencyId: formData.get('currencyId'),
     };
 
     try {
@@ -196,8 +244,14 @@ async function handleAddAccount(event) {
 
 async function handleAddCard(event) {
     event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
 
-    const formData = new FormData(event.target);
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
     const cardData = {
         accountId: parseInt(document.getElementById('cardAccountId').value),
         cardName: formData.get('cardName') || document.getElementById('cardName').value,

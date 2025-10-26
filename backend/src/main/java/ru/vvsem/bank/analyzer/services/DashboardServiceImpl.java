@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DashboardService {
+public class DashboardServiceImpl implements DashboardService {
 
     private final TransactionRepository transactionRepository;
 
@@ -26,6 +26,7 @@ public class DashboardService {
     private final TransactionMapper transactionMapper;
 
     @Transactional(readOnly = true)
+    @Override
     public DashboardStatsDto getDashboardStats(Long userId) {
         log.info("Getting dashboard stats for user: {}", userId);
         LocalDateTime startOfMonth = getStartOfMonth();
@@ -68,6 +69,7 @@ public class DashboardService {
     }
 
     @Transactional(readOnly = true)
+    @Override
     public List<TransactionDto> getRecentTransactions(Long userId, int limit) {
         log.info("Getting recent {} transactions for user: {}", limit, userId);
 

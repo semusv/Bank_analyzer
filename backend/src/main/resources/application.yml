@@ -2,6 +2,13 @@ spring:
   profiles:
     active: security
 
+  messages:
+    baseName: messages
+    encoding: UTF-8
+    # Не дает свалиться в системную локаль если не найден файл для переданной в MessageSource
+    # Если false то будут браться сообщения из дефолтного файла, если true, то из файла соответствующего системной локали
+    fallbackToSystemLocale: false
+
   devtools:
     restart:
       enabled: true
@@ -36,3 +43,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+#Шаблон вывода ошибок
+app:
+  templates:
+    error: "static/error-template.txt"

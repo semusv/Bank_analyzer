@@ -3,6 +3,7 @@ package ru.vvsem.bank.analyzer.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import ru.vvsem.bank.analyzer.dto.Accounts.BankAccountDto;
 import ru.vvsem.bank.analyzer.models.Card;
 
 /**

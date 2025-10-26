@@ -1,7 +1,9 @@
-package ru.vvsem.bank.analyzer.models;
+package ru.vvsem.bank.analyzer.dto.Accounts;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Value;
+import ru.vvsem.bank.analyzer.models.BankAccount;
+import ru.vvsem.bank.analyzer.models.Card;
 
 import java.math.BigDecimal;
 import java.util.List;

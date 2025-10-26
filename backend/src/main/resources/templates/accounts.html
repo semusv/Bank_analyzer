@@ -67,17 +67,19 @@
                             <input type="text" class="form-control" id="accountNumber" name="accountNumber" required
                                 placeholder="40817810099910004321">
                         </div>
-                        <div class="mb-3" id="">
+                        <div class="mb-3">
                             <label for="bank-list" class="form-label">Банк *</label>
-                            <select class="form-select" id="bank-list" required>
+                            <select class="form-select" id="bank-list" name = "bankId" required>
                                 <option value="">Выберите банк</option>
-                                <option value="Сбербанк">Сбербанк</option>
-                                <option value="Тинькофф">Тинькофф</option>
-                                <option value="ВТБ">ВТБ</option>
-                                <option value="Альфа-Банк">Альфа-Банк</option>
-                                <option value="Газпромбанк">Газпромбанк</option>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label for="currency-list" class="form-label">Валюта *</label>
+                            <select class="form-select" id="currency-list" name = "currencyId" required>
+                                <option value="">Выберите валюту счета</option>
+                            </select>
+                        </div>
+
                         <div class="mb-3">
                             <label for="initialBalance" class="form-label">Начальный баланс</label>
                             <input type="number" step="0.01" class="form-control" id="initialBalance"

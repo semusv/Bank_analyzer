@@ -48,9 +48,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(this::configureAuthorization)
                 .httpBasic(Customizer.withDefaults()) // Включаем BASIC аутентификацию
-//                .sessionManagement(session ->
-//                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Делаем stateless
-                .sessionManagement(this::configureSessionManagement);
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Делаем stateless
+//                .sessionManagement(this::configureSessionManagement);
 
         return http.build();
     }

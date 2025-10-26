@@ -2,6 +2,8 @@ package ru.vvsem.bank.analyzer.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,18 +28,13 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        User user = userRepository.findByLogin(username)
+        return userRepository.findByLogin(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-        return user;
-//        return new org.springframework.security.core.userdetails.User(
-//                user.getUsername(),
-//                user.getPassword(),
-//                user.getAuthorities()
-//        );
+
     }
 
     @Transactional
-    public User registerUser(User user) {
+    public void registerUser(User user) {
         log.info("Registering new user: {}", user.getLogin());
 
         if (userRepository.existsByLogin(user.getLogin())) {
@@ -50,15 +47,34 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         user.setPassword(passwordService.encodePassword(user.getPassword()));
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     @Transactional(readOnly = true)
     public User getCurrentUser() {
-        // Этот метод будет использоваться вместе с SecurityContext
-        // Пока возвращаем тестового пользователя
-        return userRepository.findById(1L)
-                .orElseThrow(() -> new UsernameNotFoundException("Default user not found"));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new UsernameNotFoundException("User not authenticated");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof User) {
+            // Если principal уже является объектом User
+            return (User) principal;
+        } else if (principal instanceof UserDetails userDetails) {
+            // Если principal - стандартный UserDetails
+            String username = userDetails.getUsername();
+            return userRepository.findByLogin(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        } else if (principal instanceof String username) {
+            // Если principal - просто строка (username)
+            return userRepository.findByLogin(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        } else {
+            throw new UsernameNotFoundException("Unsupported principal type: " + principal.getClass().getName());
+        }
     }
 
     @Transactional(readOnly = true)

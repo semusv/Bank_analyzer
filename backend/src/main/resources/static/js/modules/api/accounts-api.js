@@ -1,7 +1,7 @@
 import { handleApiResponse } from "../utils.js";
 
 export async function fetchAccounts() {
-    const response = await fetch('/api/accounts', {
+    const response = await fetch('/api/bankAccount', {
         headers: {
             'Accept': 'application/json'
         }
@@ -11,7 +11,7 @@ export async function fetchAccounts() {
 }
 
 export async function createAccount(accountData) {
-    const response = await fetch('/api/accounts', {
+    const response = await fetch('/api/bankAccount', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -24,7 +24,7 @@ export async function createAccount(accountData) {
 }
 
 export async function createCard(cardData) {
-    const response = await fetch('/api/cards', {
+    const response = await fetch('/api/card', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
