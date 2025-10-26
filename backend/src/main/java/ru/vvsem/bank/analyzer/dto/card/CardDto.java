@@ -1,9 +1,8 @@
-package ru.vvsem.bank.analyzer.dto;
+package ru.vvsem.bank.analyzer.dto.card;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import ru.vvsem.bank.analyzer.dto.Accounts.BankAccountDto;
 import ru.vvsem.bank.analyzer.models.Card;
 
 /**
@@ -21,8 +20,8 @@ public class CardDto {
     private String cardName;
 
     @NotNull
-    private BankAccountDto account;
+    private Long accountId;
 
     @NotNull
-    private BankDto issuerBank;
+    private Long issuerBankId;
 }

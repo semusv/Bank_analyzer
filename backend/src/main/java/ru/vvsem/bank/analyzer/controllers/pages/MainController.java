@@ -56,6 +56,7 @@ public class MainController {
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal User user, Model model) {
         model.addAttribute("userName", user.getName() + " " + user.getSurname());
+        model.addAttribute("activePage", "dashboard");
         return "dashboard";
     }
 }

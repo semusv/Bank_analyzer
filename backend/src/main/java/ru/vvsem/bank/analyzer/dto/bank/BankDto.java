@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.dto;
+package ru.vvsem.bank.analyzer.dto.bank;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

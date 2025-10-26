@@ -7,10 +7,10 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
-import ru.vvsem.bank.analyzer.dto.Accounts.BankAccountDto;
-import ru.vvsem.bank.analyzer.dto.Accounts.NewBankAccountDto;
+import ru.vvsem.bank.analyzer.dto.account.BankAccountDto;
+import ru.vvsem.bank.analyzer.dto.account.NewBankAccountDto;
 import ru.vvsem.bank.analyzer.models.BankAccount;
-import ru.vvsem.bank.analyzer.dto.Accounts.BankAccountSimpleDto;
+import ru.vvsem.bank.analyzer.dto.account.BankAccountSimpleDto;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {CardMapper.class})
 public interface BankAccountMapper {

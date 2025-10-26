@@ -239,6 +239,17 @@ async function handleAddAccount(event) {
     } catch (error) {
         console.error('Failed to create account:', error);
         showErrorMessage('Ошибка создания счета: ' + error.message);
+
+        if (error.status === 400) {
+            error.errors.forEach(error => {
+                showErrorMessage(error.message);
+            });
+        } else {
+            showErrorMessage(error.message);
+        }
+
+
+
     }
 }
 

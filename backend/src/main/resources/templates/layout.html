@@ -39,27 +39,30 @@
                 <div class="position-sticky pt-3">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="/dashboard">
+                            <a th:class="${activePage == 'dashboard'} ? 'nav-link active' : 'nav-link'"
+                                href="/dashboard">
                                 <i class="fas fa-tachometer-alt"></i> Дашборд
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/transactions">
+                            <a th:class="${activePage == 'transactions'} ? 'nav-link active' : 'nav-link'"
+                                href="/transactions">
                                 <i class="fas fa-exchange-alt"></i> Транзакции
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/accounts">
+                            <a th:class="${activePage == 'accounts'} ? 'nav-link active' : 'nav-link'" href="/accounts">
                                 <i class="fas fa-credit-card"></i> Счета и карты
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/categories">
+                            <a th:class="${activePage == 'categories'} ? 'nav-link active' : 'nav-link'"
+                                href="/categories">
                                 <i class="fas fa-tags"></i> Категории
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/analysis">
+                            <a th:class="${activePage == 'analysis'} ? 'nav-link active' : 'nav-link'" href="/analysis">
                                 <i class="fas fa-chart-bar"></i> Аналитика
                             </a>
                         </li>

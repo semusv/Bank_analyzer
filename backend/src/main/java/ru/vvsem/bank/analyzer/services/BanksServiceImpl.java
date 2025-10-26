@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.vvsem.bank.analyzer.dto.BankDto;
+import ru.vvsem.bank.analyzer.dto.bank.BankDto;
 import ru.vvsem.bank.analyzer.mappers.BankMapper;
 import ru.vvsem.bank.analyzer.models.Bank;
 import ru.vvsem.bank.analyzer.repositories.BankRepository;

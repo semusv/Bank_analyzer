@@ -15,6 +15,7 @@ public class AccountPageController {
     public String accountsPage(@AuthenticationPrincipal User user, Model model) {
         model.addAttribute("userName", user.getName() + " " + user.getSurname());
         model.addAttribute("pageTitle", "Счета и карты");
+        model.addAttribute("activePage", "accounts");
         return "accounts";
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.vvsem.bank.analyzer.dto.BankDto;
+import ru.vvsem.bank.analyzer.dto.bank.BankDto;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.services.BanksService;
 
@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/bank")
 @RequiredArgsConstructor
-public class BanksController {
+public class BankController {
 
     private final BanksService banksService;
 

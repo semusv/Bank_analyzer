@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.vvsem.bank.analyzer.dto.Accounts.NewBankAccountDto;
-import ru.vvsem.bank.analyzer.dto.Accounts.BankAccountSimpleDto;
+import ru.vvsem.bank.analyzer.dto.account.NewBankAccountDto;
+import ru.vvsem.bank.analyzer.dto.account.BankAccountSimpleDto;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.services.BankAccountService;
 
@@ -27,16 +26,10 @@ public class BankAccountController {
     private final BankAccountService bankAccountService;
 
     @GetMapping
-    //TODO: перенести статус в аннотацию и сделать обработке ошибок
-    public ResponseEntity<List<BankAccountSimpleDto>> getUserAccounts(@AuthenticationPrincipal User user) {
-        try {
+    @ResponseStatus(HttpStatus.OK)
+    public List<BankAccountSimpleDto> getUserAccounts(@AuthenticationPrincipal User user) {
             log.info("GET /api/accounts for user: {}", user.getUsername());
-            List<BankAccountSimpleDto> accounts = bankAccountService.getUserAccountsWithCards(user.getId());
-            return ResponseEntity.ok(accounts);
-        } catch (Exception e) {
-            log.error("Error getting accounts for user: {}", user.getUsername(), e);
-            return ResponseEntity.internalServerError().build();
-        }
+            return bankAccountService.getUserAccountsWithCards(user.getId());
     }
 
     @PostMapping

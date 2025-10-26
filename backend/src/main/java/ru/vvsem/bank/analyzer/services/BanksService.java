@@ -1,7 +1,6 @@
 package ru.vvsem.bank.analyzer.services;
 
-import org.springframework.transaction.annotation.Transactional;
-import ru.vvsem.bank.analyzer.dto.BankDto;
+import ru.vvsem.bank.analyzer.dto.bank.BankDto;
 
 import java.util.List;
 
