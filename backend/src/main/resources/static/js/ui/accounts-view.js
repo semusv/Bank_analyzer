@@ -1,4 +1,4 @@
-import { fetchAccounts, createAccount, createCard } from "../modules/api/accounts-api.js";
+import { fetchAccounts, createAccount, createCard, deleteAccount as deleteAccountApi, deleteCard as deleteCardApi } from "../modules/api/accounts-api.js";
 import { fetchBanks } from "../modules/api/banks-api.js";
 import { showErrorMessage, showSuccessMessage } from "../modules/utils.js";
 import { fetchCurrencies } from "../modules/api/currency-api.js";
@@ -74,14 +74,12 @@ function renderCurrencies(currencies) {
     placeholderOption.disabled = true;
     placeholderOption.selected = true;
     currencySelect.appendChild(placeholderOption);
-
-
-    currencies.forEach(currency => {
+    for (const currency of currencies) {
         const option = document.createElement('option');
         option.value = currency.id;
         option.textContent = `${currency.code} (${currency.name})`;
         currencySelect.appendChild(option);
-    });
+    }
 }
 
 
@@ -96,14 +94,14 @@ function renderBankList(banks) {
     placeholderOption.selected = true;
     bankList.appendChild(placeholderOption);
 
-    banks.forEach(banks => {
+    for (const bank of banks) {
         const option = document.createElement('option');
-        option.value = banks.id;
-        option.textContent = banks.name;
+        option.value = bank.id;
+        option.textContent = bank.name;
         bankList.appendChild(option);
-    });
-}
+    }
 
+}
 
 function renderAccounts(accounts) {
     const container = document.getElementById('accountsContainer');
@@ -122,6 +120,7 @@ function renderAccounts(accounts) {
                     </h6>
                     <span class="badge bg-primary">${account.currencyCode}</span>
                 </div>
+
                 <div class="card-body">
                     <h5 class="card-title">${account.name}</h5>
                     <p class="card-text text-muted small">
@@ -132,7 +131,7 @@ function renderAccounts(accounts) {
                             ${account.balance.toLocaleString('ru-RU')} ${account.currencySymbol}
                         </div>
                     </div>
-                    
+
                     ${account.cards.length > 0 ? `
                         <div class="cards-section mt-3">
                             <h6 class="cards-title">
@@ -141,9 +140,18 @@ function renderAccounts(accounts) {
                             <div class="cards-list">
                                 ${account.cards.map(card => `
                                     <div class="card-item">
-                                        <div class="card-info">
-                                            <span class="card-name">${card.cardName}</span>
-                                            <span class="card-number">**** ${card.lastFourDigits}</span>
+                                        <div class="card-info d-flex justify-content-between align-items-center">
+                                            <div class="card-info-left">
+                                                <span class="card-name" title="${card.cardName}">
+                                                    ${card.cardName}
+                                                </span>
+                                                <span class="card-number">*${card.lastFourDigits}</span>
+                                            </div>
+                                            <button class="btn btn-sm btn-icon-delete"
+                                                    onclick="deleteCard(${card.id}, ${account.id})"
+                                                    title="Удалить карту">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -157,20 +165,27 @@ function renderAccounts(accounts) {
                         </div>
                     `}
                 </div>
+
+
                 <div class="card-footer">
-                    <div class="btn-group w-100" role="group">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="viewAccountDetails(${account.id})">
-                            <i class="fas fa-eye"></i> Подробнее
+                    <div class="d-flex gap-2 justify-content-between flex-wrap">
+                        <button class="btn btn-sm btn-outline-secondary flex-fill" onclick="viewAccountDetails(${account.id})">
+                            <i class="fas fa-eye"></i> <span class="btn-text">Подробно</span>
                         </button>
-                        <button class="btn btn-sm btn-outline-primary" onclick="openAddCardModal(${account.id})">
-                            <i class="fas fa-plus"></i> Карта
+
+                        <button class="btn btn-sm btn-outline-primary flex-fill" onclick="openAddCardModal(${account.id})">
+                            <i class="fas fa-credit-card"></i> <span class="btn-text">Карта</span>
+                        </button>
+
+                        <button class="btn btn-sm btn-outline-danger flex-fill" onclick="deleteAccount(${account.id})">
+                            <i class="fas fa-trash"></i> <span class="btn-text">Удалить</span>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     `).join('');
-}
+};
 
 function renderEmptyState() {
     const container = document.getElementById('accountsContainer');
@@ -186,7 +201,7 @@ function renderEmptyState() {
             </div>
         </div>
     `;
-}
+};
 
 function setupEventListeners() {
     // Обработчик формы добавления счета
@@ -200,7 +215,7 @@ function setupEventListeners() {
     if (addCardForm) {
         addCardForm.addEventListener('submit', handleAddCard);
     }
-}
+};
 
 async function handleAddAccount(event) {
     event.preventDefault();
@@ -215,7 +230,7 @@ async function handleAddAccount(event) {
     const accountData = {
         name: formData.get('accountName') || document.getElementById('accountName').value,
         accountNumber: formData.get('accountNumber') || document.getElementById('accountNumber').value,
-        initialBalance: parseFloat(formData.get('initialBalance') || document.getElementById('initialBalance').value) || 0,
+        initialBalance: Number.parseFloat(formData.get('initialBalance') || document.getElementById('initialBalance').value) || 0,
         bankId: formData.get('bankId'),
         currencyId: formData.get('currencyId'),
     };
@@ -241,9 +256,9 @@ async function handleAddAccount(event) {
         showErrorMessage('Ошибка создания счета: ' + error.message);
 
         if (error.status === 400) {
-            error.errors.forEach(error => {
+            for (const error of error.errors) {
                 showErrorMessage(error.message);
-            });
+            }
         } else {
             showErrorMessage(error.message);
         }
@@ -251,7 +266,7 @@ async function handleAddAccount(event) {
 
 
     }
-}
+};
 
 async function handleAddCard(event) {
     event.preventDefault();
@@ -264,7 +279,7 @@ async function handleAddCard(event) {
     }
 
     const cardData = {
-        accountId: parseInt(document.getElementById('cardAccountId').value),
+        accountId: Number.parseFloat(document.getElementById('cardAccountId').value),
         cardName: formData.get('cardName') || document.getElementById('cardName').value,
         lastFourDigits: formData.get('lastFourDigits') || document.getElementById('lastFourDigits').value
     };
@@ -289,10 +304,10 @@ async function handleAddCard(event) {
         console.error('Failed to create card:', error);
         showErrorMessage('Ошибка создания карты: ' + error.message);
     }
-}
+};
 
 // Глобальные функции для вызова из HTML
-window.openAddAccountModal = function () {
+globalThis.openAddAccountModal = function () {
     if (typeof bootstrap === 'undefined') {
         console.error('Bootstrap is not loaded');
         showErrorMessage('Bootstrap не загружен. Проверьте подключение скриптов.');
@@ -302,7 +317,7 @@ window.openAddAccountModal = function () {
     modal.show();
 };
 
-window.openAddCardModal = function (accountId) {
+globalThis.openAddCardModal = function (accountId) {
     if (typeof bootstrap === 'undefined') {
         console.error('Bootstrap is not loaded');
         showErrorMessage('Bootstrap не загружен. Проверьте подключение скриптов.');
@@ -313,8 +328,38 @@ window.openAddCardModal = function (accountId) {
     modal.show();
 };
 
-window.viewAccountDetails = function (accountId) {
+globalThis.viewAccountDetails = function (accountId) {
     // TODO: Реализовать просмотр деталей счета
     console.log('View account details:', accountId);
     showSuccessMessage('Функция просмотра деталей счета будет реализована позже');
+};
+
+globalThis.deleteAccount = async function (accountId) {
+    if (!confirm('Вы уверены, что хотите удалить этот счет?')) {
+        return;
+    }
+
+    try {
+        await deleteAccountApi(accountId);
+        showSuccessMessage('Счет успешно удален!');
+        await loadAccounts();
+    } catch (error) {
+        console.error('Failed to delete account:', error);
+        showErrorMessage('Ошибка удаления счета: ' + error.message);
+    }
+};
+
+globalThis.deleteCard = async function (cardId, accountId) {
+    if (!confirm('Вы уверены, что хотите удалить эту карту?')) {
+        return;
+    }
+
+    try {
+        await deleteCardApi(cardId);
+        showSuccessMessage('Карта успешно удалена!');
+        await loadAccounts();
+    } catch (error) {
+        console.error('Failed to delete card:', error);
+        showErrorMessage('Ошибка удаления карты: ' + error.message);
+    }
 };
