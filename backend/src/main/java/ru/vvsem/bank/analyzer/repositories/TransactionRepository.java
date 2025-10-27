@@ -1,6 +1,7 @@
 package ru.vvsem.bank.analyzer.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.vvsem.bank.analyzer.models.Transaction;
@@ -8,8 +9,12 @@ import ru.vvsem.bank.analyzer.models.Transaction;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
-public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+public interface TransactionRepository extends JpaRepository<Transaction, Long>,
+        JpaSpecificationExecutor<Transaction> {
+    Optional<Transaction> findByIdAndUser_Id(Long transactionId, Long userId);
+
     List<Transaction> findByUserId(Long userId);
 
     @Query("SELECT COUNT(t) " +

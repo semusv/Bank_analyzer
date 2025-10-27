@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,8 @@ import ru.vvsem.bank.analyzer.dto.card.NewCardDto;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.services.CardService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/card")
 @RequiredArgsConstructor
@@ -25,7 +28,7 @@ public class CardController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CardDto createAccount(
+    public CardDto createCard(
             @Valid @RequestBody NewCardDto newCardDto,
             @AuthenticationPrincipal User user
     ) {
@@ -39,6 +42,14 @@ public class CardController {
             @AuthenticationPrincipal User user
     ) {
         cardService.deleteCard(id, user.getId());
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<CardDto> getCardList(
+            @AuthenticationPrincipal User user
+    ) {
+        return cardService.getCardList(user.getId());
     }
 }
 

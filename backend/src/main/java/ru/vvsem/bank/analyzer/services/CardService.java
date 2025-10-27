@@ -5,6 +5,8 @@ import ru.vvsem.bank.analyzer.dto.card.CardDto;
 import ru.vvsem.bank.analyzer.dto.card.NewCardDto;
 import ru.vvsem.bank.analyzer.models.User;
 
+import java.util.List;
+
 public interface CardService {
 
     @Transactional
@@ -12,4 +14,7 @@ public interface CardService {
 
     @Transactional
     void deleteCard(Long cardId, Long userId);
+
+    @Transactional
+    List<CardDto> getCardList(Long userId);
 }

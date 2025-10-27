@@ -17,6 +17,8 @@ import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
 import ru.vvsem.bank.analyzer.repositories.BankRepository;
 import ru.vvsem.bank.analyzer.repositories.CardRepository;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -57,6 +59,15 @@ public class CardServiceImpl implements CardService {
                 );
 
         cardRepository.delete(card);
+    }
+
+    @Override
+    public List<CardDto> getCardList(Long userId) {
+
+        return cardRepository.findByAccountUserId(userId)
+                .stream()
+                .map(cardMapper::toCardDto)
+                .toList();
     }
 
     private Bank prepareIssuerBank(Long id) {
