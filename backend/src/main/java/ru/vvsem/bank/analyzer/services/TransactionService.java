@@ -1,11 +1,8 @@
 package ru.vvsem.bank.analyzer.services;
 
 import ru.vvsem.bank.analyzer.dto.TransactionDto;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
 
 public interface TransactionService {
 
@@ -17,8 +14,7 @@ public interface TransactionService {
 
     void deleteTransaction(Long transactionId, Long userId);
 
-    @SuppressWarnings({"CheckStyle", "MethodCanBeVariableArityMethod"})
-    List<TransactionDto> getListTransaction(
+    org.springframework.data.domain.Page<TransactionDto> getListTransaction(
             Long userId,
             LocalDateTime startDate,
             LocalDateTime endDate,
@@ -27,6 +23,5 @@ public interface TransactionService {
             Long categoryId,
             String description,
             int page,
-            int size,
-            String[] sort);
+            int size);
 }

@@ -38,11 +38,9 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionDto getTransaction(Long transactionId, Long userId) {
         return transactionRepository.findByIdAndUser_Id(transactionId, userId)
                 .map(transactionMapper::toTransactionDto)
-                .orElseThrow(() ->
-                        new EntityNotFoundException(
-                                "Transaction with id %d for UserId %d not found".formatted(transactionId, userId),
-                                "exception.entity.not.found.transaction")
-                );
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Transaction with id %d for UserId %d not found".formatted(transactionId, userId),
+                        "exception.entity.not.found.transaction"));
     }
 
     @Override
@@ -60,7 +58,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<TransactionDto> getListTransaction(
+    public Page<TransactionDto> getListTransaction(
             Long userId,
             LocalDateTime startDate,
             LocalDateTime endDate,
@@ -69,23 +67,13 @@ public class TransactionServiceImpl implements TransactionService {
             Long categoryId,
             String description,
             int page,
-            int size,
-            String[] sort) {
+            int size) {
 
         Specification<Transaction> spec = buildSpecification(
-                userId, startDate, endDate, cardId, bankId, categoryId, description
-        );
-
-        // Создаем объект пагинации и сортировки
-        Pageable pageable = createPageable(page, size, sort);
-
-        // Получаем данные из репозитория
+                userId, startDate, endDate, cardId, bankId, categoryId, description);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "operationTime"));
         Page<Transaction> transactions = transactionRepository.findAll(spec, pageable);
-
-        return transactions
-                .stream()
-                .map(transactionMapper::toTransactionDto)
-                .toList();
+        return transactions.map(transactionMapper::toTransactionDto);
     }
 
     private Specification<Transaction> buildSpecification(
@@ -104,72 +92,46 @@ public class TransactionServiceImpl implements TransactionService {
             // Фильтр по дате
             if (startDate != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(
-                        root.get("operationTime"), startDate
-                ));
+                        root.get("operationTime"), startDate));
             }
             if (endDate != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(
-                        root.get("operationTime"), endDate
-                ));
+                        root.get("operationTime"), endDate));
             }
             // Фильтр по карте
             if (cardId != null) {
                 predicates.add(criteriaBuilder.equal(
-                        root.get("card").get("id"), cardId
-                ));
+                        root.get("card").get("id"), cardId));
             }
 
             // Фильтр по категории
             if (categoryId != null) {
                 predicates.add(criteriaBuilder.equal(
-                        root.get("category").get("id"), categoryId
-                ));
+                        root.get("category").get("id"), categoryId));
+            }
+
+            // Фильтр по банку
+            if (bankId != null) {
+                predicates.add(criteriaBuilder.equal(
+                        root.get("card").get("account").get("bank").get("id"), bankId));
             }
 
             // Фильтр по описанию
             if (description != null && !description.trim().isEmpty()) {
                 predicates.add(criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("description")),
-                        "%" + description.toLowerCase() + "%"
-                ));
+                        "%" + description.toLowerCase() + "%"));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
 
-    private Pageable createPageable(int page, int size, String[] sort) {
-        List<Sort.Order> orders = new ArrayList<>();
-
-        if (sort[0].contains(",")) {
-            // sortOrder="field,direction"
-            for (String sortOrder : sort) {
-                String[] sortOrderDir = sortOrder.split(",");
-                orders.add(new Sort.Order(getSortDirection(sortOrderDir[1]), sortOrderDir[0]));
-            }
-        } else {
-            // sort=[field, direction]
-            orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
-        }
-
-        return PageRequest.of(page, size, Sort.by(orders));
-    }
-
-    private Sort.Direction getSortDirection(String direction) {
-        if ("desc".equals(direction)) {
-            return Sort.Direction.DESC;
-        }
-        return Sort.Direction.ASC;
-    }
-
     private Transaction getTransactionWithIdAndUserId(Long transactionId, Long userId) {
         return transactionRepository.findByIdAndUser_Id(transactionId, userId)
-                .orElseThrow(() ->
-                        new EntityNotFoundException(
-                                "Transaction with id %d for UserId %d not found".formatted(transactionId, userId),
-                                "exception.entity.not.found.transaction")
-                );
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Transaction with id %d for UserId %d not found".formatted(transactionId, userId),
+                        "exception.entity.not.found.transaction"));
     }
-
 
 }

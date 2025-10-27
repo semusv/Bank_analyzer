@@ -10,8 +10,14 @@ export async function fetchTransactions(filters = {}) {
     if (filters.categoryId) params.append('categoryId', filters.categoryId);
     if (filters.description) params.append('description', filters.description);
 
+    // Pagination parameters
+    const page = filters.page || 0;
+    const size = filters.size || 20;
+    params.append('page', page);
+    params.append('size', size);
+
     const queryString = params.toString();
-    const url = `/api/transaction${queryString ? '?' + queryString : ''}`;
+    const url = `/api/transaction?${queryString}`;
 
     const response = await fetch(url, {
         headers: {

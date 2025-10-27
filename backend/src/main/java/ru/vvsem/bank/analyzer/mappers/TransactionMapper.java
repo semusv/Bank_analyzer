@@ -9,16 +9,21 @@ import org.mapstruct.ReportingPolicy;
 import ru.vvsem.bank.analyzer.dto.TransactionDto;
 import ru.vvsem.bank.analyzer.models.Transaction;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {
+        BankMapper.class, CardMapper.class })
 public interface TransactionMapper {
     @Mapping(source = "userId", target = "user.id")
     Transaction toEntity(TransactionDto transactionDto);
 
     @AfterMapping
     default void linkSubTransactions(@MappingTarget Transaction transaction) {
-        transaction.getSubTransactions().forEach(subTransaction -> subTransaction.setParentTransaction(transaction));
+        if (transaction.getSubTransactions() != null) {
+            transaction.getSubTransactions()
+                    .forEach(subTransaction -> subTransaction.setParentTransaction(transaction));
+        }
     }
 
     @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "card.account.bank", target = "bank")
     TransactionDto toTransactionDto(Transaction transaction);
 }

@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: security1
+    active: security
 
   messages:
     baseName: messages

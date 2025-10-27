@@ -8,21 +8,46 @@
     animation: slideInUp 0.5s ease-out;
 }
 
-
-
 .account-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     border-color: #007bff;
 }
 
+
 .account-card .card-header {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    background: linear-gradient(135deg, var(--bankDefault-primary, #007bff) 0%, var(--bankDefault-secondary, #0056b3) 100%);
     color: white;
     border-bottom: none;
     border-radius: 12px 12px 0 0 !important;
     padding: 0.75rem 1rem;
 }
+
+/* Динамические цвета для банков через CSS переменные */
+.account-card[data-bank="ВТБ"] .card-header {
+    background: linear-gradient(135deg, var(--vtb-primary) 0%, var(--vtb-secondary) 100%);
+}
+
+.account-card[data-bank="Сбербанк"] .card-header {
+    background: linear-gradient(135deg, var(--sberbank-primary) 0%, var(--sberbank-secondary) 100%);
+}
+
+.account-card[data-bank="Тинькофф"] .card-header {
+    background: linear-gradient(135deg, var(--tinkoff-primary) 0%, var(--tinkoff-secondary) 100%);
+    color: #333;
+}
+
+.account-card[data-bank="Альфа-Банк"] .card-header {
+    background: linear-gradient(135deg, var(--alpha-primary) 0%, var(--alpha-secondary) 100%);
+}
+
+/* .account-card .card-header {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    border-bottom: none;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 0.75rem 1rem;
+} */
 
 .account-card .card-header h6 {
     font-weight: 600;
@@ -196,29 +221,29 @@
     .account-card .card-body {
         padding: 1rem;
     }
-    
+
     .balance-amount {
         font-size: 1.25rem;
     }
-    
+
     .card-info {
         flex-wrap: wrap;
     }
-    
+
     .card-info-left {
         flex: 1 1 100%;
         margin-bottom: 0.5rem;
     }
-    
+
     .account-card .card-footer {
         padding: 0.75rem;
     }
-    
+
     .account-card .card-footer .d-flex {
         flex-direction: column;
         gap: 0.5rem !important;
     }
-    
+
     .account-card .card-footer .btn {
         width: 100%;
         border-radius: 6px !important;
@@ -229,45 +254,45 @@
     .account-card .card-header {
         padding: 0.5rem 0.75rem;
     }
-    
+
     .account-card .card-header h6 {
         font-size: 0.85rem;
     }
-    
+
     .account-card .card-header .badge {
         font-size: 0.65rem;
     }
-    
+
     .card-info {
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .card-info-left {
         width: 100%;
     }
-    
+
     .btn-icon-delete {
         align-self: flex-end;
     }
-    
+
     .cards-title {
         font-size: 0.85rem;
     }
-    
+
     .card-name {
         font-size: 0.8rem;
     }
-    
+
     .card-number {
         font-size: 0.7rem;
     }
-    
+
     /* Скрыть текст на кнопках footer на мобильных устройствах */
     .card-footer .btn-text {
         display: none;
     }
-    
+
     .card-footer .btn {
         padding: 0.5rem !important;
         min-width: 44px;
@@ -286,28 +311,9 @@
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-
-
-/* Bank-specific colors */
-.account-card[data-bank="Сбербанк"] .card-header {
-    background: linear-gradient(135deg, #00a651 0%, #007a3d 100%);
-}
-
-.account-card[data-bank="Тинькофф"] .card-header {
-    background: linear-gradient(135deg, #ffdd2d 0%, #ffcd02 100%);
-    color: #333;
-}
-
-.account-card[data-bank="ВТБ"] .card-header {
-    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-}
-
-.account-card[data-bank="Альфа-Банк"] .card-header {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 }

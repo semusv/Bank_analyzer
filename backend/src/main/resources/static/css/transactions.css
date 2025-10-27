@@ -3,6 +3,29 @@
     transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
+.transaction-card .card-header {
+    background: linear-gradient(135deg, var(--bankDefault-primary, #007bff) 0%, var(--bankDefault-secondary, #0056b3) 100%);
+    color: white;
+}
+
+/* Динамические цвета для банков через CSS переменные */
+.transaction-card[data-bank="ВТБ"] .card-header {
+    background: linear-gradient(135deg, var(--vtb-primary) 0%, var(--vtb-secondary) 100%);
+}
+
+.transaction-card[data-bank="Сбербанк"] .card-header {
+    background: linear-gradient(135deg, var(--sberbank-primary) 0%, var(--sberbank-secondary) 100%);
+}
+
+.transaction-card[data-bank="Тинькофф"] .card-header {
+    background: linear-gradient(135deg, var(--tinkoff-primary) 0%, var(--tinkoff-secondary) 100%);
+    color: #333;
+}
+
+.transaction-card[data-bank="Альфа-Банк"] .card-header {
+    background: linear-gradient(135deg, var(--alpha-primary) 0%, var(--alpha-secondary) 100%);
+}
+
 .transaction-card:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
@@ -28,9 +51,6 @@
     font-size: 0.9rem;
 }
 
-.card-info i {
-    color: #6c757d;
-}
 
 .amount {
     font-size: 1.1rem;
@@ -66,7 +86,7 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .transaction-card .row > div {
+    .transaction-card .row>div {
         margin-bottom: 1rem;
     }
 

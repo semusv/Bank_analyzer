@@ -1,10 +1,13 @@
 package ru.vvsem.bank.analyzer.controllers.api;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.QueryParameter;
+import lombok.Setter;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +20,6 @@ import ru.vvsem.bank.analyzer.services.TransactionService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/transaction")
@@ -26,32 +28,34 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
-    @RequestMapping
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<TransactionDto> getListTransactions(
-            @RequestParam(required = false, name = "startDate") LocalDate startDate,
-            @RequestParam(required = false, name = "endDate") LocalDate endDate,
-            @RequestParam(required = false, name = "cardId") Long cardId,
-            @RequestParam(required = false, name = "bankId") Long bankId,
-            @RequestParam(required = false, name = "categoryId") Long categoryId,
-            @RequestParam(required = false, name = "description") String description,
+    public PageResponse<TransactionDto> getListTransactions(
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(required = false) Long cardId,
+            @RequestParam(required = false) Long bankId,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String description,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "transactionDate,desc") String[] sort,
-            @AuthenticationPrincipal User user
-    ) {
-        return transactionService.getListTransaction(
+            @AuthenticationPrincipal User user) {
+
+        LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
+        LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;
+
+        Page<TransactionDto> result = transactionService.getListTransaction(
                 user.getId(),
-                startDate.atStartOfDay(),
-                endDate.atStartOfDay(),
+                startDateTime,
+                endDateTime,
                 cardId,
                 bankId,
                 categoryId,
                 description,
                 page,
-                size,
-                sort
-        );
+                size);
+
+        return PageResponse.from(result);
     }
 
     @RequestMapping("/{id}")
@@ -78,4 +82,42 @@ public class TransactionController {
         transactionService.deleteTransaction(transactionId, user.getId());
     }
 
+    @Setter
+    @Getter
+    public static class PageResponse<T> {
+        // Getters and Setters
+        private java.util.List<T> content;
+        private long totalElements;
+        private int totalPages;
+        private int pageNumber;
+        private int pageSize;
+        private boolean first;
+        private boolean last;
+
+        public PageResponse() {
+        }
+
+        public PageResponse(java.util.List<T> content, long totalElements, int totalPages,
+                int pageNumber, int pageSize, boolean first, boolean last) {
+            this.content = content;
+            this.totalElements = totalElements;
+            this.totalPages = totalPages;
+            this.pageNumber = pageNumber;
+            this.pageSize = pageSize;
+            this.first = first;
+            this.last = last;
+        }
+
+        public static <T> PageResponse<T> from(Page<T> page) {
+            return new PageResponse<>(
+                    page.getContent(),
+                    page.getTotalElements(),
+                    page.getTotalPages(),
+                    page.getNumber(),
+                    page.getSize(),
+                    page.isFirst(),
+                    page.isLast());
+        }
+
+    }
 }

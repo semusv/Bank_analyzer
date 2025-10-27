@@ -20,6 +20,9 @@ let categoriesCache = null;
 let cardsCache = null;
 let banksCache = null;
 let currenciesCache = null;
+let currentPage = 0;
+let totalPages = 0;
+let pageSize = 20;
 
 async function init() {
     try {
@@ -78,10 +81,23 @@ async function loadCurrencies() {
     }
 }
 
-async function loadTransactions() {
+async function loadTransactions(page = 0) {
     try {
-        const transactions = await fetchTransactions(currentFilters);
+        currentPage = page;
+        const filtersWithPagination = {
+            ...currentFilters,
+            page: currentPage,
+            size: pageSize
+        };
+
+        const response = await fetchTransactions(filtersWithPagination);
+
+        // Handle paginated response
+        const transactions = response.content || response;
+        totalPages = response.totalPages || 1;
+
         renderTransactions(transactions);
+        renderPagination();
     } catch (error) {
         console.error('Failed to load transactions:', error);
         showErrorMessage('Ошибка загрузки транзакций: ' + error.message);
@@ -98,9 +114,9 @@ function renderTransactions(transactions) {
     }
 
     container.innerHTML = transactions.map(transaction => `
-        <div class="card transaction-card mb-3 ${transaction.hide ? 'opacity-50' : ''}" data-transaction-id="${transaction.id}">
+        <div class="card transaction-card mb-3 ${transaction.hide ? 'opacity-50' : ''}" data-transaction-id="${transaction.id}" data-bank="${transaction.bank.name}">
             <div class="card-body">
-                <div class="row align-items-center">
+                <div class="row align-items-center" ">
                     <div class="col-12 col-md-6 col-lg-4">
                         <div class="transaction-info">
                             <h6 class="mb-1">
@@ -112,9 +128,9 @@ function renderTransactions(transactions) {
                             </small>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-lg-3">
+                    <div class="col-12 col-md-6 col-lg-3  "  >
                         ${transaction.card ? `
-                            <div class="card-info mb-2">
+                            <div class="card-info mb-2 card-header">
                                 <i class="fas fa-credit-card"></i>
                                 <span>**** ${transaction.card.lastFourDigits}</span>
                             </div>
@@ -274,14 +290,81 @@ async function handleFilterSubmit(event) {
         description: formData.get('description') || null
     };
 
-    await loadTransactions();
+    await loadTransactions(0); // Reset to first page
 }
 
 async function clearFilters() {
     currentFilters = {};
     document.getElementById('filterForm').reset();
-    await loadTransactions();
+    await loadTransactions(0); // Reset to first page
 }
+
+function renderPagination() {
+    const container = document.getElementById('paginationContainer');
+    if (!container) return;
+
+    if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let paginationHTML = '<nav aria-label="Page navigation"><ul class="pagination justify-content-center">';
+
+    // Previous button
+    paginationHTML += `
+        <li class="page-item ${currentPage === 0 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Предыдущая</a>
+        </li>
+    `;
+
+    // Page numbers
+    const maxVisiblePages = 5;
+    let startPage = Math.max(0, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(0, endPage - maxVisiblePages + 1);
+    }
+
+    if (startPage > 0) {
+        paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(0); return false;">1</a></li>`;
+        if (startPage > 1) {
+            paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `
+            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i + 1}</a>
+            </li>
+        `;
+    }
+
+    if (endPage < totalPages - 1) {
+        if (endPage < totalPages - 2) {
+            paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+        paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${totalPages - 1}); return false;">${totalPages}</a></li>`;
+    }
+
+    // Next button
+    paginationHTML += `
+        <li class="page-item ${currentPage >= totalPages - 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Следующая</a>
+        </li>
+    `;
+
+    paginationHTML += '</ul></nav>';
+    container.innerHTML = paginationHTML;
+}
+
+globalThis.changePage = async function (page) {
+    if (page < 0 || page >= totalPages) return;
+    await loadTransactions(page);
+    // Scroll to top of transactions list
+    document.getElementById('transactionsContainer')?.scrollIntoView({ behavior: 'smooth' });
+};
 
 function formatDateTime(dateTimeString) {
     const date = new Date(dateTimeString);
@@ -340,7 +423,13 @@ globalThis.toggleHideTransactionById = async function (transactionId, hide) {
     try {
         await toggleHideTransaction(transactionId, hide);
         showSuccessMessage(hide ? 'Транзакция скрыта из статистики' : 'Транзакция показана в статистике');
-        await loadTransactions();
+
+        // Refresh the modal with updated data
+        const transaction = await fetchTransactionById(transactionId);
+        populateTransactionDetailsModal(transaction);
+
+        // Reload the transactions list to reflect the change
+        await loadTransactions(currentPage);
     } catch (error) {
         console.error('Failed to toggle hide transaction:', error);
         showErrorMessage('Ошибка изменения видимости транзакции: ' + error.message);
@@ -393,14 +482,45 @@ function populateTransactionDetailsModal(transaction) {
     document.getElementById('detailAmount').className =
         `amount ${transaction.amount >= 0 ? 'text-success' : 'text-danger'}`;
     document.getElementById('detailDateTime').textContent = formatDateTime(transaction.operationTime);
-    document.getElementById('detailCard').textContent = transaction.card ?
-        `**** ${transaction.card.lastFourDigits}` : 'Не указана';
-    document.getElementById('detailCategory').textContent = transaction.category ?
-        transaction.category.name : 'Не указана';
+
+    // Card information with badge
+    const cardElement = document.getElementById('detailCard');
+    if (transaction.card) {
+        cardElement.innerHTML = `<span class="badge bg-primary">**** ${transaction.card.lastFourDigits}</span>`;
+        cardElement.innerHTML += ` <span class="text-muted">${transaction.card.cardName}</span>`;
+    } else {
+        cardElement.textContent = 'Не указана';
+    }
+
+    // Bank information with badge
+    const bankElement = document.getElementById('detailBank');
+    if (transaction.bank) {
+        bankElement.innerHTML = `<span class="badge bg-info">${transaction.bank.name}</span>`;
+    } else if (transaction.card) {
+        bankElement.textContent = 'Не указан';
+    } else {
+        bankElement.textContent = 'Не указан';
+    }
+
+    // Category with color
+    const categoryElement = document.getElementById('detailCategory');
+    if (transaction.category) {
+        const color = transaction.category.color || '#6c757d';
+        categoryElement.innerHTML = `<span class="badge" style="background-color: ${color}; color: white;">${transaction.category.name}</span>`;
+    } else {
+        categoryElement.textContent = 'Не указана';
+    }
+
     document.getElementById('detailHide').checked = transaction.hide;
+    document.getElementById('detailHideStatus').textContent = transaction.hide ? 'Скрыта из статистики' : 'Отображается в статистике';
+    document.getElementById('detailHideStatus').className = transaction.hide ? 'text-warning' : 'text-success';
 
     const hideToggleBtn = document.getElementById('toggleHideBtn');
     hideToggleBtn.onclick = () => toggleHideTransactionById(transaction.id, !transaction.hide);
+    hideToggleBtn.innerHTML = transaction.hide ?
+        '<i class="fas fa-eye"></i> Показать в статистике' :
+        '<i class="fas fa-eye-slash"></i> Скрыть из статистики';
+    hideToggleBtn.className = transaction.hide ? 'btn btn-success' : 'btn btn-warning';
 
     const splitBtn = document.getElementById('splitTransactionBtn');
     splitBtn.onclick = () => openSplitTransactionModal(transaction.id, transaction.amount);

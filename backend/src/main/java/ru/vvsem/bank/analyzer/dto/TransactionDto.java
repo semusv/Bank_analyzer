@@ -3,6 +3,8 @@ package ru.vvsem.bank.analyzer.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import ru.vvsem.bank.analyzer.dto.bank.BankDto;
+import ru.vvsem.bank.analyzer.dto.card.CardDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,34 +15,29 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class TransactionDto {
-    private  Long id;
+    private Long id;
 
     @NotNull
-    private  String description;
+    private String description;
 
     @NotNull
-    private  BigDecimal amount;
+    private BigDecimal amount;
 
     @NotNull
-    private  LocalDateTime operationTime;
+    private LocalDateTime operationTime;
 
-//    private  boolean hide;
-//
-//    private   boolean master;
+    private boolean hide;
+
+    private boolean master;
 
     @NotNull
-    private  CurrencyDto currency;
+    private CurrencyDto currency;
 
-    private  CategoryDto category;
+    private CategoryDto category;
 
-//    private  CardDto card;
-//
-//    @NotNull
-//    private  OperationType operationType;
-//
-    private  Long userId;
-//
-//    private  TransactionDto parentTransaction;
-//
-//    private  List<TransactionDto> subTransactions;
+    private CardDto card;
+
+    private BankDto bank;
+
+    private Long userId;
 }
