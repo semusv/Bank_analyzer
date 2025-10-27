@@ -1,20 +1,30 @@
 package ru.vvsem.bank.analyzer.services;
 
-import ru.vvsem.bank.analyzer.dto.TransactionDto;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.transaction.annotation.Transactional;
+import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
+import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TransactionService {
 
+    @Transactional
     List<TransactionDto> getListTransaction(Long userId);
 
+    @Transactional
     TransactionDto getTransaction(Long transactionId, Long userId);
 
+    @Transactional
     void hideTransaction(Long transactionId, Long userId);
 
+    @Transactional
     void deleteTransaction(Long transactionId, Long userId);
 
-    org.springframework.data.domain.Page<TransactionDto> getListTransaction(
+    @SuppressWarnings("CheckStyle")
+    @Transactional
+    Page<TransactionDto> getListTransaction(
             Long userId,
             LocalDateTime startDate,
             LocalDateTime endDate,
@@ -24,4 +34,7 @@ public interface TransactionService {
             String description,
             int page,
             int size);
+
+    @Transactional
+    void splitTransaction(Long transactionId, @Valid List<SubTransactionDto> subTransactions, Long userId);
 }

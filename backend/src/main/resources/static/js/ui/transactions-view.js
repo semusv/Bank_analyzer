@@ -6,7 +6,6 @@ import {
     toggleHideTransaction,
     splitTransaction
 } from "../modules/api/transactions-api.js";
-import { fetchAccounts } from "../modules/api/accounts-api.js";
 import { fetchCards } from "../modules/api/cards-api.js";
 import { fetchCategories } from "../modules/api/categories-api.js";
 import { fetchBanks } from "../modules/api/banks-api.js";
@@ -117,38 +116,43 @@ function renderTransactions(transactions) {
         <div class="card transaction-card mb-3 ${transaction.hide ? 'opacity-50' : ''}" data-transaction-id="${transaction.id}" data-bank="${transaction.bank.name}">
             <div class="card-body">
                 <div class="row align-items-center" ">
-                    <div class="col-12 col-md-6 col-lg-4">
+                    <div class="col-12 col-md-6 col-lg-6">
                         <div class="transaction-info">
                             <h6 class="mb-1">
                                 ${transaction.description}
                                 ${transaction.hide ? '<span class="badge bg-secondary ms-2">Скрыто</span>' : ''}
                             </h6>
-                            <small class="text-muted">
-                                ${formatDateTime(transaction.operationTime)}
-                            </small>
+                            ${transaction.category ? `
+                                <div class="category-badge d-inline-block">
+                                    <span class="badge" style="background-color: ${transaction.category.color || '#6c757d'}; color: white;">
+                                        ${transaction.category.name}
+                                    </span>
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-lg-3  "  >
+
+                    <div class="col-12 col-md-6 col-lg-2">
+                        <div class="amount ${transaction.amount >= 0 ? 'text-success' : 'text-danger'}">
+                            <strong>${transaction.amount >= 0 ? '+' : ''}${transaction.amount.toLocaleString('ru-RU')} ${transaction.currency.symbol}</strong>
+                        </div>
+                                                    <small class="text-muted">
+                                ${formatDateTime(transaction.operationTime)}
+                            </small>
+                    </div>
+
+                    <div class="col-12 col-md-9 col-lg-3"  >
                         ${transaction.card ? `
                             <div class="card-info mb-2 card-header">
                                 <i class="fas fa-credit-card"></i>
                                 <span>**** ${transaction.card.lastFourDigits}</span>
                             </div>
                         ` : ''}
-                        ${transaction.category ? `
-                            <div class="category-badge d-inline-block">
-                                <span class="badge" style="background-color: ${transaction.category.color || '#6c757d'}; color: white;">
-                                    ${transaction.category.name}
-                                </span>
-                            </div>
-                        ` : ''}
                     </div>
-                    <div class="col-12 col-md-6 col-lg-2">
-                        <div class="amount ${transaction.amount >= 0 ? 'text-success' : 'text-danger'}">
-                            <strong>${transaction.amount >= 0 ? '+' : ''}${transaction.amount.toLocaleString('ru-RU')} ${transaction.currency.symbol}</strong>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-lg-3">
+
+
+
+                    <div class="col-12 col-md-3 col-lg-1">
                         <div class="d-flex gap-2 flex-wrap">
                             <button class="btn btn-sm btn-outline-primary" onclick="viewTransactionDetails(${transaction.id})">
                                 <i class="fas fa-eye"></i>
@@ -212,11 +216,11 @@ async function handleAddTransaction(event) {
 
     const transactionData = {
         description: formData.get('description'),
-        amount: parseFloat(formData.get('amount')),
+        amount: Number.parseFloat(formData.get('amount')),
         operationTime: formData.get('operationTime'),
-        currencyId: parseInt(formData.get('currencyId')),
-        categoryId: formData.get('categoryId') ? parseInt(formData.get('categoryId')) : null,
-        cardId: formData.get('cardId') ? parseInt(formData.get('cardId')) : null
+        currencyId: Number.parseInt(formData.get('currencyId')),
+        categoryId: formData.get('categoryId') ? Number.parseInt(formData.get('categoryId')) : null,
+        cardId: formData.get('cardId') ? Number.parseInt(formData.get('cardId')) : null
     };
 
     try {
@@ -241,19 +245,33 @@ async function handleSplitTransaction(event) {
     event.preventDefault();
     const form = event.target;
     const subTransactions = [];
+    let sumAmount = 0;
 
     // Получаем все подтранзакции из формы
     const items = form.querySelectorAll('.sub-transaction-item');
     items.forEach(item => {
         const description = item.querySelector('input[name*="description"]')?.value;
-        const amount = parseFloat(item.querySelector('input[name*="amount"]')?.value);
+        const amount = Number.parseFloat(item.querySelector('input[name*="amount"]')?.value);
         if (description && amount) {
             subTransactions.push({ description, amount });
         }
+        sumAmount += amount;
     });
 
     if (subTransactions.length === 0) {
         showErrorMessage('Добавьте хотя бы одну подтранзакцию');
+        return;
+    }
+
+    const totalAmount = Number.parseFloat(form.dataset.totalAmount);
+
+    if (sumAmount !== totalAmount) {
+        if (sumAmount > totalAmount) {
+            showErrorMessage('Сумма подтранзакций больше суммы транзакции');
+            return;
+        }
+        const remainingAmount = (totalAmount - sumAmount).toFixed(2);
+        showErrorMessage('Общая сумма не совпадает с суммой транзакции, еще нужно ввести ' + remainingAmount);
         return;
     }
 
@@ -442,6 +460,12 @@ globalThis.openSplitTransactionModal = function (transactionId, totalAmount) {
         return;
     }
 
+    // Закрываем текущее открытое модальное окно
+    const existingModal = bootstrap.Modal.getInstance(document.querySelector('.modal.show'));
+    if (existingModal) {
+        existingModal.hide();
+    }
+
     const form = document.getElementById('splitTransactionForm');
     form.dataset.transactionId = transactionId;
     form.dataset.totalAmount = totalAmount;
@@ -450,22 +474,43 @@ globalThis.openSplitTransactionModal = function (transactionId, totalAmount) {
     const container = document.getElementById('subTransactionsContainer');
     container.innerHTML = '';
 
+    const totalAmountElement = document.getElementById('totalAmountDisplay');
+    if (totalAmountElement) {
+        totalAmountElement.textContent = `${totalAmount}`;
+    }
+
     const modal = new bootstrap.Modal(document.getElementById('splitTransactionModal'));
     modal.show();
+
+    setTimeout(() => {
+        updateRemainingAmount();
+    }, 100);
 };
 
 globalThis.addSubTransaction = function () {
     const container = document.getElementById('subTransactionsContainer');
     const index = container.children.length;
 
+
+    const totalAmount = parseFloat(document.getElementById('splitTransactionForm').dataset.totalAmount) || 0;
+    const amountInputs = document.querySelectorAll('.sub-transaction-amount');
+
+    let totalSubAmount = 0;
+    amountInputs.forEach(input => {
+        const value = parseFloat(input.value) || 0;
+        totalSubAmount += value;
+    });
+
+    const remainingAmount = totalAmount - totalSubAmount;
+
     const subTransactionHtml = `
         <div class="sub-transaction-item mb-3 p-3 border rounded">
             <div class="d-flex justify-content-between align-items-start">
                 <div class="flex-grow-1 me-2">
                     <input type="text" class="form-control mb-2" name="subTransactions[${index}].description" placeholder="Описание подтранзакции" required>
-                    <input type="number" class="form-control" name="subTransactions[${index}].amount" placeholder="Сумма" step="0.01" required>
+                    <input type="number" class="form-control sub-transaction-amount" name="subTransactions[${index}].amount" placeholder="Сумма" step="0.01" value="${remainingAmount > 0 ? remainingAmount.toFixed(2) : ''}" required>
                 </div>
-                <button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.parentElement.remove()">
+                <button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.parentElement.remove(); updateRemainingAmount();">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -473,6 +518,36 @@ globalThis.addSubTransaction = function () {
     `;
 
     container.insertAdjacentHTML('beforeend', subTransactionHtml);
+    const amountInput = container.lastElementChild.querySelector('.sub-transaction-amount');
+    amountInput.addEventListener('input', updateRemainingAmount);
+    updateRemainingAmount();
+};
+
+globalThis.updateRemainingAmount = function () {
+    const totalAmount = parseFloat(document.getElementById('splitTransactionForm').dataset.totalAmount) || 0;
+    const amountInputs = document.querySelectorAll('.sub-transaction-amount');
+
+    let totalSubAmount = 0;
+    amountInputs.forEach(input => {
+        const value = parseFloat(input.value) || 0;
+        totalSubAmount += value;
+    });
+
+    const remainingAmount = totalAmount - totalSubAmount;
+    const remainingAmountElement = document.getElementById('remainingAmount');
+
+    if (remainingAmountElement) {
+        remainingAmountElement.textContent = remainingAmount.toFixed(2);
+
+        // Меняем цвет в зависимости от остатка
+        if (remainingAmount === 0) {
+            remainingAmountElement.className = 'mb-3 fw-bold amount text-Success';
+        } else if (remainingAmount < 0) {
+            remainingAmountElement.className = 'mb-3 fw-bold amount text-danger';
+        } else {
+            remainingAmountElement.className = 'mb-3 fw-bold amount text-bg-info';
+        }
+    }
 };
 
 function populateTransactionDetailsModal(transaction) {

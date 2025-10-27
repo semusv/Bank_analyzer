@@ -8,12 +8,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.vvsem.bank.analyzer.dto.TransactionDto;
+import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
+import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.mappers.TransactionMapper;
 import ru.vvsem.bank.analyzer.models.Transaction;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +78,49 @@ public class TransactionServiceImpl implements TransactionService {
         Page<Transaction> transactions = transactionRepository.findAll(spec, pageable);
         return transactions.map(transactionMapper::toTransactionDto);
     }
+
+    @Override
+    public void splitTransaction(Long transactionId, List<SubTransactionDto> subTransactions, Long userId) {
+        Transaction parentTransaction = getTransactionWithIdAndUserId(transactionId, userId);
+
+        BigDecimal totalSubAmount = subTransactions.stream()
+                .map(SubTransactionDto::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2,RoundingMode.HALF_UP);
+
+        if (!totalSubAmount.equals(parentTransaction.getAmount())) {
+            throw new IllegalArgumentException("Сумма дочерних транзакций не равна сумме родительской");
+        }
+
+        parentTransaction.setHide(true);
+        parentTransaction.setMaster(true);
+        transactionRepository.save(parentTransaction);
+
+        for (SubTransactionDto subTransactionDto : subTransactions) {
+            if (subTransactionDto.getAmount().compareTo(BigDecimal.ZERO) != 0) {
+                Transaction subTransaction = getSubTransaction(subTransactionDto, parentTransaction);
+                transactionRepository.save(subTransaction);
+            }
+        }
+    }
+
+    private static Transaction getSubTransaction(SubTransactionDto subTransactionDto, Transaction parentTransaction) {
+        Transaction subTransaction = new Transaction();
+        subTransaction.setAmount(subTransactionDto.getAmount());
+        subTransaction.setDescription(subTransactionDto.getDescription());
+        subTransaction.setOperationTime(parentTransaction.getOperationTime());
+        subTransaction.setCategory(parentTransaction.getCategory());
+        subTransaction.setCard(parentTransaction.getCard());
+        subTransaction.setMaster(false);
+        subTransaction.setHide(false);
+        subTransaction.setParentTransaction(parentTransaction);
+        subTransaction.setUser(parentTransaction.getUser());
+        subTransaction.setOperationType( parentTransaction.getOperationType());
+        subTransaction.setCategory( parentTransaction.getCategory());
+        subTransaction.setCurrency( parentTransaction.getCurrency());
+        return subTransaction;
+    }
+
 
     private Specification<Transaction> buildSpecification(
             Long userId,

@@ -95,7 +95,7 @@ export async function splitTransaction(transactionId, subTransactions) {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         },
-        body: JSON.stringify({ subTransactions })
+        body: JSON.stringify( subTransactions )
     });
 
     return await handleApiResponse(response);

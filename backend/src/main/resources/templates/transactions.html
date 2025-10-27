@@ -87,9 +87,9 @@
                 <div id="transactionsContainer">
                     <div class="col-12">
                         <div class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
+                            <output class="spinner-border text-primary" aria-label="Загрузка данных">
                                 <span class="visually-hidden">Загрузка данных...</span>
-                            </div>
+                            </output>
                             <p class="mt-2 text-muted">Загрузка транзакций...</p>
                         </div>
                     </div>
@@ -164,31 +164,31 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Описание</label>
+                        <label class="form-label fw-bold" for="detailDescription">Описание</label>
                         <p id="detailDescription"></p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Сумма</label>
+                        <label class="form-label fw-bold" for="detailAmount">Сумма</label>
                         <p id="detailAmount"></p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Дата и время</label>
+                        <label class="form-label fw-bold" for="detailDateTime">Дата и время</label>
                         <p id="detailDateTime"></p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Банк</label>
+                        <label class="form-label fw-bold" for="detailBank">Банк</label>
                         <p id="detailBank"></p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Карта</label>
+                        <label class="form-label fw-bold" for="detailCard">Карта</label>
                         <p id="detailCard"></p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Категория</label>
+                        <label class="form-label fw-bold" for="detailCategory">Категория</label>
                         <p id="detailCategory"></p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Статус видимости</label>
+                        <label class="form-label fw-bold" for="detailHideStatus">Статус видимости</label>
                         <p id="detailHideStatus"></p>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="detailHide" disabled>
@@ -219,8 +219,19 @@
                     <h5 class="modal-title">Разделить транзакцию</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
+
                 <form id="splitTransactionForm">
                     <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold" for="totalAmountDisplay">Общая сумма:</label>
+                            <p class="mb-3 fw-bold amount text-success" id="totalAmountDisplay"></p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold" for="remainingAmount">Осталось разделить:</label>
+                            <p class="mb-3 fw-bold amount text-bg-info" id="remainingAmount"></p>
+                        </div>
+
+
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle"></i>
                             Введите подтранзакции. Сумма всех подтранзакций должна равняться сумме основной транзакции.
