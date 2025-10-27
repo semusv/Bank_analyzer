@@ -68,8 +68,7 @@ public class BankAccountServiceImpl implements BankAccountService {
                         () ->
                                 new EntityNotFoundException(
                                         "Bank with id %d not found".formatted(id),
-                                        "exception.entity.not.found.bank",
-                                        id)
+                                        "exception.entity.not.found.bank")
                 );
     }
 
@@ -79,8 +78,7 @@ public class BankAccountServiceImpl implements BankAccountService {
                         () ->
                                 new EntityNotFoundException(
                                         "Currency with id %d not found".formatted(id),
-                                        "exception.entity.not.found.currency",
-                                        id)
+                                        "exception.entity.not.found.currency")
                 );
     }
 
@@ -100,7 +98,12 @@ public class BankAccountServiceImpl implements BankAccountService {
         log.info("Deleting account: {} for user: {}", accountId, userId);
 
         BankAccount account = bankAccountRepository.findByIdAndUserId(accountId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Account not found or access denied"));
+                .orElseThrow(
+                        () ->
+                                new EntityNotFoundException(
+                                        "AccountId %d for UserId %d not found".formatted(accountId,userId),
+                                        "exception.entity.not.found.bankAccount")
+                );
 
         bankAccountRepository.delete(account);
     }

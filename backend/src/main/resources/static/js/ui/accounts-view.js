@@ -1,4 +1,5 @@
-import { fetchAccounts, createAccount, createCard, deleteAccount as deleteAccountApi, deleteCard as deleteCardApi } from "../modules/api/accounts-api.js";
+import { fetchAccounts, createAccount, createCard, deleteAccount as deleteAccountApi } from "../modules/api/accounts-api.js";
+import { deleteCard as deleteCardApi } from "../modules/api/cards-api.js";
 import { fetchBanks } from "../modules/api/banks-api.js";
 import { showErrorMessage, showSuccessMessage } from "../modules/utils.js";
 import { fetchCurrencies } from "../modules/api/currency-api.js";
@@ -145,7 +146,7 @@ function renderAccounts(accounts) {
                                                 <span class="card-name" title="${card.cardName}">
                                                     ${card.cardName}
                                                 </span>
-                                                <span class="card-number">*${card.lastFourDigits}</span>
+                                                <span class="card-number">**** ${card.lastFourDigits}</span>
                                             </div>
                                             <button class="btn btn-sm btn-icon-delete"
                                                     onclick="deleteCard(${card.id}, ${account.id})"
@@ -335,7 +336,7 @@ globalThis.viewAccountDetails = function (accountId) {
 };
 
 globalThis.deleteAccount = async function (accountId) {
-    if (!confirm('Вы уверены, что хотите удалить этот счет?')) {
+    if (!confirm('Вы уверены, что хотите удалить этот счет и все карты?')) {
         return;
     }
 
@@ -347,6 +348,7 @@ globalThis.deleteAccount = async function (accountId) {
         console.error('Failed to delete account:', error);
         showErrorMessage('Ошибка удаления счета: ' + error.message);
     }
+    await loadAccounts();
 };
 
 globalThis.deleteCard = async function (cardId, accountId) {
@@ -362,4 +364,5 @@ globalThis.deleteCard = async function (cardId, accountId) {
         console.error('Failed to delete card:', error);
         showErrorMessage('Ошибка удаления карты: ' + error.message);
     }
+    await loadAccounts();
 };

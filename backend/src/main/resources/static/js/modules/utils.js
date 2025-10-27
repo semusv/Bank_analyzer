@@ -10,6 +10,9 @@ export class ApiError extends Error {
 
 export async function handleApiResponse(response) {
     if (response.ok) {
+        if (response.status === 204) {
+            return null;
+        }
         return await response.json();
     }
 
@@ -94,7 +97,7 @@ export function getLocaleMessage(messageKey, ...args) {
             message = message.replace(new RegExp(escapeRegExp(placeholder), 'g'), arg);
         });
 
-        return message;
+          return message;
     } catch (error) {
         console.error('Error parsing messages:', error);
         return messageKey;

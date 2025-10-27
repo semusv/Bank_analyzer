@@ -9,4 +9,7 @@ public interface CardService {
 
     @Transactional
     CardDto createCard(NewCardDto newCardDto, User user);
+
+    @Transactional
+    void deleteCard(Long cardId, Long userId);
 }
