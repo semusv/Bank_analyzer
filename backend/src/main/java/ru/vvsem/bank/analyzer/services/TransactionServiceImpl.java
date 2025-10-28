@@ -8,11 +8,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import ru.vvsem.bank.analyzer.dto.transaction.NewTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.mappers.TransactionMapper;
+import ru.vvsem.bank.analyzer.models.Card;
+import ru.vvsem.bank.analyzer.models.Category;
+import ru.vvsem.bank.analyzer.models.Currency;
 import ru.vvsem.bank.analyzer.models.Transaction;
+import ru.vvsem.bank.analyzer.models.User;
+import ru.vvsem.bank.analyzer.models.enums.OperationType;
+import ru.vvsem.bank.analyzer.repositories.CardRepository;
+import ru.vvsem.bank.analyzer.repositories.CategoryRepository;
+import ru.vvsem.bank.analyzer.repositories.CurrencyRepository;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
 
 import java.math.BigDecimal;
@@ -28,6 +37,12 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
 
     private final TransactionMapper transactionMapper;
+
+    private final CardRepository cardRepository;
+
+    private final CurrencyRepository currencyRepository;
+
+    private final CategoryRepository categoryRepository;
 
     @Override
     public List<TransactionDto> getListTransaction(Long userId) {
@@ -86,7 +101,7 @@ public class TransactionServiceImpl implements TransactionService {
         BigDecimal totalSubAmount = subTransactions.stream()
                 .map(SubTransactionDto::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .setScale(2,RoundingMode.HALF_UP);
+                .setScale(2, RoundingMode.HALF_UP);
 
         if (!totalSubAmount.equals(parentTransaction.getAmount())) {
             throw new IllegalArgumentException("Сумма дочерних транзакций не равна сумме родительской");
@@ -104,6 +119,47 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
+    @Override
+    public TransactionDto insertTransaction(NewTransactionDto newTransactionDto, User user) {
+
+        Transaction transaction = new Transaction();
+        transaction.setDescription(newTransactionDto.getDescription());
+        transaction.setAmount(newTransactionDto.getAmount());
+        transaction.setOperationTime(newTransactionDto.getOperationTime());
+        transaction.setCategory(getCategoryById(newTransactionDto.getCategoryId()));
+        transaction.setCurrency(getCurrencyByCardID(newTransactionDto.getCardId()));
+        transaction.setCard(getCardByIdAndUserId(newTransactionDto.getCardId(), user.getId()));
+        transaction.setOperationType(newTransactionDto.getOperationType());
+        if (transaction.getOperationType() == OperationType.OUTGOING) {
+            transaction.setAmount(transaction.getAmount().negate());
+        }
+        transaction.setUser(user);
+
+        return transactionMapper.toTransactionDto(
+                transactionRepository.save(transaction));
+    }
+
+    private Category getCategoryById(Long categoryId) {
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Currency for card with id %d not found".formatted(categoryId),
+                        "exception.entity.not.found.category"));
+    }
+
+    private Currency getCurrencyByCardID(Long cardId) {
+        return currencyRepository.getCurrencyByCardId(cardId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Currency for card with id %d not found".formatted(cardId),
+                        "exception.entity.not.found.currency"));
+    }
+
+    private Card getCardByIdAndUserId(Long cardId, Long userId) {
+        return cardRepository.findByIdAndAccount_User_Id(cardId, userId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Card with id %d for UserId %d not found".formatted(cardId, userId),
+                        "exception.entity.not.found.card"));
+    }
+
     private static Transaction getSubTransaction(SubTransactionDto subTransactionDto, Transaction parentTransaction) {
         Transaction subTransaction = new Transaction();
         subTransaction.setAmount(subTransactionDto.getAmount());
@@ -115,9 +171,9 @@ public class TransactionServiceImpl implements TransactionService {
         subTransaction.setHide(false);
         subTransaction.setParentTransaction(parentTransaction);
         subTransaction.setUser(parentTransaction.getUser());
-        subTransaction.setOperationType( parentTransaction.getOperationType());
-        subTransaction.setCategory( parentTransaction.getCategory());
-        subTransaction.setCurrency( parentTransaction.getCurrency());
+        subTransaction.setOperationType(parentTransaction.getOperationType());
+        subTransaction.setCategory(parentTransaction.getCategory());
+        subTransaction.setCurrency(parentTransaction.getCurrency());
         return subTransaction;
     }
 

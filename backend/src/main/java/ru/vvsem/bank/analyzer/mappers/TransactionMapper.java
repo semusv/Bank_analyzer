@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
+import ru.vvsem.bank.analyzer.dto.transaction.NewTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.models.Transaction;
@@ -33,4 +34,11 @@ public interface TransactionMapper {
 
     @InheritInverseConfiguration(name = "toEntity")
     SubTransactionDto toSubTransactionDto(Transaction transaction);
+
+    @Mapping(source = "cardId", target = "card.id")
+    @Mapping(source = "categoryId", target = "category.id")
+    Transaction toEntity(NewTransactionDto newTransactionDto);
+
+    @InheritInverseConfiguration(name = "toEntity")
+    NewTransactionDto toNewTransactionDto(Transaction transaction);
 }

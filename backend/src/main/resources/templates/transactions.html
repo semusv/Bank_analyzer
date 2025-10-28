@@ -112,6 +112,22 @@
                 <form id="addTransactionForm">
                     <div class="modal-body">
                         <div class="mb-3">
+                            <label class="form-label" for="type-selection">Тип операции *</label>
+                            <fieldset class="btn-group w-100" id="type-selection">
+                                <input type="radio" class="btn-check" name="operationType" id="expenseType" value="1"
+                                    checked>
+                                <label class="btn btn-outline-danger" for="expenseType">Расход</label>
+
+                                <input type="radio" class="btn-check" name="operationType" id="incomeType" value="2">
+                                <label class="btn btn-outline-success" for="incomeType">Доход</label>
+
+                                <input type="radio" class="btn-check" name="operationType" id="transferType" value="3">
+                                <label class="btn btn-outline-primary" for="transferType">Перевод</label>
+                            </fieldset>
+                        </div>
+
+
+                        <div class="mb-3">
                             <label for="addDescription" class="form-label">Описание *</label>
                             <input type="text" class="form-control" id="addDescription" name="description" required
                                 placeholder="Например: Пятерочка">
@@ -125,12 +141,6 @@
                             <label for="addOperationTime" class="form-label">Дата и время *</label>
                             <input type="datetime-local" class="form-control" id="addOperationTime" name="operationTime"
                                 required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="addCurrencyId" class="form-label">Валюта *</label>
-                            <select class="form-select" id="addCurrencyId" name="currencyId" required>
-                                <option value="">Выберите валюту</option>
-                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="addCategoryId" class="form-label">Категория</label>

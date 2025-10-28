@@ -218,7 +218,6 @@ async function handleAddTransaction(event) {
         description: formData.get('description'),
         amount: Number.parseFloat(formData.get('amount')),
         operationTime: formData.get('operationTime'),
-        currencyId: Number.parseInt(formData.get('currencyId')),
         categoryId: formData.get('categoryId') ? Number.parseInt(formData.get('categoryId')) : null,
         cardId: formData.get('cardId') ? Number.parseInt(formData.get('cardId')) : null
     };
@@ -492,12 +491,12 @@ globalThis.addSubTransaction = function () {
     const index = container.children.length;
 
 
-    const totalAmount = parseFloat(document.getElementById('splitTransactionForm').dataset.totalAmount) || 0;
+    const totalAmount = Number.parseFloat(document.getElementById('splitTransactionForm').dataset.totalAmount) || 0;
     const amountInputs = document.querySelectorAll('.sub-transaction-amount');
 
     let totalSubAmount = 0;
     amountInputs.forEach(input => {
-        const value = parseFloat(input.value) || 0;
+        const value = Number.parseFloat(input.value) || 0;
         totalSubAmount += value;
     });
 
@@ -524,12 +523,12 @@ globalThis.addSubTransaction = function () {
 };
 
 globalThis.updateRemainingAmount = function () {
-    const totalAmount = parseFloat(document.getElementById('splitTransactionForm').dataset.totalAmount) || 0;
+    const totalAmount = Number.parseFloat(document.getElementById('splitTransactionForm').dataset.totalAmount) || 0;
     const amountInputs = document.querySelectorAll('.sub-transaction-amount');
 
     let totalSubAmount = 0;
     amountInputs.forEach(input => {
-        const value = parseFloat(input.value) || 0;
+        const value = Number.parseFloat(input.value) || 0;
         totalSubAmount += value;
     });
 
@@ -602,15 +601,6 @@ function populateTransactionDetailsModal(transaction) {
 }
 
 function populateAddTransactionModal() {
-    // Заполнить выбор валют
-    const currencySelect = document.getElementById('addCurrencyId');
-    currencySelect.innerHTML = '<option value="">Выберите валюту</option>';
-    currenciesCache.forEach(currency => {
-        const option = document.createElement('option');
-        option.value = currency.id;
-        option.textContent = `${currency.code} (${currency.name})`;
-        currencySelect.appendChild(option);
-    });
 
     // Заполнить выбор категорий
     const categorySelect = document.getElementById('addCategoryId');
@@ -622,6 +612,11 @@ function populateAddTransactionModal() {
         categorySelect.appendChild(option);
     });
 
+    // Заполнить текущее время
+    if (document.getElementById('addOperationTime')) {
+        document.getElementById('addOperationTime').value = getLocalDateTimeString();
+    }
+
     // Заполнить выбор карт
     const cardSelect = document.getElementById('addCardId');
     cardSelect.innerHTML = '<option value="">Не выбрано</option>';
@@ -632,6 +627,14 @@ function populateAddTransactionModal() {
         cardSelect.appendChild(option);
     });
 }
+
+    function getLocalDateTimeString(date = new Date()) {
+        // Смещаем дату на разницу с UTC чтобы получить локальное время
+        const timezoneOffset = date.getTimezoneOffset() * 60000;
+        const localDate = new Date(date.getTime() - timezoneOffset);
+        return localDate.toISOString().slice(0, 16);
+    }
+
 
 function populateFilters() {
     // Заполнить фильтр категорий

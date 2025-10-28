@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.vvsem.bank.analyzer.dto.transaction.NewTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.models.User;
@@ -99,6 +100,13 @@ public class TransactionController {
 
     }
 
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public TransactionDto createTransaction(
+            @Valid @RequestBody NewTransactionDto newTransactionDto,
+            @AuthenticationPrincipal User user) {
+       return transactionService.insertTransaction( newTransactionDto, user);
+    }
 
     @Setter
     @Getter
