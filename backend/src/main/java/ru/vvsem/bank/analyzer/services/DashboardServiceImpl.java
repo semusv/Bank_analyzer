@@ -11,6 +11,7 @@ import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,12 +33,12 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDateTime startOfMonth = getStartOfMonth();
         LocalDateTime endOfMonth = getEndOfMonth();
         return DashboardStatsDto.builder()
-                .totalBalance(getSafeBigDecimal(
-                        bankAccountRepository.calculateTotalBalanceByUserId(userId)))
                 .monthlyIncome(getSafeBigDecimal(
                         transactionRepository.calculateMonthlyIncome(userId, startOfMonth, endOfMonth)))
                 .monthlyExpense(getSafeBigDecimal(
-                        transactionRepository.calculateMonthlyExpense(userId, startOfMonth, endOfMonth)).abs())
+                        transactionRepository.calculateMonthlyExpense(userId, startOfMonth, endOfMonth)))
+                .totalBalance(getSafeBigDecimal(
+                        bankAccountRepository.calculateTotalBalanceByUserId(userId)))
                 .totalTransactions(getSafeLong(
                         transactionRepository.countByUserId(userId)))
                 .uncategorizedTransactions(getSafeLong(
@@ -46,7 +47,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     private BigDecimal getSafeBigDecimal(BigDecimal value) {
-        return value != null ? value : BigDecimal.ZERO;
+        return value != null ? value.setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
     }
 
     private Long getSafeLong(Long value) {

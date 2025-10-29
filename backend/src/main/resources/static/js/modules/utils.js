@@ -94,15 +94,39 @@ export function getLocaleMessage(messageKey, ...args) {
         // Заменяем подстановки {0}, {1} и т.д. на соответствующие аргументы
         args.forEach((arg, index) => {
             const placeholder = `{${index}}`;
-            message = message.replace(new RegExp(escapeRegExp(placeholder), 'g'), arg);
+            message = message.replaceAll(new RegExp(escapeRegExp(placeholder), 'g'), arg);
         });
 
-          return message;
+        return message;
     } catch (error) {
         console.error('Error parsing messages:', error);
         return messageKey;
     }
 }
 function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return string.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+export function getCurrencyFormatter(currency) {
+    const locale = document.querySelector('meta[name="locale"]').content;
+    const formatter = new Intl.NumberFormat(locale,
+        {
+            style: 'currency',
+            currency: currency,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+    return formatter;
+}
+
+export function formatCurrency(value, currency) {
+    try {
+        const formatter = getCurrencyFormatter(currency);
+        const formattedValue = formatter.format(value);
+        return value > 0 ? '+' + formattedValue : formattedValue;
+
+    } catch (error) {
+        console.error('Error formatting currency:', error);
+        return value;
+    }
 }

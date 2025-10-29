@@ -1,7 +1,7 @@
 import { fetchAccounts, createAccount, createCard, deleteAccount as deleteAccountApi } from "../modules/api/accounts-api.js";
 import { deleteCard as deleteCardApi } from "../modules/api/cards-api.js";
 import { fetchBanks } from "../modules/api/banks-api.js";
-import { showErrorMessage, showSuccessMessage } from "../modules/utils.js";
+import { showErrorMessage, showSuccessMessage, formatCurrency } from "../modules/utils.js";
 import { fetchCurrencies } from "../modules/api/currency-api.js";
 
 
@@ -128,8 +128,8 @@ function renderAccounts(accounts) {
                         <i class="fas fa-hashtag"></i> ${account.accountNumber}
                     </p>
                     <div class="balance-section">
-                        <div class="balance-amount">
-                            ${account.balance.toLocaleString('ru-RU')} ${account.currencySymbol}
+                        <div class="balance-amount ${account.balance >= 0 ? 'text-success' : 'text-danger'}">
+                            ${formatCurrency(account.balance, account.currencyCode)}
                         </div>
                     </div>
 

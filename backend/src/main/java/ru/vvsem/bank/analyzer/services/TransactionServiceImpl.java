@@ -13,12 +13,15 @@ import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.mappers.TransactionMapper;
+import ru.vvsem.bank.analyzer.models.BankAccount;
 import ru.vvsem.bank.analyzer.models.Card;
 import ru.vvsem.bank.analyzer.models.Category;
 import ru.vvsem.bank.analyzer.models.Currency;
 import ru.vvsem.bank.analyzer.models.Transaction;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
+import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
+import ru.vvsem.bank.analyzer.repositories.BankRepository;
 import ru.vvsem.bank.analyzer.repositories.CardRepository;
 import ru.vvsem.bank.analyzer.repositories.CategoryRepository;
 import ru.vvsem.bank.analyzer.repositories.CurrencyRepository;
@@ -44,6 +47,10 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final CategoryRepository categoryRepository;
 
+    private final BankRepository bankRepository;
+
+    private final BankAccountRepository bankAccountRepository;
+
     @Override
     public List<TransactionDto> getListTransaction(Long userId) {
         return transactionRepository.findByUserId(userId)
@@ -66,6 +73,17 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = getTransactionWithIdAndUserId(transactionId, userId);
         transaction.setHide(!transaction.isHide());
         transactionRepository.save(transaction);
+
+        updateAccountBalance(transaction.getCard().getAccount(),
+                !transaction.isHide() ? transaction.getAmount() : transaction.getAmount().negate());
+
+    }
+
+    private void updateAccountBalance(BankAccount bankAccount, BigDecimal amount ) {
+        bankAccountRepository.updateBalance(
+                bankAccount.getBalance().add (amount),
+                bankAccount.getId()
+        );
     }
 
     @Override
@@ -73,6 +91,9 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = getTransactionWithIdAndUserId(transactionId, userId);
         transaction.setHide(!transaction.isHide());
         transactionRepository.delete(transaction);
+
+        updateAccountBalance(transaction.getCard().getAccount(),
+                 transaction.getAmount().negate());
     }
 
     @Override
@@ -135,8 +156,12 @@ public class TransactionServiceImpl implements TransactionService {
         }
         transaction.setUser(user);
 
+        updateAccountBalance(transaction.getCard().getAccount(),
+                transaction.getAmount());
+
         return transactionMapper.toTransactionDto(
                 transactionRepository.save(transaction));
+
     }
 
     private Category getCategoryById(Long categoryId) {

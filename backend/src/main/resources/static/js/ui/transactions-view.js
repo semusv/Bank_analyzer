@@ -10,7 +10,7 @@ import { fetchCards } from "../modules/api/cards-api.js";
 import { fetchCategories } from "../modules/api/categories-api.js";
 import { fetchBanks } from "../modules/api/banks-api.js";
 import { fetchCurrencies } from "../modules/api/currency-api.js";
-import { showErrorMessage, showSuccessMessage } from "../modules/utils.js";
+import { showErrorMessage, showSuccessMessage, formatCurrency } from "../modules/utils.js";
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -119,7 +119,7 @@ function renderTransactions(transactions) {
                     <div class="col-12 col-md-6 col-lg-6">
                         <div class="transaction-info">
                             <h6 class="mb-1">
-                                ${transaction.description}
+                                    ${transaction.description}
                                 ${transaction.hide ? '<span class="badge bg-secondary ms-2">Скрыто</span>' : ''}
                             </h6>
                             ${transaction.category ? `
@@ -134,11 +134,13 @@ function renderTransactions(transactions) {
 
                     <div class="col-12 col-md-6 col-lg-2">
                         <div class="amount ${transaction.amount >= 0 ? 'text-success' : 'text-danger'}">
-                            <strong>${transaction.amount >= 0 ? '+' : ''}${transaction.amount.toLocaleString('ru-RU')} ${transaction.currency.symbol}</strong>
+                            <strong>
+                            ${formatCurrency(transaction.amount, transaction.currency.code)}
+                            </strong>
                         </div>
-                                                    <small class="text-muted">
-                                ${formatDateTime(transaction.operationTime)}
-                            </small>
+                        <small class="text-muted">
+                            ${formatDateTime(transaction.operationTime)}
+                        </small>
                     </div>
 
                     <div class="col-12 col-md-9 col-lg-3"  >
@@ -219,7 +221,8 @@ async function handleAddTransaction(event) {
         amount: Number.parseFloat(formData.get('amount')),
         operationTime: formData.get('operationTime'),
         categoryId: formData.get('categoryId') ? Number.parseInt(formData.get('categoryId')) : null,
-        cardId: formData.get('cardId') ? Number.parseInt(formData.get('cardId')) : null
+        cardId: formData.get('cardId') ? Number.parseInt(formData.get('cardId')) : null,
+        operationType: formData.get("operationType")
     };
 
     try {
@@ -551,10 +554,13 @@ globalThis.updateRemainingAmount = function () {
 
 function populateTransactionDetailsModal(transaction) {
     document.getElementById('detailDescription').textContent = transaction.description;
-    document.getElementById('detailAmount').textContent =
-        `${transaction.amount >= 0 ? '+' : ''}${transaction.amount.toLocaleString('ru-RU')} ${transaction.currency.symbol}`;
+
+    // Сумма операции
+    document.getElementById('detailAmount').textContent = formatCurrency(transaction.amount, transaction.currency.code);
     document.getElementById('detailAmount').className =
         `amount ${transaction.amount >= 0 ? 'text-success' : 'text-danger'}`;
+
+
     document.getElementById('detailDateTime').textContent = formatDateTime(transaction.operationTime);
 
     // Card information with badge
@@ -626,14 +632,37 @@ function populateAddTransactionModal() {
         option.textContent = `${card.cardName} (****${card.lastFourDigits})`;
         cardSelect.appendChild(option);
     });
+
+
+
+    // изменяем цвет суммы в зависимости от типа операции
+    document.querySelectorAll('input[type="radio"][name="operationType"]')
+        .forEach(radio => {
+            radio.addEventListener('change', () => {
+                changeAddAmountColor(radio);
+            });
+        });
 }
 
-    function getLocalDateTimeString(date = new Date()) {
-        // Смещаем дату на разницу с UTC чтобы получить локальное время
-        const timezoneOffset = date.getTimezoneOffset() * 60000;
-        const localDate = new Date(date.getTime() - timezoneOffset);
-        return localDate.toISOString().slice(0, 16);
+function changeAddAmountColor(radio) {
+    const amountInput = document.getElementById('addAmount');
+    amountInput.classList.remove('text-danger', 'text-success', 'text-info');
+
+    if (radio.value == 0) {
+        amountInput.classList.add('text-danger');
+    } else if (radio.value == 1) {
+        amountInput.classList.add('text-success');
+    } else if (radio.value == 2) {
+        amountInput.classList.add('text-info');
     }
+}
+
+function getLocalDateTimeString(date = new Date()) {
+    // Смещаем дату на разницу с UTC чтобы получить локальное время
+    const timezoneOffset = date.getTimezoneOffset() * 60000;
+    const localDate = new Date(date.getTime() - timezoneOffset);
+    return localDate.toISOString().slice(0, 16);
+}
 
 
 function populateFilters() {

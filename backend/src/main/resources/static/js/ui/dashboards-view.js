@@ -1,5 +1,5 @@
 import { fetchStats, fetchTransactionsRes } from "../modules/api/dashboards-api.js";
-import { showErrorMessage } from "../modules/utils.js";
+import { showErrorMessage, getCurrencyFormatter, formatCurrency } from "../modules/utils.js";
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -20,9 +20,11 @@ async function init() {
 }
 
 function renderStats(stats) {
-    document.getElementById('totalBalance').textContent = stats.totalBalance + ' ₽';
-    document.getElementById('monthlyIncome').textContent = stats.monthlyIncome + ' ₽';
-    document.getElementById('monthlyExpense').textContent = stats.monthlyExpense + ' ₽';
+    const formatter = getCurrencyFormatter('RUB');
+
+    document.getElementById('totalBalance').textContent = formatCurrency(stats.totalBalance, 'RUB');
+    document.getElementById('monthlyIncome').textContent = formatCurrency(stats.monthlyIncome, 'RUB');
+    document.getElementById('monthlyExpense').textContent = formatCurrency(stats.monthlyExpense, 'RUB');
 }
 
 
@@ -42,8 +44,10 @@ function renderTransactions(transactions) {
                         <small class="text-muted">${new Date(txn.operationTime).toLocaleDateString()}</small>
                     </div>
                     <div class="text-end">
-                        <span class="${txn.amount > 0 ? 'transaction-income' : 'transaction-expense'}">
-                            ${txn.amount > 0 ? '+' : ''}${txn.amount} ₽
+                        <span class="amount ${txn.amount > 0 ? 'text-success' : 'text-danger'}">
+                            <strong>
+                                ${formatCurrency(txn.amount, txn.currency.code)}
+                            </strong>
                         </span>
                         <br>
                         <small class="text-muted">${txn.category?.name || 'Без категории'}</small>

@@ -40,6 +40,7 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     private final CurrencyRepository currencyRepository;
 
+
     @Transactional(readOnly = true)
     @Override
     public List<BankAccountDto> getUserBankAccount(Long userId) {
