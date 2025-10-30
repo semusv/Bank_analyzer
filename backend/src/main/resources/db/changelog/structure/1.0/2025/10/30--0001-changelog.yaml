@@ -1,0 +1,37 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1761833878990-1
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: bank_code
+                  type: VARCHAR(50)
+            tableName: banks
+  - changeSet:
+      id: 1761833878990-2
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: budgets
+            constraintName: fk_budgets_categories
+  - changeSet:
+      id: 1761833878990-3
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: budgets
+            constraintName: fk_budgets_users
+  - changeSet:
+      id: 1761833878990-4
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropTable:
+            cascadeConstraints: true
+            tableName: budgets
+

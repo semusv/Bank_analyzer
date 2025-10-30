@@ -1,5 +1,5 @@
-name;bic;logo_url
-Сбербанк;044525225;https://example.com/sberbank.png
-Тинькофф;044525974;https://example.com/tinkoff.png
-ВТБ;044525187;https://example.com/vtb.png
-Альфа-Банк;044525593;https://example.com/alfabank.png
+name;bic;logo_url;bank_code
+Сбербанк;044525225;https://example.com/sberbank.png;sber
+Тинькофф;044525974;https://example.com/tinkoff.png;tinkoff
+ВТБ;044525187;https://example.com/vtb.png;vtb
+Альфа-Банк;044525593;https://example.com/alfabank.png;alpha

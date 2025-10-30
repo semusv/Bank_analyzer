@@ -48,3 +48,28 @@ spring:
 app:
   templates:
     error: "static/error-template.txt"
+
+
+bank:
+  themes:
+    sber:
+      primary-color: "#21a038"
+      secondary-color: "#1e8a34"
+      text-color: "#FFFFFF"
+    tinkoff:
+      primary-color: "#ffdd2d"
+      secondary-color: "#fcc521"
+      text-color: "#1E1E1E"
+    alpha:
+      primary-color: "#ef4444"
+      secondary-color: "#dc2626"
+      text-color: "#FFFFFF"
+    vtb:
+      primary-color: "#1e3a8a"
+      secondary-color: "#1e40af"
+      text-color: "#FFFFFF"
+    default:
+      primary-color: "#007bff"
+      secondary-color: "#0056b3"
+      text-color: "#FFFFFF"
+

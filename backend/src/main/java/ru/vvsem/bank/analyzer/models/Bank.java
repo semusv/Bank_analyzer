@@ -11,6 +11,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.util.List;
 
 @Entity
@@ -29,6 +32,9 @@ public class Bank extends AbstractBaseEntity {
     @NotNull
     @Column(name = "bic", nullable = false, unique = true, length = 9)
     private String bic; // БИК банка
+
+    @Column(name = "bank_code", length = 50)
+    private String bankCode;
 
     @Column(name = "logo_url")
     private String logoUrl;

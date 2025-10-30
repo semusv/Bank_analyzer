@@ -19,4 +19,6 @@ public class BankDto {
     private  String bic;
 
     private String logoUrl;
+
+    private String bankCode;
 }
