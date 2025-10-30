@@ -42,8 +42,6 @@ databaseChangeLog:
                   name: bic
               - column:
                   name: logo_url
-              - column:
-                  name: bank_code
 
   - changeSet:
       id: 2025-08-13--0003-users-data

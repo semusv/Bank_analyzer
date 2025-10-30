@@ -1,9 +1,10 @@
 package ru.vvsem.bank.analyzer.services;
 
-import ru.vvsem.bank.analyzer.configs.BankThemeConfig.BankTheme;
+
+import ru.vvsem.bank.analyzer.dto.BankThemeDto;
 
 public interface BankThemeService {
 
-    BankTheme getBankTheme(String bankCode);
+    BankThemeDto getBankTheme(String bankCode);
 
 }

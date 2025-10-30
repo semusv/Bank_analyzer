@@ -9,8 +9,14 @@ import {
 import { fetchCards } from "../modules/api/cards-api.js";
 import { fetchCategories } from "../modules/api/categories-api.js";
 import { fetchBanks } from "../modules/api/banks-api.js";
+import { getBankColorsForElem } from "./themes.js";
 import { fetchCurrencies } from "../modules/api/currency-api.js";
-import { showErrorMessage, showSuccessMessage, formatCurrency, showApiErrors } from "../modules/utils.js";
+import {
+    showErrorMessage,
+    showSuccessMessage,
+    formatCurrency,
+    showApiErrors
+} from "../modules/utils.js";
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -22,6 +28,7 @@ let currenciesCache = null;
 let currentPage = 0;
 let totalPages = 0;
 let pageSize = 20;
+
 
 async function init() {
     try {
@@ -80,6 +87,8 @@ async function loadCurrencies() {
     }
 }
 
+
+
 async function loadTransactions(page = 0) {
     try {
         currentPage = page;
@@ -112,8 +121,8 @@ function renderTransactions(transactions) {
         return;
     }
 
-    container.innerHTML = transactions.map(transaction => `
-        <div class="card transaction-card mb-3 ${transaction.hide ? 'opacity-50' : ''}" data-transaction-id="${transaction.id}" data-bank="${transaction.bank.name}">
+    container.innerHTML = transactions.map(transaction =>
+        `<div class="card transaction-card mb-3 ${transaction.hide ? 'opacity-50' : ''}" data-transaction-id="${transaction.id}" data-bank="${transaction.bank.name}">
             <div class="card-body">
                 <div class="row align-items-center" ">
                     <div class="col-12 col-md-6 col-lg-6">
@@ -145,7 +154,7 @@ function renderTransactions(transactions) {
 
                     <div class="col-12 col-md-9 col-lg-3"  >
                         ${transaction.card ? `
-                            <div class="card-info mb-2 card-header">
+                            <div class="card-info mb-2 card-header" data-bank-theme="${transaction.bank.bankCode}">
                                 <i class="fas fa-credit-card"></i>
                                 <span>**** ${transaction.card.lastFourDigits}</span>
                             </div>
@@ -168,6 +177,16 @@ function renderTransactions(transactions) {
             </div>
         </div>
     `).join('');
+
+    // Динамическое применение темы
+    applyBankThemesToTransactions(transactions);
+}
+
+async function applyBankThemesToTransactions(transactions) {
+    for (const txn of transactions) {
+        const { bank: { bankCode }, id } = txn;
+        getBankColorsForElem(bankCode, document.querySelector(`.transaction-card[data-transaction-id="${id}"] .card-info`));
+    }
 }
 
 function renderEmptyState() {
@@ -577,12 +596,15 @@ function populateTransactionDetailsModal(transaction) {
     // Bank information with badge
     const bankElement = document.getElementById('detailBank');
     if (transaction.bank) {
-        bankElement.innerHTML = `<span class="badge bg-info">${transaction.bank.name}</span>`;
+        const bankElementBadge = document.getElementById('detailBankBadge');
+        bankElementBadge.innerHTML = transaction.bank.name;
+        getBankColorsForElem(transaction.bank.bankCode, bankElementBadge);
     } else if (transaction.card) {
         bankElement.textContent = 'Не указан';
     } else {
         bankElement.textContent = 'Не указан';
     }
+
 
     // Category with color
     const categoryElement = document.getElementById('detailCategory');
@@ -707,3 +729,4 @@ function populateFilters() {
         });
     }
 }
+
