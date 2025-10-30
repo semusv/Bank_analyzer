@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.services;
+package ru.vvsem.bank.analyzer.services.handlers;
 
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;

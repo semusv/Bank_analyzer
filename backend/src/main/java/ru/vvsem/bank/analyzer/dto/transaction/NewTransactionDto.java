@@ -1,9 +1,10 @@
 package ru.vvsem.bank.analyzer.dto.transaction;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+
 import jakarta.validation.constraints.NotNull;
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
 import ru.vvsem.bank.analyzer.models.Transaction;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
 
@@ -13,24 +14,25 @@ import java.time.LocalDateTime;
 /**
  * DTO for {@link Transaction}
  */
-@Value
+@Getter
+@Setter
 public class NewTransactionDto {
     @NotNull
     @NotBlank(message = "{validation.Transaction.description.notBlank}")
-    String description;
+    private String description;
 
     @NotNull(message = "{validation.Transaction.amount.NotNull}")
-    BigDecimal amount;
+    private BigDecimal amount;
 
     @NotNull(message = "{validation.Transaction.operationTime.NotNull}")
-    LocalDateTime operationTime;
+    private LocalDateTime operationTime;
 
     @NotNull(message = "{validation.Transaction.categoryId.NotNull}")
-    Long categoryId;
+    private Long categoryId;
 
     @NotNull(message = "{validation.Transaction.cardId.NotNull}")
-    Long cardId;
+    private Long cardId;
 
     @NotNull(message = "{validation.Transaction.operationType.NotNull}")
-    OperationType operationType;
+    private OperationType operationType;
 }

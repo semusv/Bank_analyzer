@@ -13,18 +13,9 @@ import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.mappers.TransactionMapper;
-import ru.vvsem.bank.analyzer.models.BankAccount;
-import ru.vvsem.bank.analyzer.models.Card;
-import ru.vvsem.bank.analyzer.models.Category;
-import ru.vvsem.bank.analyzer.models.Currency;
 import ru.vvsem.bank.analyzer.models.Transaction;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
-import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
-import ru.vvsem.bank.analyzer.repositories.BankRepository;
-import ru.vvsem.bank.analyzer.repositories.CardRepository;
-import ru.vvsem.bank.analyzer.repositories.CategoryRepository;
-import ru.vvsem.bank.analyzer.repositories.CurrencyRepository;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
 
 import java.math.BigDecimal;
@@ -41,15 +32,13 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionMapper transactionMapper;
 
-    private final CardRepository cardRepository;
+    private final CurrencyService currencyService;
 
-    private final CurrencyRepository currencyRepository;
+    private final CategoryService categoryService;
 
-    private final CategoryRepository categoryRepository;
+    private final CardService cardService;
 
-    private final BankRepository bankRepository;
-
-    private final BankAccountRepository bankAccountRepository;
+    private final BankAccountService bankAccountService;
 
     @Override
     public List<TransactionDto> getListTransaction(Long userId) {
@@ -74,16 +63,9 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setHide(!transaction.isHide());
         transactionRepository.save(transaction);
 
-        updateAccountBalance(transaction.getCard().getAccount(),
+        bankAccountService.updateAccountBalance(transaction.getCard().getAccount(),
                 !transaction.isHide() ? transaction.getAmount() : transaction.getAmount().negate());
 
-    }
-
-    private void updateAccountBalance(BankAccount bankAccount, BigDecimal amount ) {
-        bankAccountRepository.updateBalance(
-                bankAccount.getBalance().add (amount),
-                bankAccount.getId()
-        );
     }
 
     @Override
@@ -92,10 +74,11 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setHide(!transaction.isHide());
         transactionRepository.delete(transaction);
 
-        updateAccountBalance(transaction.getCard().getAccount(),
-                 transaction.getAmount().negate());
+        bankAccountService.updateAccountBalance(transaction.getCard().getAccount(),
+                transaction.getAmount().negate());
     }
 
+    @SuppressWarnings("CheckStyle")
     @Override
     public Page<TransactionDto> getListTransaction(
             Long userId,
@@ -147,16 +130,16 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setDescription(newTransactionDto.getDescription());
         transaction.setAmount(newTransactionDto.getAmount());
         transaction.setOperationTime(newTransactionDto.getOperationTime());
-        transaction.setCategory(getCategoryById(newTransactionDto.getCategoryId()));
-        transaction.setCurrency(getCurrencyByCardID(newTransactionDto.getCardId()));
-        transaction.setCard(getCardByIdAndUserId(newTransactionDto.getCardId(), user.getId()));
+        transaction.setCategory(categoryService.getCategoryById(newTransactionDto.getCategoryId()));
+        transaction.setCurrency(currencyService.getCurrencyByCardID(newTransactionDto.getCardId()));
+        transaction.setCard(cardService.getCardByIdAndUserId(newTransactionDto.getCardId(), user.getId()));
         transaction.setOperationType(newTransactionDto.getOperationType());
         if (transaction.getOperationType() == OperationType.OUTGOING) {
             transaction.setAmount(transaction.getAmount().negate());
         }
         transaction.setUser(user);
 
-        updateAccountBalance(transaction.getCard().getAccount(),
+        bankAccountService.updateAccountBalance(transaction.getCard().getAccount(),
                 transaction.getAmount());
 
         return transactionMapper.toTransactionDto(
@@ -164,26 +147,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     }
 
-    private Category getCategoryById(Long categoryId) {
-        return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Currency for card with id %d not found".formatted(categoryId),
-                        "exception.entity.not.found.category"));
-    }
 
-    private Currency getCurrencyByCardID(Long cardId) {
-        return currencyRepository.getCurrencyByCardId(cardId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Currency for card with id %d not found".formatted(cardId),
-                        "exception.entity.not.found.currency"));
-    }
-
-    private Card getCardByIdAndUserId(Long cardId, Long userId) {
-        return cardRepository.findByIdAndAccount_User_Id(cardId, userId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Card with id %d for UserId %d not found".formatted(cardId, userId),
-                        "exception.entity.not.found.card"));
-    }
 
     private static Transaction getSubTransaction(SubTransactionDto subTransactionDto, Transaction parentTransaction) {
         Transaction subTransaction = new Transaction();
@@ -203,53 +167,36 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
-    private Specification<Transaction> buildSpecification(
-            Long userId,
-            LocalDateTime startDate,
-            LocalDateTime endDate,
-            Long cardId,
-            Long bankId,
-            Long categoryId,
-            String description) {
-
+    @SuppressWarnings("CheckStyle")
+    private Specification<Transaction> buildSpecification(Long userId,
+                                                          LocalDateTime startDate,
+                                                          LocalDateTime endDate,
+                                                          Long cardId,
+                                                          Long bankId,
+                                                          Long categoryId,
+                                                          String description) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // Базовый фильтр по пользователю
             predicates.add(criteriaBuilder.equal(root.get("user").get("id"), userId));
-            // Фильтр по дате
             if (startDate != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(
-                        root.get("operationTime"), startDate));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("operationTime"), startDate));
             }
             if (endDate != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(
-                        root.get("operationTime"), endDate));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("operationTime"), endDate));
             }
-            // Фильтр по карте
             if (cardId != null) {
-                predicates.add(criteriaBuilder.equal(
-                        root.get("card").get("id"), cardId));
+                predicates.add(criteriaBuilder.equal(root.get("card").get("id"), cardId));
             }
-
-            // Фильтр по категории
             if (categoryId != null) {
-                predicates.add(criteriaBuilder.equal(
-                        root.get("category").get("id"), categoryId));
+                predicates.add(criteriaBuilder.equal(root.get("category").get("id"), categoryId));
             }
-
-            // Фильтр по банку
             if (bankId != null) {
-                predicates.add(criteriaBuilder.equal(
-                        root.get("card").get("account").get("bank").get("id"), bankId));
+                predicates.add(criteriaBuilder.equal(root.get("card").get("account").get("bank").get("id"), bankId));
             }
-
-            // Фильтр по описанию
             if (description != null && !description.trim().isEmpty()) {
-                predicates.add(criteriaBuilder.like(
-                        criteriaBuilder.lower(root.get("description")),
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("description")),
                         "%" + description.toLowerCase() + "%"));
             }
-
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

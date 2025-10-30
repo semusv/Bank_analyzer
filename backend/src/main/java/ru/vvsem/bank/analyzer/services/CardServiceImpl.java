@@ -16,6 +16,7 @@ import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
 import ru.vvsem.bank.analyzer.repositories.BankRepository;
 import ru.vvsem.bank.analyzer.repositories.CardRepository;
+import ru.vvsem.bank.analyzer.services.security.UserService;
 
 import java.util.List;
 
@@ -90,6 +91,14 @@ public class CardServiceImpl implements CardService {
                                         "exception.entity.not.found.bankAccount",
                                         id)
                 );
+    }
+
+    @Override
+    public Card getCardByIdAndUserId(Long cardId, Long userId) {
+        return cardRepository.findByIdAndAccount_User_Id(cardId, userId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Card with id %d for UserId %d not found".formatted(cardId, userId),
+                        "exception.entity.not.found.card"));
     }
 
 }

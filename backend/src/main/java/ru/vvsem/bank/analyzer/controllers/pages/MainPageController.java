@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.vvsem.bank.analyzer.models.User;
-import ru.vvsem.bank.analyzer.services.CustomUserDetailsService;
+import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 
 @Controller
 @RequiredArgsConstructor
-public class MainController {
+public class MainPageController {
 
     private final CustomUserDetailsService userService;
 

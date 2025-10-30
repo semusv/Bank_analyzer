@@ -33,6 +33,7 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
+    @SuppressWarnings("CheckStyle")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<TransactionDto> getListTransactions(
@@ -105,7 +106,7 @@ public class TransactionController {
     public TransactionDto createTransaction(
             @Valid @RequestBody NewTransactionDto newTransactionDto,
             @AuthenticationPrincipal User user) {
-       return transactionService.insertTransaction( newTransactionDto, user);
+       return transactionService.insertTransaction(newTransactionDto, user);
     }
 
     @Setter
@@ -113,18 +114,25 @@ public class TransactionController {
     public static class PageResponse<T> {
         // Getters and Setters
         private java.util.List<T> content;
+
         private long totalElements;
+
         private int totalPages;
+
         private int pageNumber;
+
         private int pageSize;
+
         private boolean first;
+
         private boolean last;
 
         public PageResponse() {
         }
 
+        @SuppressWarnings("CheckStyle")
         public PageResponse(java.util.List<T> content, long totalElements, int totalPages,
-                int pageNumber, int pageSize, boolean first, boolean last) {
+                            int pageNumber, int pageSize, boolean first, boolean last) {
             this.content = content;
             this.totalElements = totalElements;
             this.totalPages = totalPages;

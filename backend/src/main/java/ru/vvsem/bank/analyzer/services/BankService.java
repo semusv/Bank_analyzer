@@ -1,10 +1,13 @@
 package ru.vvsem.bank.analyzer.services;
 
 import ru.vvsem.bank.analyzer.dto.bank.BankDto;
+import ru.vvsem.bank.analyzer.models.Bank;
 
 import java.util.List;
 
-public interface BanksService {
+public interface BankService {
 
     List<BankDto> getBanks();
+
+    Bank getBankById(Long id);
 }

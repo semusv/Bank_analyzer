@@ -17,7 +17,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.vvsem.bank.analyzer.dto.validator.ValidationErrorResponse;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
-import ru.vvsem.bank.analyzer.services.ErrorHandlingService;
+import ru.vvsem.bank.analyzer.services.handlers.ErrorHandlingService;
 
 
 @Slf4j

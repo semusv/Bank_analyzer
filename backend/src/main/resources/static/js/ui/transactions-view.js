@@ -183,9 +183,23 @@ function renderTransactions(transactions) {
 }
 
 async function applyBankThemesToTransactions(transactions) {
-    for (const txn of transactions) {
+    if (!transactions || transactions.length === 0) return;
+    
+    const themePromises = transactions.map(async (txn) => {
         const { bank: { bankCode }, id } = txn;
-        getBankColorsForElem(bankCode, document.querySelector(`.transaction-card[data-transaction-id="${id}"] .card-info`));
+        const cardElement = document.querySelector(
+            `.transaction-card[data-transaction-id="${id}"] .card-info`
+        );
+        
+        if (cardElement) {
+            await getBankColorsForElem(bankCode, cardElement);
+        }
+    });
+    
+    try {
+        await Promise.all(themePromises);
+    } catch (error) {
+        console.error('Failed to apply bank themes:', error);
     }
 }
 
@@ -422,6 +436,7 @@ function formatDateTime(dateTimeString) {
 globalThis.openAddTransactionModal = function () {
     if (typeof bootstrap === 'undefined') {
         console.error('Bootstrap is not loaded');
+        showErrorMessage('Ошибка: Bootstrap не загружен. Пожалуйста, обновите страницу.');
         return;
     }
 
@@ -690,7 +705,7 @@ function changeAddAmountColor(radio) {
 function getLocalDateTimeString(date = new Date()) {
     // Смещаем дату на разницу с UTC чтобы получить локальное время
     const timezoneOffset = date.getTimezoneOffset() * 60000;
-    const localDate = new Date(date.getTime() - timezoneOffset);
+    const localDate = new Date(date.getTime() + timezoneOffset);
     return localDate.toISOString().slice(0, 16);
 }
 

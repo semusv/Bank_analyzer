@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.services;
+package ru.vvsem.bank.analyzer.services.security;
 
 import ru.vvsem.bank.analyzer.dto.UserDto;
 

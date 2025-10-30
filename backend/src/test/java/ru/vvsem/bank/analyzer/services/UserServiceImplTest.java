@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import ru.vvsem.bank.analyzer.mappers.UserMapperImpl;
+import ru.vvsem.bank.analyzer.services.security.UserService;
+import ru.vvsem.bank.analyzer.services.security.UserServiceImpl;
 
 @DataJpaTest
 @DisplayName("Интеграционный тест для Юзеров")

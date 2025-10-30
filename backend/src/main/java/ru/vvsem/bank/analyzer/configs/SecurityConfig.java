@@ -19,7 +19,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import ru.vvsem.bank.analyzer.services.CustomUserDetailsService;
+import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity

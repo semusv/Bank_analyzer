@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.vvsem.bank.analyzer.dto.DashboardStatsDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.models.User;
-import ru.vvsem.bank.analyzer.services.DashboardService;
+import ru.vvsem.bank.analyzer.services.analytics.DashboardService;
 
 import java.util.List;
 

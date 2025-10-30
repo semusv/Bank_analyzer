@@ -16,8 +16,8 @@ import java.math.BigDecimal;
 public class SubTransactionDto {
 
     @NotBlank
-    String description;
+    private String description;
 
     @NotNull
-    BigDecimal amount;
+    private BigDecimal amount;
 }

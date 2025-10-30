@@ -1,7 +1,6 @@
 package ru.vvsem.bank.analyzer.repositories;
 
-import jakarta.persistence.NamedAttributeNode;
-import jakarta.persistence.NamedEntityGraph;
+
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.models.BankAccount;
-import ru.vvsem.bank.analyzer.models.User;
 
 import java.math.BigDecimal;
 import java.util.List;

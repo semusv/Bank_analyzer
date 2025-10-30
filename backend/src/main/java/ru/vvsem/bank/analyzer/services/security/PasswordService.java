@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.services;
+package ru.vvsem.bank.analyzer.services.security;
 
 public interface PasswordService {
     String encodePassword(String rawPassword);

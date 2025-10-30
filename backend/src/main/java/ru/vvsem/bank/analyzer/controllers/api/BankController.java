@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.vvsem.bank.analyzer.dto.bank.BankDto;
 import ru.vvsem.bank.analyzer.models.User;
-import ru.vvsem.bank.analyzer.services.BanksService;
+import ru.vvsem.bank.analyzer.services.BankService;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BankController {
 
-    private final BanksService banksService;
+    private final BankService banksService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
