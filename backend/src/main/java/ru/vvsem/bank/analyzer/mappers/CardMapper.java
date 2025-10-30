@@ -12,6 +12,7 @@ import ru.vvsem.bank.analyzer.models.Card;
 public interface CardMapper {
     @Mapping(source = "issuerBank.id", target = "issuerBankId")
     @Mapping(source = "account.id", target = "accountId")
+    @Mapping(source = "account.currency", target = "currency")
     CardDto toCardDto(Card card);
 
     @Mapping(source = "issuerBankId", target = "issuerBank.id")

@@ -1,7 +1,7 @@
 import { fetchAccounts, createAccount, createCard, deleteAccount as deleteAccountApi } from "../modules/api/accounts-api.js";
 import { deleteCard as deleteCardApi } from "../modules/api/cards-api.js";
 import { fetchBanks } from "../modules/api/banks-api.js";
-import { showErrorMessage, showSuccessMessage, formatCurrency } from "../modules/utils.js";
+import { showErrorMessage, showSuccessMessage, formatCurrency, showApiErrors } from "../modules/utils.js";
 import { fetchCurrencies } from "../modules/api/currency-api.js";
 
 
@@ -18,7 +18,7 @@ async function init() {
         setupEventListeners();
     } catch (error) {
         console.error('Failed to initialize accounts page:', error);
-        showErrorMessage('Ошибка загрузки страницы: ' + error.message);
+        showApiErrors(error);
     }
 }
 
@@ -33,7 +33,7 @@ async function loadCurrencies() {
         return currenciesCache;
     } catch (error) {
         console.error('Failed to load currencies:', error);
-        showErrorMessage('Ошибка загрузки валют: ' + error.message);
+        throw error;
     }
 }
 
@@ -48,8 +48,7 @@ async function loadBanks() {
         return banksCache;
     } catch (error) {
         console.error('Failed to load banks:', error);
-        showErrorMessage('Ошибка загрузки списка банков');
-        return [];
+        throw error;
     }
 }
 
@@ -59,8 +58,8 @@ async function loadAccounts() {
         renderAccounts(accounts);
     } catch (error) {
         console.error('Failed to load accounts:', error);
-        showErrorMessage('Ошибка загрузки счетов: ' + error.message);
         renderEmptyState();
+        throw error;
     }
 }
 
@@ -254,18 +253,7 @@ async function handleAddAccount(event) {
         await loadAccounts();
     } catch (error) {
         console.error('Failed to create account:', error);
-        showErrorMessage('Ошибка создания счета: ' + error.message);
-
-        if (error.status === 400) {
-            for (const error of error.errors) {
-                showErrorMessage(error.message);
-            }
-        } else {
-            showErrorMessage(error.message);
-        }
-
-
-
+        showApiErrors(error);
     }
 };
 
@@ -303,7 +291,7 @@ async function handleAddCard(event) {
         await loadAccounts();
     } catch (error) {
         console.error('Failed to create card:', error);
-        showErrorMessage('Ошибка создания карты: ' + error.message);
+        showApiErrors(error);
     }
 };
 
@@ -346,7 +334,7 @@ globalThis.deleteAccount = async function (accountId) {
         await loadAccounts();
     } catch (error) {
         console.error('Failed to delete account:', error);
-        showErrorMessage('Ошибка удаления счета: ' + error.message);
+        showApiErrors(error);
     }
     await loadAccounts();
 };

@@ -10,7 +10,7 @@ import { fetchCards } from "../modules/api/cards-api.js";
 import { fetchCategories } from "../modules/api/categories-api.js";
 import { fetchBanks } from "../modules/api/banks-api.js";
 import { fetchCurrencies } from "../modules/api/currency-api.js";
-import { showErrorMessage, showSuccessMessage, formatCurrency } from "../modules/utils.js";
+import { showErrorMessage, showSuccessMessage, formatCurrency, showApiErrors } from "../modules/utils.js";
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -46,7 +46,7 @@ async function loadCategories() {
         return categoriesCache;
     } catch (error) {
         console.error('Failed to load categories:', error);
-        return [];
+        throw error;
     }
 }
 
@@ -56,7 +56,7 @@ async function loadCards() {
         return cardsCache;
     } catch (error) {
         console.error('Failed to load cards:', error);
-        return [];
+        throw error;
     }
 }
 
@@ -66,7 +66,7 @@ async function loadBanks() {
         return banksCache;
     } catch (error) {
         console.error('Failed to load banks:', error);
-        return [];
+        throw error;
     }
 }
 
@@ -76,7 +76,7 @@ async function loadCurrencies() {
         return currenciesCache;
     } catch (error) {
         console.error('Failed to load currencies:', error);
-        return [];
+        throw error;
     }
 }
 
@@ -99,8 +99,8 @@ async function loadTransactions(page = 0) {
         renderPagination();
     } catch (error) {
         console.error('Failed to load transactions:', error);
-        showErrorMessage('Ошибка загрузки транзакций: ' + error.message);
         renderEmptyState();
+        throw error;
     }
 }
 
@@ -238,10 +238,12 @@ async function handleAddTransaction(event) {
         event.target.reset();
         await loadTransactions();
     } catch (error) {
-        console.error('Failed to create transaction:', error);
-        showErrorMessage('Ошибка создания транзакции: ' + error.message);
+        console.error('Failed create transaction', error);
+        showApiErrors(error);
     }
 }
+
+
 
 async function handleSplitTransaction(event) {
     event.preventDefault();
@@ -292,7 +294,7 @@ async function handleSplitTransaction(event) {
         await loadTransactions();
     } catch (error) {
         console.error('Failed to split transaction:', error);
-        showErrorMessage('Ошибка разделения транзакции: ' + error.message);
+        showApiErrors(error);
     }
 }
 
@@ -420,7 +422,7 @@ globalThis.viewTransactionDetails = async function (transactionId) {
         }
     } catch (error) {
         console.error('Failed to load transaction details:', error);
-        showErrorMessage('Ошибка загрузки деталей транзакции: ' + error.message);
+        showApiErrors(error);
     }
 };
 
@@ -435,7 +437,7 @@ globalThis.deleteTransactionById = async function (transactionId) {
         await loadTransactions();
     } catch (error) {
         console.error('Failed to delete transaction:', error);
-        showErrorMessage('Ошибка удаления транзакции: ' + error.message);
+        showApiErrors(error);
     }
 };
 
@@ -452,7 +454,7 @@ globalThis.toggleHideTransactionById = async function (transactionId, hide) {
         await loadTransactions(currentPage);
     } catch (error) {
         console.error('Failed to toggle hide transaction:', error);
-        showErrorMessage('Ошибка изменения видимости транзакции: ' + error.message);
+        showApiErrors(error);
     }
 };
 
@@ -629,11 +631,9 @@ function populateAddTransactionModal() {
     cardsCache.forEach(card => {
         const option = document.createElement('option');
         option.value = card.id;
-        option.textContent = `${card.cardName} (****${card.lastFourDigits})`;
+        option.textContent = `${card.cardName} (****${card.lastFourDigits}) - ${card.currency.code}`;
         cardSelect.appendChild(option);
     });
-
-
 
     // изменяем цвет суммы в зависимости от типа операции
     document.querySelectorAll('input[type="radio"][name="operationType"]')
@@ -642,6 +642,14 @@ function populateAddTransactionModal() {
                 changeAddAmountColor(radio);
             });
         });
+
+    document.getElementById('addCardId').addEventListener('change', () => {
+        cardsCache.forEach(card => {
+            if (card.id === Number.parseInt(document.getElementById('addCardId').value)) {
+                document.getElementById('addAmount').textContent = formatCurrency(document.getElementById('addAmount').value, card.currency.code);
+            }
+        });
+    });
 }
 
 function changeAddAmountColor(radio) {

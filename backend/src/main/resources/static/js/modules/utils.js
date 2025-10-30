@@ -7,7 +7,6 @@ export class ApiError extends Error {
         this.errors = errors;
     }
 }
-
 export async function handleApiResponse(response) {
     if (response.ok) {
         if (response.status === 204) {
@@ -128,5 +127,17 @@ export function formatCurrency(value, currency) {
     } catch (error) {
         console.error('Error formatting currency:', error);
         return value;
+    }
+}
+
+export function showApiErrors(error) {
+
+
+    if (error.status === 400) {
+        error.errors.forEach(error => {
+            showErrorMessage(error.message);
+        });
+    } else {
+        showErrorMessage(error.message);
     }
 }
