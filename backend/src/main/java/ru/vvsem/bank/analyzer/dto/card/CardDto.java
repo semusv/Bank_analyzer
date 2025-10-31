@@ -28,4 +28,7 @@ public class CardDto {
 
     @NotNull
     private CurrencyDto currency;
+
+    @NotNull
+    private String bankCode;
 }

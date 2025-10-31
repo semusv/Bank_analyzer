@@ -99,8 +99,6 @@ async function loadTransactions(page = 0) {
         };
 
         const response = await fetchTransactions(filtersWithPagination);
-
-        // Handle paginated response
         const transactions = response.content || response;
         totalPages = response.totalPages || 1;
 

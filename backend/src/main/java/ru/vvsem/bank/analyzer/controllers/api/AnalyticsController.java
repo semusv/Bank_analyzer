@@ -27,15 +27,19 @@ public class AnalyticsController {
     @RequestMapping("/time-series")
     @ResponseStatus(HttpStatus.OK)
     public List<TimeSeriesDto> getTimeSeries(
-            @RequestParam(required = true) LocalDate startDate,
-            @RequestParam(required = true) LocalDate endDate,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate,
             @RequestParam(required = false) List<Long> cardIdList,
-            @RequestParam(required = false) List<OperationType> operationTypeList,
+            @RequestParam(required = false) List<Integer> operationTypeIdList,
             @AuthenticationPrincipal User user) {
 
         LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
         LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;
-
+        List<OperationType> operationTypeList =
+                operationTypeIdList == null ? null :
+                        operationTypeIdList.stream()
+                        .map(value -> OperationType.values()[value])
+                        .toList();
         return analyticsService.getTimeSeries(startDateTime, endDateTime, cardIdList, operationTypeList, user);
 
 
@@ -44,8 +48,8 @@ public class AnalyticsController {
     @RequestMapping("/category-breakdown")
     @ResponseStatus(HttpStatus.OK)
     public List<CategoryBreakdownDto> getCategoryBreakdown(
-            @RequestParam(required = true) LocalDate startDate,
-            @RequestParam(required = true) LocalDate endDate,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate,
             @RequestParam(required = false) List<Long> cardIdList,
             @AuthenticationPrincipal User user) {
 

@@ -18,6 +18,7 @@ import ru.vvsem.bank.analyzer.services.security.UserServiceImpl;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -43,18 +44,22 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             List<Long> cardIdList,
             List<OperationType> operationTypeList,
             User user) {
-
         Map<LocalDate, BigDecimal> mapTimeseries = new HashMap<>();
-
         Specification<Transaction> spec = buildSpecification(
                 user.getId(), startDateTime, endDateTime, cardIdList, operationTypeList);
         List<Transaction> transactions = transactionRepository.findAll(spec);
 
-        // Суммируем суммы по датам
         for (Transaction transaction : transactions) {
             LocalDate operationDate = transaction.getOperationTime().toLocalDate();
             BigDecimal currentAmount = mapTimeseries.getOrDefault(operationDate, BigDecimal.ZERO);
             mapTimeseries.put(operationDate, currentAmount.add(transaction.getAmount()));
+        }
+        for (int i = 0; i <= ChronoUnit.DAYS.between(
+                startDateTime.toLocalDate().atStartOfDay(),
+                endDateTime.toLocalDate().atStartOfDay()); i++) {
+            if (!mapTimeseries.containsKey(startDateTime.toLocalDate().plusDays(i))) {
+                mapTimeseries.put(startDateTime.toLocalDate().plusDays(i), BigDecimal.ZERO);
+            }
         }
 
         // Преобразуем в список DTO

@@ -5,13 +5,14 @@ export async function fetchAnalyticsTimeSeries(filters = {}) {
 
     if (filters.startDate) params.append('startDate', filters.startDate);
     if (filters.endDate) params.append('endDate', filters.endDate);
-    if (filters.operationType !== undefined && filters.operationType !== null && filters.operationType !== '') {
-        params.append('operationType', filters.operationType);
-    }
 
+    // operationTypeIds
+    if (filters.operationTypeIds && Array.isArray(filters.operationTypeIds) && filters.operationTypeIds.length > 0) {
+        params.append('operationTypeIdList', filters.operationTypeIds.join(','));
+    }
     // Multiple card IDs: comma-separated
     if (filters.cardIds && Array.isArray(filters.cardIds) && filters.cardIds.length > 0) {
-        params.append('cardIds', filters.cardIds.join(','));
+        params.append('cardIdList', filters.cardIds.join(','));
     }
 
     const queryString = params.toString();
@@ -35,7 +36,7 @@ export async function fetchAnalyticsCategoryBreakdown(filters = {}) {
     }
 
     if (filters.cardIds && Array.isArray(filters.cardIds) && filters.cardIds.length > 0) {
-        params.append('cardIds', filters.cardIds.join(','));
+        params.append('cardIdList', filters.cardIds.join(','));
     }
 
     const url = `/api/analytics/category-breakdown?${params.toString()}`;

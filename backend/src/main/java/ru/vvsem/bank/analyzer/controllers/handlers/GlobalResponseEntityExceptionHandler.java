@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -45,6 +46,26 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     }
 
+    //отсутствующий обязательный параметр запроса
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(
+            @Nullable MissingServletRequestParameterException ex,
+            @Nullable HttpHeaders headers,
+            @Nullable HttpStatusCode status,
+            @Nullable WebRequest request) {
+
+
+        assert status != null;
+        assert ex != null;
+
+        return errorHandlingService.handleError(
+                ex,
+                request,
+                HttpStatus.valueOf(status.value()),
+                "error.missing.servlet.request.parameter",
+                ex.getParameterName());
+
+    }
 
     // Обработка ошибок валидации DTO
     @Override
@@ -79,7 +100,6 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
                 HttpStatus.FORBIDDEN,
                 "error.access.denied",
                 (Object[]) null);
-
     }
 
 

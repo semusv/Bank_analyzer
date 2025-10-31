@@ -9,6 +9,7 @@ public enum OperationType {
     TRANSFER("Перевод");
 
     private final String description;
+
     OperationType(String description) {
         this.description = description;
     }

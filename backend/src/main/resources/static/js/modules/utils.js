@@ -20,7 +20,7 @@ export async function handleApiResponse(response) {
     // Валидационные ошибки
     if (errorData.status === 400) {
         throw new ApiError(
-            errorData.message || 'Validation failed',
+            errorData.message || errorData.errorText || 'Validation failed',
             errorData.errorType,
             response.status,
             errorData.errors || []
@@ -131,10 +131,8 @@ export function formatCurrency(value, currency) {
 }
 
 export function showApiErrors(error) {
-
-
-    if (error.status === 400) {
-        error.errors.forEach(error => {
+    if (error.status === 400 && Array.isArray(error.errors) && error.errors.length > 0) {
+        if (error.errors) error.errors.forEach(error => {
             showErrorMessage(error.message);
         });
     } else {

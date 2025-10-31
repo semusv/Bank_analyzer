@@ -1,6 +1,7 @@
 import { fetchCards } from "../modules/api/cards-api.js";
 import { fetchAnalyticsTimeSeries, fetchAnalyticsCategoryBreakdown } from "../modules/api/analytics-api.js";
 import { showErrorMessage, showApiErrors, formatCurrency } from "../modules/utils.js";
+import { getBankColorsForBtn } from "./themes.js";
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -15,6 +16,7 @@ async function init() {
         populateFilters();
         setDefaultDateRange30Days();
         setupEventListeners();
+        actualizeFilters(document.getElementById('analyticsFilterForm'));
         await refreshCharts();
     } catch (error) {
         console.error('Failed to initialize analytics page:', error);
@@ -23,35 +25,61 @@ async function init() {
 }
 
 async function loadCards() {
-    cardsCache = await fetchCards();
+    try {
+        cardsCache = await fetchCards();
+    } catch (error) {
+        console.error('Failed to fetch cards account:', error);
+        showApiErrors(error);
+    }
 }
 
 function populateFilters() {
     const chipContainer = document.getElementById('filterCardsChips');
     if (chipContainer) {
         chipContainer.innerHTML = '';
-        cardsCache.forEach(card => {
+        cardsCache.forEach(async card => {
             const btn = document.createElement('button');
             btn.type = 'button';
-            btn.className = 'btn btn-sm btn-outline-primary chip active';
+            btn.className = 'btn btn-sm chip active';
             btn.dataset.cardId = String(card.id);
+            btn.dataset.bankCode = String(card.bankCode);
             btn.textContent = `${card.cardName} (****${card.lastFourDigits})`;
-            btn.addEventListener('click', () => {
+
+            btn.addEventListener('click', async () => {
                 btn.classList.toggle('active');
+                const bankCode = btn.dataset.bankCode;
                 if (btn.classList.contains('active')) {
-                    btn.classList.remove('btn-outline-primary');
-                    btn.classList.add('btn-primary');
+                    await getBankColorsForBtn(bankCode, btn, true);
                 } else {
-                    btn.classList.remove('btn-primary');
-                    btn.classList.add('btn-outline-primary');
+                    await getBankColorsForBtn(bankCode, btn, false);
                 }
             });
+
+
             // привести к активному виду
-            btn.classList.remove('btn-outline-primary');
-            btn.classList.add('btn-primary');
+            await getBankColorsForBtn(card.bankCode, btn, true);
             chipContainer.appendChild(btn);
         });
     }
+}
+
+function actualizeFilters(form) {
+    const formData = new FormData(form);
+
+    const selectedCardIds = Array.from(document.querySelectorAll('#filterCardsChips .chip.active'))
+        .map(btn => Number.parseInt(btn.dataset.cardId))
+        .filter(v => !Number.isNaN(v));
+
+    const operationTypeIds = Array.from(document.querySelectorAll('#filterOperationType .btn-check'))
+        .filter(input => input.checked) // проверяем атрибут checked
+        .map(input => Number.parseInt(input.value));
+
+    currentFilters = {
+        startDate: formData.get('startDate') || null,
+        endDate: formData.get('endDate') || null,
+        cardIds: selectedCardIds,
+        operationTypeIds: operationTypeIds
+    };
 }
 
 function setDefaultDateRange30Days() {
@@ -74,23 +102,8 @@ function setupEventListeners() {
 
 async function handleFilterSubmit(event) {
     event.preventDefault();
-
     const form = event.target;
-    const formData = new FormData(form);
-
-    const selectedCardIds = Array.from(document.querySelectorAll('#filterCardsChips .chip.active'))
-        .map(btn => Number.parseInt(btn.dataset.cardId))
-        .filter(v => !Number.isNaN(v));
-
-    const operationType = formData.get('operationType');
-
-    currentFilters = {
-        startDate: formData.get('startDate') || null,
-        endDate: formData.get('endDate') || null,
-        cardIds: selectedCardIds,
-        operationType: operationType === '' ? null : Number.parseInt(operationType)
-    };
-
+    actualizeFilters(form);
     await refreshCharts();
 }
 
@@ -98,9 +111,8 @@ async function clearFilters() {
     currentFilters = {};
     const form = document.getElementById('analyticsFilterForm');
     form?.reset();
-    // Дата по умолчанию 30 дней
+
     setDefaultDateRange30Days();
-    // Выделить все карты снова
     document.querySelectorAll('#filterCardsChips .chip').forEach(btn => {
         btn.classList.add('active');
         btn.classList.remove('btn-outline-primary');
@@ -140,11 +152,12 @@ function renderCumulativeChart(series) {
         return;
     }
 
-    // Уничтожаем существующий чарт
-    const existingChart = Chart.getChart(ctx);
-    if (existingChart) {
-        existingChart.destroy();
+    if (cumulativeChartInstance) {
+        cumulativeChartInstance.destroy();
     }
+    // hidden loader
+    document.getElementById('cumulativeLineChartLoader').hidden = true;
+    ctx.hidden = false;
 
     try {
         cumulativeChartInstance = new Chart(ctx, {
@@ -155,7 +168,7 @@ function renderCumulativeChart(series) {
                     label: 'Накопленный итог',
                     data: cumulative,
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    backgroundColor: 'rgba(19, 123, 192, 0.1)',
                     tension: 0.25,
                     fill: true,
                     pointRadius: 2
@@ -204,7 +217,6 @@ function renderCumulativeChart(series) {
 
 
 function renderCategoryDonut(breakdown) {
-    // breakdown ожидается массив объектов: { category: { id, name, color }, amount }
     const safe = Array.isArray(breakdown) ? breakdown : [];
     const labels = safe.map(x => x.category?.name || 'Без категории');
     const data = safe.map(x => Math.abs(Number(x.amount || 0)));
@@ -216,6 +228,9 @@ function renderCategoryDonut(breakdown) {
     if (categoryChartInstance) {
         categoryChartInstance.destroy();
     }
+    // Hidden loader
+    document.getElementById('categoryDonutChartLoader').hidden = true;
+    ctx.hidden = false;
 
     categoryChartInstance = new Chart(ctx, {
         type: 'pie',
@@ -260,16 +275,17 @@ function formatLabelDate(isoDate) {
 // Кнопки выбрать/снять все для карт
 document.addEventListener('click', (e) => {
     if (e.target?.id === 'selectAllCards') {
-        document.querySelectorAll('#filterCardsChips .chip').forEach(btn => {
+        document.querySelectorAll('#filterCardsChips .chip').forEach(async btn => {
+            const bankCode = btn.dataset.bankCode;
+            await getBankColorsForBtn(bankCode, btn, true);
             btn.classList.add('active');
-            btn.classList.remove('btn-outline-primary');
-            btn.classList.add('btn-primary');
         });
     }
     if (e.target?.id === 'deselectAllCards') {
-        document.querySelectorAll('#filterCardsChips .chip').forEach(btn => {
-            btn.classList.remove('active', 'btn-primary');
-            btn.classList.add('btn-outline-primary');
+        document.querySelectorAll('#filterCardsChips .chip').forEach(async btn => {
+            const bankCode = btn.dataset.bankCode;
+            await getBankColorsForBtn(bankCode, btn, false);
+            btn.classList.remove('active');
         });
     }
 });

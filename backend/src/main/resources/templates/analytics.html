@@ -45,7 +45,8 @@
                                 <div class="col-12 col-md-12 col-lg-6">
                                     <label class="form-label" for="operationTypeGroup">Тип операции</label>
 
-                                    <fieldset class="btn-group w-100" aria-labelledby="operationTypeLegend">
+                                    <fieldset class="btn-group w-100" aria-labelledby="operationTypeLegend"
+                                        id="filterOperationType">
                                         <legend id="operationTypeLegend" class="form-label visually-hidden">Тип операции
                                         </legend>
 
@@ -91,6 +92,7 @@
 
                 <!-- Чарты -->
                 <div class="row" id="chartsContainer">
+
                     <div class="col-12 col-xl-8 mb-4">
                         <div class="card chart-card">
                             <div class="card-header d-flex align-items-center justify-content-between">
@@ -98,7 +100,16 @@
                             </div>
                             <div class="card-body">
                                 <div class="chart-wrapper">
-                                    <canvas id="cumulativeLineChart" aria-label="График накопленного итога"></canvas>
+                                    <div id="cumulativeLineChartLoader">
+                                        <div class="text-center py-5">
+                                            <output class="spinner-border text-primary" aria-label="Загрузка данных">
+                                                <span class="visually-hidden">Загрузка данных...</span>
+                                            </output>
+                                            <p class="mt-2 text-muted">Загрузка данных...</p>
+                                        </div>
+                                    </div>
+                                    <canvas hidden id="cumulativeLineChart"
+                                        aria-label="График накопленного итога"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -110,7 +121,15 @@
                             </div>
                             <div class="card-body">
                                 <div class="chart-wrapper">
-                                    <canvas id="categoryDonutChart" aria-label="Разбивка по категориям"></canvas>
+                                    <div id="categoryDonutChartLoader">
+                                        <div class="text-center py-5">
+                                            <output class="spinner-border text-primary" aria-label="Загрузка данных">
+                                                <span class="visually-hidden">Загрузка данных...</span>
+                                            </output>
+                                            <p class="mt-2 text-muted">Загрузка данных...</p>
+                                        </div>
+                                    </div>
+                                    <canvas hidden id="categoryDonutChart" aria-label="Разбивка по категориям"></canvas>
                                 </div>
                             </div>
                         </div>
