@@ -1,0 +1,21 @@
+package ru.vvsem.bank.analyzer.controllers.pages;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import ru.vvsem.bank.analyzer.models.User;
+
+@Controller
+@RequiredArgsConstructor
+public class AnalyticsPageController {
+
+    @GetMapping("/analytics")
+    public String accountsPage(@AuthenticationPrincipal User user, Model model) {
+        model.addAttribute("userName", user.getName() + " " + user.getSurname());
+        model.addAttribute("pageTitle", "Счета и карты");
+        model.addAttribute("activePage", "analytics");
+        return "analytics";
+    }
+}

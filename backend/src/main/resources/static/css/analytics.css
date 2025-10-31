@@ -1,0 +1,28 @@
+        /* Небольшие доработки для гармоничного размещения графиков */
+        .chart-card {
+            min-height: 420px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 340px;
+        }
+
+        .chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .25rem;
+            max-height: 110px;
+            overflow: auto;
+            padding: .25rem;
+            border: 1px solid rgba(0, 0, 0, .125);
+            border-radius: .375rem;
+        }
+
+        .chip-group .chip {
+            cursor: pointer;
+        }
+
+        .chip-actions {
+            margin-top: .5rem;
+        }

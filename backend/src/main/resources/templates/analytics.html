@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+
+<head th:replace="~{layout :: head}">
+    <title>Аналитика - Bank Analyzer</title>
+    <link th:href="@{/css/transactions.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div th:replace="~{layout :: topnav}"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{layout :: sidebar}"></div>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <!-- Заголовок -->
+                <div
+                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-chart-line"></i> Аналитика
+                    </h1>
+                </div>
+
+                <!-- Сообщения -->
+                <div id="alertContainer"></div>
+
+                <!-- Фильтры -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Фильтры</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="analyticsFilterForm">
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <label for="filterStartDate" class="form-label">Дата с</label>
+                                    <input type="date" class="form-control" id="filterStartDate" name="startDate">
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <label for="filterEndDate" class="form-label">Дата по</label>
+                                    <input type="date" class="form-control" id="filterEndDate" name="endDate">
+                                </div>
+                                <div class="col-12 col-md-12 col-lg-6">
+                                    <label class="form-label" for="operationTypeGroup">Тип операции</label>
+
+                                    <fieldset class="btn-group w-100" aria-labelledby="operationTypeLegend">
+                                        <legend id="operationTypeLegend" class="form-label visually-hidden">Тип операции
+                                        </legend>
+
+                                        <input type="checkbox" class="btn-check" name="operationType" id="op-expense"
+                                            value="0" checked>
+                                        <label class="btn btn-outline-danger" for="op-expense">Расход</label>
+
+                                        <input type="checkbox" class="btn-check" name="operationType" id="op-income"
+                                            value="1">
+                                        <label class="btn btn-outline-success" for="op-income">Доход</label>
+
+                                        <input type="checkbox" class="btn-check" name="operationType" id="op-transfer"
+                                            value="2">
+                                        <label class="btn btn-outline-primary" for="op-transfer">Перевод</label>
+                                    </fieldset>
+                                </div>
+                                <div class="col-12 col-md-12 col-lg-12">
+                                    <label class="form-label" for="filterCardsChips">Карты</label>
+                                    <div id="filterCardsChips" class="chip-group" aria-label="Выбор карт"></div>
+                                    <div class="chip-actions">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary me-2"
+                                            id="selectAllCards">Выбрать все</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            id="deselectAllCards">Снять все</button>
+                                    </div>
+                                    <small class="text-muted">По умолчанию учитываются все карты</small>
+                                </div>
+
+                                <div class="col-12 col-md-12 col-lg-12">
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-primary me-2">
+                                            <i class="fas fa-filter"></i> Применить
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" id="clearAnalyticsFilters">
+                                            <i class="fas fa-times"></i> Очистить
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Чарты -->
+                <div class="row" id="chartsContainer">
+                    <div class="col-12 col-xl-8 mb-4">
+                        <div class="card chart-card">
+                            <div class="card-header d-flex align-items-center justify-content-between">
+                                <h5 class="mb-0"><i class="fas fa-chart-area"></i> Динамика накопленного итога</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-wrapper">
+                                    <canvas id="cumulativeLineChart" aria-label="График накопленного итога"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-xl-4 mb-4">
+                        <div class="card chart-card">
+                            <div class="card-header d-flex align-items-center justify-content-between">
+                                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Разбивка по категориям</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-wrapper">
+                                    <canvas id="categoryDonutChart" aria-label="Разбивка по категориям"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <div class="notification-container" id="notification-container"></div>
+
+    <div th:replace="~{layout :: scripts}"></div>
+
+    <script type="module" th:src="@{/js/ui/analytics-view.js}"></script>
+</body>
+
+</html>
