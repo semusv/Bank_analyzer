@@ -30,6 +30,7 @@ public interface BankAccountMapper {
     @Mapping(source = "currencyCode", target = "currency.code")
     @Mapping(source = "bankName", target = "bank.name")
     @Mapping(source = "bankId", target = "bank.id")
+    @Mapping(source = "bankCode", target = "bank.bankCode")
     BankAccount toEntity(BankAccountSimpleDto bankAccountSimpleDto);
 
     @InheritInverseConfiguration(name = "toEntity")

@@ -3,7 +3,7 @@ import { deleteCard as deleteCardApi } from "../modules/api/cards-api.js";
 import { fetchBanks } from "../modules/api/banks-api.js";
 import { showErrorMessage, showSuccessMessage, formatCurrency, showApiErrors } from "../modules/utils.js";
 import { fetchCurrencies } from "../modules/api/currency-api.js";
-
+import { getBankColorsForElem } from "./themes.js";
 
 document.addEventListener('DOMContentLoaded', init);
 let banksCache = null;
@@ -113,7 +113,7 @@ function renderAccounts(accounts) {
 
     container.innerHTML = accounts.map(account => `
         <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card account-card h-100" data-bank="${account.bankName}">
+            <div class="card account-card h-100" data-bank="${account.bankName}" data-accountId="${account.id}" fa>
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="mb-0">
                         <i class="fas fa-university"></i> ${account.bankName}
@@ -185,8 +185,32 @@ function renderAccounts(accounts) {
             </div>
         </div>
     `).join('');
+
+    applyBankThemesToAccounts(accounts);
 };
 
+
+
+async function applyBankThemesToAccounts(accounts) {
+    if (!accounts || accounts.length === 0) return;
+
+    const themePromises = accounts.map(async (txn) => {
+        // const { bank: { bankCode }, id } = txn;
+        const cardElement = document.querySelector(
+            `.account-card[data-accountId="${txn.id}"] .card-header`
+        );
+
+        if (cardElement) {
+            await getBankColorsForElem(txn.bankCode, cardElement);
+        }
+    });
+
+    try {
+        await Promise.all(themePromises);
+    } catch (error) {
+        console.error('Failed to apply bank themes:', error);
+    }
+}
 function renderEmptyState() {
     const container = document.getElementById('accountsContainer');
     container.innerHTML = `

@@ -1,7 +1,8 @@
 package ru.vvsem.bank.analyzer.dto.account;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
 import ru.vvsem.bank.analyzer.models.BankAccount;
 import ru.vvsem.bank.analyzer.models.Card;
 
@@ -11,31 +12,47 @@ import java.util.List;
 /**
  * DTO for {@link BankAccount}
  */
-@Value
+@Getter
+@Setter
 public class BankAccountSimpleDto {
-    Long id;
+    private Long id;
+
     @NotNull
-    String name;
+    private String name;
+
     @NotNull
-    String accountNumber;
+    private String accountNumber;
+
     @NotNull
-    BigDecimal balance;
-    Long bankId;
+    private BigDecimal balance;
+
     @NotNull
-    String bankName;
+    private Long bankId;
+
     @NotNull
-    String currencyCode;
+    private String bankCode;
+
     @NotNull
-    String currencySymbol;
-    List<CardDto> cards;
+    private String bankName;
+
+    @NotNull
+    private String currencyCode;
+
+    @NotNull
+    private String currencySymbol;
+
+    private List<CardDto> cards;
 
     /**
      * DTO for {@link Card}
      */
-    @Value
+    @Setter
+    @Getter
     public static class CardDto {
-        Long id;
-        String lastFourDigits;
-        String cardName;
+        private Long id;
+
+        private String lastFourDigits;
+
+        private String cardName;
     }
 }
