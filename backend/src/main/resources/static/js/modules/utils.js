@@ -23,7 +23,7 @@ export async function handleApiResponse(response) {
             errorData.message || errorData.errorText || 'Validation failed',
             errorData.errorType,
             response.status,
-            errorData.errors || []
+            errorData.errors
         );
     }
 
@@ -130,9 +130,11 @@ export function formatCurrency(value, currency) {
 }
 
 export function showApiErrors(error) {
+    console.error('API Error:', error);
+
     if (error.status === 400 && Array.isArray(error.errors) && error.errors.length > 0) {
-        if (error.errors) error.errors.forEach(error => {
-            showErrorMessage(error.message);
+        error.errors.forEach(errorDet => {
+            showErrorMessage(errorDet.field + ' ' + errorDet.message);
         });
     } else {
         showErrorMessage(error.message);

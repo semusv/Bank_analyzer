@@ -181,7 +181,7 @@ async function handleEditCategory(event) {
     const categoryId = formData.get('id');
     const categoryData = {
         name: formData.get('name'),
-        backgroundColor: formData.get('backgroundColor'),
+        color: formData.get('backgroundColor'),
         textColor: formData.get('textColor')
     };
 
@@ -287,8 +287,8 @@ globalThis.openEditCategoryModal = async function (categoryId) {
         document.getElementById('editTextColor').value = category.textColor || '#FFFFFF';
 
         // Рендерим палитры цветов
-        const bgColors = availableColors?.backgroundColors || DEFAULT_BACKGROUND_COLORS;
-        const textColors = availableColors?.textColors || DEFAULT_TEXT_COLORS;
+        const bgColors = availableColors?.backgroundColors;
+        const textColors = availableColors?.textColors;
 
         renderColorPicker('editBackgroundColorPicker', bgColors, 'editBackgroundColor', 'background');
         renderColorPicker('editTextColorPicker', textColors, 'editTextColor', 'text');

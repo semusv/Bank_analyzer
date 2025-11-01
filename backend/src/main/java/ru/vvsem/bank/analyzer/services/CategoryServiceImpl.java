@@ -31,6 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findByUserId(user.getId())
                 .stream()
                 .map(categoryMapper::toCategoryDto)
+                .sorted( (categoryDto1, categoryDto2) -> categoryDto1.getName().compareTo(categoryDto2.getName()))
                 .toList();
     }
 
@@ -63,6 +64,12 @@ public class CategoryServiceImpl implements CategoryService {
         category.setTextColor(categoryDto.getTextColor());
         category.setUser(user);
         return categoryMapper.toCategoryDto(categoryRepository.save(category));
+    }
+
+    @Override
+    public void deleteCategory(Long categoryId, User user) {
+        Category category = entityAccessProviderImpl.requireOwnedCategory(categoryId, user.getId());
+        categoryRepository.delete(category);
     }
 
 }

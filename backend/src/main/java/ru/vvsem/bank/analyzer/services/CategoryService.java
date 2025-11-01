@@ -19,4 +19,6 @@ public interface CategoryService {
     CategoryColorsDto getCategoryColors();
 
     CategoryDto updateCategory(Long categoryId, @Valid CategoryDto categoryDto, User user);
+
+    void deleteCategory(Long categoryId, User user);
 }

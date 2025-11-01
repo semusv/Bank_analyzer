@@ -54,7 +54,6 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
             @Nullable HttpStatusCode status,
             @Nullable WebRequest request) {
 
-
         assert status != null;
         assert ex != null;
 
@@ -64,10 +63,9 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
                 HttpStatus.valueOf(status.value()),
                 "error.missing.servlet.request.parameter",
                 ex.getParameterName());
-
     }
 
-    // Обработка ошибок валидации DTO
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             @Nullable MethodArgumentNotValidException ex,
