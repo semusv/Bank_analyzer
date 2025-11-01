@@ -43,16 +43,16 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public void deleteCard(Long cardId, Long userId) {
-        log.info("Deleting card: {} for user: {}", cardId, userId);
-        Card card = entityAccessProvider.requireOwnedCard(cardId, userId);
+    public void deleteCard(Long cardId, User user) {
+        log.info("Deleting card: {} for user: {}", cardId, user.getId());
+        Card card = entityAccessProvider.requireOwnedCard(cardId, user.getId());
         cardRepository.delete(card);
     }
 
     @Override
-    public List<CardDto> getCardList(Long userId) {
+    public List<CardDto> getCardList(User user) {
 
-        return cardRepository.findByAccountUserId(userId)
+        return cardRepository.findByAccountUserId(user.getId())
                 .stream()
                 .map(cardMapper::toCardDto)
                 .toList();

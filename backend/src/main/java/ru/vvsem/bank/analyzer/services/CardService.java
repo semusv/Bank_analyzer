@@ -13,8 +13,8 @@ public interface CardService {
     CardDto createCard(NewCardDto newCardDto, User user);
 
     @Transactional
-    void deleteCard(Long cardId, Long userId);
+    void deleteCard(Long cardId, User user);
 
     @Transactional
-    List<CardDto> getCardList(Long userId);
+    List<CardDto> getCardList(User user);
 }

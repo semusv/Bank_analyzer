@@ -27,7 +27,7 @@ public class DashboardsApiController {
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
     public DashboardStatsDto getDashboardStats(@AuthenticationPrincipal User user) {
-        return dashboardService.getDashboardStats(user.getId());
+        return dashboardService.getDashboardStats(user);
     }
 
     @GetMapping("/recent-transactions")
@@ -35,7 +35,7 @@ public class DashboardsApiController {
     public List<TransactionDto> getRecentTransactions(
             @AuthenticationPrincipal User user,
             @RequestParam(defaultValue = "5") int limit) {
-        return dashboardService.getRecentTransactions(user.getId(), limit);
+        return dashboardService.getRecentTransactions(user, limit);
     }
 
 }

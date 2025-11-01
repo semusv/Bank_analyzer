@@ -55,9 +55,9 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Transactional
     @Override
-    public List<BankAccountSimpleDto> getUserAccountsWithCards(Long userId) {
-        log.info("Getting accounts with cards for user: {}", userId);
-        List<BankAccount> accounts = bankAccountRepository.findWithCardsAndUserAndCurrencyByUserId(userId);
+    public List<BankAccountSimpleDto> getUserAccountsWithCards(User user) {
+        log.info("Getting accounts with cards for user: {}", user.getId());
+        List<BankAccount> accounts = bankAccountRepository.findWithCardsAndUserAndCurrencyByUserId(user.getId());
         return accounts.stream()
                 .map(bankAccountMapper::toBankAccountSimpleDto).toList();
 
@@ -65,14 +65,14 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Transactional
     @Override
-    public void deleteAccount(Long accountId, Long userId) {
-        log.info("Deleting account: {} for user: {}", accountId, userId);
+    public void deleteAccount(Long accountId, User user) {
+        log.info("Deleting account: {} for user: {}", accountId, user.getId());
 
-        BankAccount account = bankAccountRepository.findByIdAndUserId(accountId, userId)
+        BankAccount account = bankAccountRepository.findByIdAndUserId(accountId, user.getId())
                 .orElseThrow(
                         () ->
                                 new EntityNotFoundException(
-                                        "AccountId %d for UserId %d not found".formatted(accountId, userId),
+                                        "AccountId %d for UserId %d not found".formatted(accountId, user.getId()),
                                         "exception.entity.not.found.bankAccount")
                 );
 

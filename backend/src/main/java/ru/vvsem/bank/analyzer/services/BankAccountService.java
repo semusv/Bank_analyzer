@@ -15,13 +15,13 @@ public interface BankAccountService {
     List<BankAccountDto> getUserBankAccount(Long userId);
 
     @Transactional
-    BankAccountSimpleDto createAccount(NewBankAccountDto newBankAccountDto, User use);
+    BankAccountSimpleDto createAccount(NewBankAccountDto newBankAccountDto, User user);
 
     @Transactional
-    List<BankAccountSimpleDto> getUserAccountsWithCards(Long userId);
+    List<BankAccountSimpleDto> getUserAccountsWithCards(User user);
 
     @Transactional
-    void deleteAccount(Long accountId, Long userId);
+    void deleteAccount(Long accountId, User user);
 
     void updateAccountBalance(BankAccount bankAccount, BigDecimal amount);
 }

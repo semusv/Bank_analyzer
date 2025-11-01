@@ -52,7 +52,7 @@ public class TransactionApiController {
         LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;
 
         Page<TransactionDto> result = transactionService.getListTransaction(
-                user.getId(),
+                user,
                 startDateTime,
                 endDateTime,
                 cardId,
@@ -70,7 +70,7 @@ public class TransactionApiController {
     public TransactionDto getTransaction(
             @PathVariable("id") Long transactionId,
             @AuthenticationPrincipal User user) {
-        return transactionService.getTransaction(transactionId, user.getId());
+        return transactionService.getTransaction(transactionId, user);
     }
 
     @RequestMapping("/{id}/hide")
@@ -78,7 +78,7 @@ public class TransactionApiController {
     public void hideTransaction(
             @PathVariable("id") Long transactionId,
             @AuthenticationPrincipal User user) {
-        transactionService.hideTransaction(transactionId, user.getId());
+        transactionService.hideTransaction(transactionId, user);
     }
 
     @DeleteMapping("/{id}")
@@ -86,7 +86,7 @@ public class TransactionApiController {
     public void deleteTransaction(
             @PathVariable("id") Long transactionId,
             @AuthenticationPrincipal User user) {
-        transactionService.deleteTransaction(transactionId, user.getId());
+        transactionService.deleteTransaction(transactionId, user);
     }
 
     @PostMapping("/{id}/split")
@@ -98,7 +98,7 @@ public class TransactionApiController {
         transactionService.splitTransaction(
                 transactionId,
                 subTransactions,
-                user.getId());
+                user);
 
     }
 

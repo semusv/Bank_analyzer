@@ -31,7 +31,7 @@ public class BankAccountApiController {
     @ResponseStatus(HttpStatus.OK)
     public List<BankAccountSimpleDto> getUserAccounts(@AuthenticationPrincipal User user) {
         log.info("GET /api/accounts for user: {}", user.getUsername());
-        return bankAccountService.getUserAccountsWithCards(user.getId());
+        return bankAccountService.getUserAccountsWithCards(user);
     }
 
     @PostMapping
@@ -49,7 +49,7 @@ public class BankAccountApiController {
             @PathVariable("id") Long id,
             @AuthenticationPrincipal User user
     ) {
-        bankAccountService.deleteAccount(id, user.getId());
+        bankAccountService.deleteAccount(id, user);
     }
 
 

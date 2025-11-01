@@ -41,7 +41,7 @@ public class CardApiController {
             @PathVariable("id") Long id,
             @AuthenticationPrincipal User user
     ) {
-        cardService.deleteCard(id, user.getId());
+        cardService.deleteCard(id, user);
     }
 
     @GetMapping
@@ -49,7 +49,7 @@ public class CardApiController {
     public List<CardDto> getCardList(
             @AuthenticationPrincipal User user
     ) {
-        return cardService.getCardList(user.getId());
+        return cardService.getCardList(user);
     }
 }
 

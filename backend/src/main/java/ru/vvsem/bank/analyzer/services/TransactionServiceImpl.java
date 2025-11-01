@@ -37,22 +37,22 @@ public class TransactionServiceImpl implements TransactionService {
     private final EntityAccessProviderImpl entityAccessProviderImpl;
 
     @Override
-    public List<TransactionDto> getListTransaction(Long userId) {
-        return transactionRepository.findByUserId(userId)
+    public List<TransactionDto> getListTransaction(User user) {
+        return transactionRepository.findByUserId(user.getId())
                 .stream()
                 .map(transactionMapper::toTransactionDto)
                 .toList();
     }
 
     @Override
-    public TransactionDto getTransaction(Long transactionId, Long userId) {
+    public TransactionDto getTransaction(Long transactionId, User user) {
         return transactionMapper.toTransactionDto(
-                entityAccessProviderImpl.requireOwnedTransaction(transactionId, userId));
+                entityAccessProviderImpl.requireOwnedTransaction(transactionId, user.getId()));
     }
 
     @Override
-    public void hideTransaction(Long transactionId, Long userId) {
-        Transaction transaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, userId);
+    public void hideTransaction(Long transactionId, User user) {
+        Transaction transaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, user.getId());
         transaction.setHide(!transaction.isHide());
         transactionRepository.save(transaction);
 
@@ -62,8 +62,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void deleteTransaction(Long transactionId, Long userId) {
-        Transaction transaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, userId);
+    public void deleteTransaction(Long transactionId, User user) {
+        Transaction transaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, user.getId());
         transaction.setHide(!transaction.isHide());
         transactionRepository.delete(transaction);
 
@@ -74,8 +74,7 @@ public class TransactionServiceImpl implements TransactionService {
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Override
     public Page<TransactionDto> getListTransaction(
-            Long userId,
-            LocalDateTime startDate,
+            User user, LocalDateTime startDate,
             LocalDateTime endDate,
             Long cardId,
             Long bankId,
@@ -85,15 +84,15 @@ public class TransactionServiceImpl implements TransactionService {
             int size) {
 
         Specification<Transaction> spec = buildSpecification(
-                userId, startDate, endDate, cardId, bankId, categoryId, description);
+                user.getId(), startDate, endDate, cardId, bankId, categoryId, description);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "operationTime"));
         Page<Transaction> transactions = transactionRepository.findAll(spec, pageable);
         return transactions.map(transactionMapper::toTransactionDto);
     }
 
     @Override
-    public void splitTransaction(Long transactionId, List<SubTransactionDto> subTransactions, Long userId) {
-        Transaction parentTransaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, userId);
+    public void splitTransaction(Long transactionId, List<SubTransactionDto> subTransactions, User user) {
+        Transaction parentTransaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, user.getId());
 
         BigDecimal totalSubAmount = subTransactions.stream()
                 .map(SubTransactionDto::getAmount)
