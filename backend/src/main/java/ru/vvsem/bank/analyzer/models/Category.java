@@ -30,6 +30,9 @@ public class Category extends AbstractBaseEntity {
     @Column(name = "color", length = 7)          // HEX → 7 символов
     private String color; // HEX-код
 
+    @Column(name = "textcolor", length = 7)          // HEX → 7 символов
+    private String textColor; // HEX-код
+
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

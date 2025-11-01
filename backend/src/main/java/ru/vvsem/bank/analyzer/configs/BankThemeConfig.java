@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@ConfigurationProperties(prefix = "bank")
+@ConfigurationProperties(prefix = "colors.bank")
 @Getter
 @Setter
 public class BankThemeConfig {

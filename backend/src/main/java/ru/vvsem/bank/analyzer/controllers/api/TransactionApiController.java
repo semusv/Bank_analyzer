@@ -29,7 +29,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/transaction")
 @RequiredArgsConstructor
-public class TransactionController {
+public class TransactionApiController {
 
     private final TransactionService transactionService;
 

@@ -17,6 +17,8 @@ databaseChangeLog:
       path: db/changelog/structure/1.0/2025/09
   - includeAll:
       path: db/changelog/structure/1.0/2025/10
+  - includeAll:
+      path: db/changelog/structure/1.0/2025/11
 
   # Данные для инициализации
   - include:

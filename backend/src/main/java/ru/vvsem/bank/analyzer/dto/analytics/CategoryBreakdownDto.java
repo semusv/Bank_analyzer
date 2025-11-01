@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import ru.vvsem.bank.analyzer.dto.CategoryDto;
+import ru.vvsem.bank.analyzer.dto.category.CategoryDto;
 
 import java.math.BigDecimal;
 

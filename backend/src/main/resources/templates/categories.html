@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+
+<head th:replace="~{layout :: head}">
+    <title>Категории - Bank Analyzer</title>
+    <link th:href="@{/css/categories.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div th:replace="~{layout :: topnav}"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{layout :: sidebar}"></div>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <!-- Заголовок и кнопка добавления -->
+                <div
+                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-tags"></i> Категории
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-sm btn-primary" onclick="openAddCategoryModal()">
+                            <i class="fas fa-plus"></i> Добавить категорию
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Сообщения -->
+                <div id="alertContainer"></div>
+
+                <!-- Список категорий -->
+                <div id="categoriesContainer">
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <output class="spinner-border text-primary" aria-label="Загрузка данных">
+                                <span class="visually-hidden">Загрузка данных...</span>
+                            </output>
+                            <p class="mt-2 text-muted">Загрузка категорий...</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Модальное окно добавления категории -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить категорию</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="addCategoryForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="addCategoryName" class="form-label">Название *</label>
+                            <input type="text" class="form-control" id="addCategoryName" name="name" required
+                                placeholder="Например: Продукты">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="addBackgroundColor">Цвет фона *</label>
+                            <div id="backgroundColorPicker" class="color-picker-grid mb-2"></div>
+                            <input type="color" class="form-control form-control-color" id="addBackgroundColor"
+                                name="backgroundColor" value="#FFE4E1" title="Выберите цвет фона">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="addTextColor">Цвет текста *</label>
+                            <div id="textColorPicker" class="color-picker-grid mb-2"></div>
+                            <input type="color" class="form-control form-control-color" id="addTextColor"
+                                name="textColor" value="#333333" title="Выберите цвет текста">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="addPreviewBadge">Предпросмотр</label>
+                            <div class="category-preview" id="addCategoryPreview">
+                                <span class="badge" id="addPreviewBadge">Название категории</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно редактирования категории -->
+    <div class="modal fade" id="editCategoryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Редактировать категорию</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editCategoryForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="editCategoryId" name="id">
+
+                        <div class="mb-3">
+                            <label for="editCategoryName" class="form-label">Название *</label>
+                            <input type="text" class="form-control" id="editCategoryName" name="name" required
+                                placeholder="Например: Продукты">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Цвет фона *</label>
+                            <div id="editBackgroundColorPicker" class="color-picker-grid mb-2"></div>
+                            <input type="color" class="form-control form-control-color" id="editBackgroundColor"
+                                name="backgroundColor" title="Выберите цвет фона">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Цвет текста *</label>
+                            <div id="editTextColorPicker" class="color-picker-grid mb-2"></div>
+                            <input type="color" class="form-control form-control-color" id="editTextColor"
+                                name="textColor" title="Выберите цвет текста">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Предпросмотр</label>
+                            <div class="category-preview" id="editCategoryPreview">
+                                <span class="badge" id="editPreviewBadge">Название категории</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification-container" id="notification-container"></div>
+
+    <div th:replace="~{layout :: scripts}"></div>
+
+    <script type="module" th:src="@{/js/ui/categories-view.js}"></script>
+</body>
+
+</html>

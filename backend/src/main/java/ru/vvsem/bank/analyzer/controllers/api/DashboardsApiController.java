@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/dashboard")
-public class DashboardsController {
+public class DashboardsApiController {
 
     private final DashboardService dashboardService;
 

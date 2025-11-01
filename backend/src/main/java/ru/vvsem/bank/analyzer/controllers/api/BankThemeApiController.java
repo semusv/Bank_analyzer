@@ -13,7 +13,7 @@ import ru.vvsem.bank.analyzer.services.BankThemeService;
 @RestController
 @RequestMapping("/api/bank-themes")
 @RequiredArgsConstructor
-public class BankThemeController {
+public class BankThemeApiController {
 
     private final BankThemeService bankThemeService;
 

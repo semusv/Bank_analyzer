@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1761982461620-1
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: textcolor
+                  type: VARCHAR(7)
+            tableName: categories
+

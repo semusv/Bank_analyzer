@@ -4,7 +4,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.vvsem.bank.analyzer.dto.CategoryDto;
+import ru.vvsem.bank.analyzer.dto.category.CategoryDto;
 import ru.vvsem.bank.analyzer.dto.analytics.CategoryBreakdownDto;
 import ru.vvsem.bank.analyzer.dto.analytics.TimeSeriesDto;
 import ru.vvsem.bank.analyzer.models.Transaction;

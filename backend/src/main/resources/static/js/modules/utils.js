@@ -38,9 +38,8 @@ export async function handleApiResponse(response) {
 
 function showNotification(message, type = 'success') {
     const container = document.getElementById('notification-container');
-
     const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
+    notification.className = `alert alert-${type} notification`;
 
     notification.innerHTML = `
             ${message}
@@ -63,7 +62,7 @@ export function showSuccessMessage(message) {
 }
 
 export function showErrorMessage(message) {
-    showNotification(message, 'error');
+    showNotification(message, 'danger');
 }
 
 export function showWarningMessage(message) {

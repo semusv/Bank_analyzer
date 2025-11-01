@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/analytics")
-public class AnalyticsController {
+public class AnalyticsApiController {
 
     private final AnalyticsService analyticsService;
 

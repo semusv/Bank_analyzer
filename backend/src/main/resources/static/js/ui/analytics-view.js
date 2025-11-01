@@ -232,37 +232,42 @@ function renderCategoryDonut(breakdown) {
     document.getElementById('categoryDonutChartLoader').hidden = true;
     ctx.hidden = false;
 
-    categoryChartInstance = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels,
-            datasets: [{
-                data: data,
-                backgroundColor: colors,
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: (ctx) => {
-                            const label = ctx.label || '';
-                            const val = ctx.parsed || 0;
-                            return ` ${label}: ${formatCurrency(val, 'RUB')}`;
+
+    try {
+        categoryChartInstance = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => {
+                                const label = ctx.label || '';
+                                const val = ctx.parsed || 0;
+                                return ` ${label}: ${formatCurrency(val, 'RUB')}`;
+                            }
                         }
                     }
-                }
-            },
-            cutout: '60%'
-        }
-    });
+                },
+                cutout: '60%'
+            }
+        });
+    } catch (error) {
+        console.error('Error creating cumulative chart:', error);
+    }
 }
 
 function formatLabelDate(isoDate) {

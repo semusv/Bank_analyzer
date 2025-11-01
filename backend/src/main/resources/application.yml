@@ -39,7 +39,7 @@ spring:
     generate-ddl: false
     hibernate:
       ddl-auto: validate
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -49,27 +49,53 @@ app:
   templates:
     error: "static/error-template.txt"
 
-
-bank:
-  themes:
-    sber:
-      primary-color: "#21a038"
-      secondary-color: "#1e8a34"
-      text-color: "#FFFFFF"
-    tinkoff:
-      primary-color: "#ffdd2d"
-      secondary-color: "#fcc521"
-      text-color: "#1E1E1E"
-    alpha:
-      primary-color: "#ef4444"
-      secondary-color: "#dc2626"
-      text-color: "#FFFFFF"
-    vtb:
-      primary-color: "#1e3a8a"
-      secondary-color: "#1e40af"
-      text-color: "#FFFFFF"
-    default:
-      primary-color: "#007bff"
-      secondary-color: "#0056b3"
-      text-color: "#FFFFFF"
-
+colors:
+  bank:
+    themes:
+      sber:
+        primary-color: "#21a038"
+        secondary-color: "#1e8a34"
+        text-color: "#FFFFFF"
+      tinkoff:
+        primary-color: "#ffdd2d"
+        secondary-color: "#fcc521"
+        text-color: "#1E1E1E"
+      alpha:
+        primary-color: "#ef4444"
+        secondary-color: "#dc2626"
+        text-color: "#FFFFFF"
+      vtb:
+        primary-color: "#1e3a8a"
+        secondary-color: "#1e40af"
+        text-color: "#FFFFFF"
+      default:
+        primary-color: "#007bff"
+        secondary-color: "#0056b3"
+        text-color: "#FFFFFF"
+  category:
+    backgroundColors:
+      color01: "#FFE4E1"
+      color02: "#E6E6FA"
+      color03: "#F0E68C"
+      color04: "#B0E0E6"
+      color05: "#FFB6C1"
+      color06: "#DDA0DD"
+      color07: "#F5DEB3"
+      color08: "#98FB98"
+      color09: "#FFE4B5"
+      color10: "#D8BFD8"
+      color11: "#D8BF28"
+    textColors:
+      color00: "#000000"
+      color01: "#404040"
+      color02: "#FFE4E1"
+      color03: "#E6E6FA"
+      color04: "#F0E68C"
+      color05: "#B0E0E6"
+      color06: "#FFB6C1"
+      color07: "#DDA0DD"
+      color08: "#F5DEB3"
+      color09: "#98FB98"
+      color10: "#FFE4B5"
+      color11: "#D8BFD8"
+      color12: "#FFFFFF"

@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.dto;
+package ru.vvsem.bank.analyzer.dto.category;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -16,5 +16,9 @@ public class CategoryDto {
     @NotNull
     private  String name;
 
+    @NotNull
     private  String color;
+
+    private String textColor;
+
 }

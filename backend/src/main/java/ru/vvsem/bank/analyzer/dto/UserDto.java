@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import ru.vvsem.bank.analyzer.dto.account.BankAccountDto;
+import ru.vvsem.bank.analyzer.dto.category.CategoryDto;
 import ru.vvsem.bank.analyzer.models.User;
 
 import java.util.List;

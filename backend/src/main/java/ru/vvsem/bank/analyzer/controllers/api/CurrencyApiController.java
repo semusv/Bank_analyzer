@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/currency")
 @Slf4j
-public class CurrencyController {
+public class CurrencyApiController {
 
     private final CurrencyService currencyService;
 
