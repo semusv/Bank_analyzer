@@ -25,7 +25,7 @@ public interface TransactionService {
     @Transactional
     void deleteTransaction(Long transactionId, Long userId);
 
-    @SuppressWarnings("CheckStyle")
+    @SuppressWarnings("checkstyle:ParameterNumber")
     @Transactional(readOnly = true)
     Page<TransactionDto> getListTransaction(
             Long userId,

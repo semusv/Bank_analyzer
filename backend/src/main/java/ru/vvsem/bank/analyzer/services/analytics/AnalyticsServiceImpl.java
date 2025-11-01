@@ -75,7 +75,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                                                            List<Long> cardIdList, User user) {
         Map<Long, BigDecimal> countedCategoriesMap = new HashMap<>();
         Map<Long, CategoryDto> categoryMap = new HashMap<>();
-        categoryService.getCategoriesForUser(user.getId())
+        categoryService.getCategoriesForUser(user)
                 .forEach(category -> categoryMap.put(category.getId(), category));
 
         Specification<Transaction> spec = buildSpecificationCategories(

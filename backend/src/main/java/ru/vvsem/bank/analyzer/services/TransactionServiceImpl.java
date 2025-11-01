@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 import ru.vvsem.bank.analyzer.dto.transaction.NewTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
-import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.mappers.TransactionMapper;
 import ru.vvsem.bank.analyzer.models.Transaction;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
+import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
 
 import java.math.BigDecimal;
@@ -32,13 +32,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionMapper transactionMapper;
 
-    private final CurrencyService currencyService;
-
-    private final CategoryService categoryService;
-
-    private final CardService cardService;
-
     private final BankAccountService bankAccountService;
+
+    private final EntityAccessProviderImpl entityAccessProviderImpl;
 
     @Override
     public List<TransactionDto> getListTransaction(Long userId) {
@@ -50,16 +46,13 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDto getTransaction(Long transactionId, Long userId) {
-        return transactionRepository.findByIdAndUser_Id(transactionId, userId)
-                .map(transactionMapper::toTransactionDto)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Transaction with id %d for UserId %d not found".formatted(transactionId, userId),
-                        "exception.entity.not.found.transaction"));
+        return transactionMapper.toTransactionDto(
+                entityAccessProviderImpl.requireOwnedTransaction(transactionId, userId));
     }
 
     @Override
     public void hideTransaction(Long transactionId, Long userId) {
-        Transaction transaction = getTransactionWithIdAndUserId(transactionId, userId);
+        Transaction transaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, userId);
         transaction.setHide(!transaction.isHide());
         transactionRepository.save(transaction);
 
@@ -70,7 +63,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public void deleteTransaction(Long transactionId, Long userId) {
-        Transaction transaction = getTransactionWithIdAndUserId(transactionId, userId);
+        Transaction transaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, userId);
         transaction.setHide(!transaction.isHide());
         transactionRepository.delete(transaction);
 
@@ -78,7 +71,7 @@ public class TransactionServiceImpl implements TransactionService {
                 transaction.getAmount().negate());
     }
 
-    @SuppressWarnings("CheckStyle")
+    @SuppressWarnings("checkstyle:ParameterNumber")
     @Override
     public Page<TransactionDto> getListTransaction(
             Long userId,
@@ -100,7 +93,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public void splitTransaction(Long transactionId, List<SubTransactionDto> subTransactions, Long userId) {
-        Transaction parentTransaction = getTransactionWithIdAndUserId(transactionId, userId);
+        Transaction parentTransaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, userId);
 
         BigDecimal totalSubAmount = subTransactions.stream()
                 .map(SubTransactionDto::getAmount)
@@ -130,9 +123,11 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setDescription(newTransactionDto.getDescription());
         transaction.setAmount(newTransactionDto.getAmount());
         transaction.setOperationTime(newTransactionDto.getOperationTime());
-        transaction.setCategory(categoryService.getCategoryById(newTransactionDto.getCategoryId()));
-        transaction.setCurrency(currencyService.getCurrencyByCardID(newTransactionDto.getCardId()));
-        transaction.setCard(cardService.getCardByIdAndUserId(newTransactionDto.getCardId(), user.getId()));
+        transaction.setCategory(entityAccessProviderImpl.requireOwnedCategory(
+                newTransactionDto.getCategoryId(),
+                user.getId()));
+        transaction.setCurrency(entityAccessProviderImpl.requireCurrencyByCardId(newTransactionDto.getCardId()));
+        transaction.setCard(entityAccessProviderImpl.requireOwnedCard(newTransactionDto.getCardId(), user.getId()));
         transaction.setOperationType(newTransactionDto.getOperationType());
         if (transaction.getOperationType() == OperationType.OUTGOING) {
             transaction.setAmount(transaction.getAmount().negate());
@@ -146,7 +141,6 @@ public class TransactionServiceImpl implements TransactionService {
                 transactionRepository.save(transaction));
 
     }
-
 
 
     private static Transaction getSubTransaction(SubTransactionDto subTransactionDto, Transaction parentTransaction) {
@@ -167,7 +161,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
-    @SuppressWarnings("CheckStyle")
+    @SuppressWarnings("checkStyle")
     private Specification<Transaction> buildSpecification(Long userId,
                                                           LocalDateTime startDate,
                                                           LocalDateTime endDate,
@@ -201,11 +195,5 @@ public class TransactionServiceImpl implements TransactionService {
         };
     }
 
-    private Transaction getTransactionWithIdAndUserId(Long transactionId, Long userId) {
-        return transactionRepository.findByIdAndUser_Id(transactionId, userId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Transaction with id %d for UserId %d not found".formatted(transactionId, userId),
-                        "exception.entity.not.found.transaction"));
-    }
 
 }

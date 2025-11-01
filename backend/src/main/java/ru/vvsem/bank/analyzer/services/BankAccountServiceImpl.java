@@ -8,10 +8,10 @@ import ru.vvsem.bank.analyzer.dto.account.BankAccountDto;
 import ru.vvsem.bank.analyzer.dto.account.NewBankAccountDto;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.mappers.BankAccountMapper;
-import ru.vvsem.bank.analyzer.mappers.UserMapper;
 import ru.vvsem.bank.analyzer.models.BankAccount;
 import ru.vvsem.bank.analyzer.dto.account.BankAccountSimpleDto;
 import ru.vvsem.bank.analyzer.models.User;
+import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
 import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
 import ru.vvsem.bank.analyzer.services.security.UserService;
 
@@ -27,14 +27,9 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     private final UserService userService;
 
-    private final UserMapper userMapper;
-
     private final BankAccountMapper bankAccountMapper;
 
-    private final CurrencyService currencyService;
-
-    private final BankService bankService;
-
+    private final EntityAccessProvider entityAccessProvider;
 
     @Transactional(readOnly = true)
     @Override
@@ -51,8 +46,8 @@ public class BankAccountServiceImpl implements BankAccountService {
         log.info("Creating new account for user: {}", user.getId());
 
         var bankAccount = bankAccountMapper.toEntity(newBankAccountDto);
-        bankAccount.setBank(bankService.getBankById(bankAccount.getBank().getId()));
-        bankAccount.setCurrency(currencyService.getCurrencyById(bankAccount.getCurrency().getId()));
+        bankAccount.setBank(entityAccessProvider.requireBank(bankAccount.getBank().getId()));
+        bankAccount.setCurrency(entityAccessProvider.requireCurrency(bankAccount.getCurrency().getId()));
         bankAccount.setUser(user);
 
         return bankAccountMapper.toBankAccountSimpleDto(bankAccountRepository.save(bankAccount));

@@ -8,6 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -29,24 +30,24 @@ public class CategoryApiController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<CategoryDto> getAll(
+    public List<CategoryDto> getAllCategories(
             @AuthenticationPrincipal User user
     ) {
-        return categoryService.getCategoriesForUser(user.getId());
+        return categoryService.getCategoriesForUser(user);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CategoryDto getById(
+    public CategoryDto getCategoryById(
             @PathVariable("id") Long categoryId,
             @AuthenticationPrincipal User user
     ) {
-        return categoryService.getCategoryDtoById(categoryId);
+        return categoryService.getCategoryDtoById(categoryId, user);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryDto create(
+    public CategoryDto createCategory(
             @Valid @RequestBody CategoryDto categoryDto,
             @AuthenticationPrincipal User user
     ) {
@@ -59,4 +60,13 @@ public class CategoryApiController {
         return categoryService.getCategoryColors();
     }
 
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CategoryDto updateCategory(
+            @PathVariable("id") Long categoryId,
+            @Valid @RequestBody CategoryDto categoryDto,
+            @AuthenticationPrincipal User user
+    ) {
+        return categoryService.updateCategory(categoryId, categoryDto, user);
+    }
 }

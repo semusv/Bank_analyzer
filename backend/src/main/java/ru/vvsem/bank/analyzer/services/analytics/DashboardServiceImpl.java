@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.DashboardStatsDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.mappers.TransactionMapper;
+import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
 
@@ -28,21 +29,21 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Transactional(readOnly = true)
     @Override
-    public DashboardStatsDto getDashboardStats(Long userId) {
-        log.info("Getting dashboard stats for user: {}", userId);
+    public DashboardStatsDto getDashboardStats(User user) {
+        log.info("Getting dashboard stats for user: {}", user.getId());
         LocalDateTime startOfMonth = getStartOfMonth();
         LocalDateTime endOfMonth = getEndOfMonth();
         return DashboardStatsDto.builder()
                 .monthlyIncome(getSafeBigDecimal(
-                        transactionRepository.calculateMonthlyIncome(userId, startOfMonth, endOfMonth)))
+                        transactionRepository.calculateMonthlyIncome(user.getId(), startOfMonth, endOfMonth)))
                 .monthlyExpense(getSafeBigDecimal(
-                        transactionRepository.calculateMonthlyExpense(userId, startOfMonth, endOfMonth)))
+                        transactionRepository.calculateMonthlyExpense(user.getId(), startOfMonth, endOfMonth)))
                 .totalBalance(getSafeBigDecimal(
-                        bankAccountRepository.calculateTotalBalanceByUserId(userId)))
+                        bankAccountRepository.calculateTotalBalanceByUserId(user.getId())))
                 .totalTransactions(getSafeLong(
-                        transactionRepository.countByUserId(userId)))
+                        transactionRepository.countByUserId(user.getId())))
                 .uncategorizedTransactions(getSafeLong(
-                        transactionRepository.countUncategorizedByUserId(userId)))
+                        transactionRepository.countUncategorizedByUserId(user.getId())))
                 .build();
     }
 
@@ -71,10 +72,10 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<TransactionDto> getRecentTransactions(Long userId, int limit) {
-        log.info("Getting recent {} transactions for user: {}", limit, userId);
+    public List<TransactionDto> getRecentTransactions(User user, int limit) {
+        log.info("Getting recent {} transactions for user: {}", limit, user.getId());
 
-        var transactions = transactionRepository.findTopNByUserIdOrderByOperationTimeDesc(userId, limit);
+        var transactions = transactionRepository.findTopNByUserIdOrderByOperationTimeDesc(user.getId(), limit);
         return transactions
                 .stream()
                 .map(transactionMapper::toTransactionDto)

@@ -5,10 +5,10 @@ import org.springframework.stereotype.Service;
 import ru.vvsem.bank.analyzer.configs.CategoryColorConfig;
 import ru.vvsem.bank.analyzer.dto.category.CategoryColorsDto;
 import ru.vvsem.bank.analyzer.dto.category.CategoryDto;
-import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.mappers.CategoryMapper;
 import ru.vvsem.bank.analyzer.models.Category;
 import ru.vvsem.bank.analyzer.models.User;
+import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
 import ru.vvsem.bank.analyzer.repositories.CategoryRepository;
 
 import java.util.List;
@@ -23,30 +23,20 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryColorConfig categoryColorConfig;
 
-    @Override
-    public List<CategoryDto> getCategoriesForUser(Long userId) {
+    private final EntityAccessProviderImpl entityAccessProviderImpl;
 
-        return categoryRepository.findByUserId(userId)
+    @Override
+    public List<CategoryDto> getCategoriesForUser(User user) {
+
+        return categoryRepository.findByUserId(user.getId())
                 .stream()
                 .map(categoryMapper::toCategoryDto)
                 .toList();
     }
 
     @Override
-    public Category getCategoryById(Long categoryId) {
-        return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Currency for card with id %d not found".formatted(categoryId),
-                        "exception.entity.not.found.category"));
-    }
-
-    @Override
-    public CategoryDto getCategoryDtoById(Long categoryId) {
-        return categoryRepository.findById(categoryId)
-                .map(categoryMapper::toCategoryDto)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Currency for card with id %d not found".formatted(categoryId),
-                        "exception.entity.not.found.category"));
+    public CategoryDto getCategoryDtoById(Long categoryId, User user) {
+        return categoryMapper.toCategoryDto(entityAccessProviderImpl.requireOwnedCategory(categoryId, user.getId()));
     }
 
     @Override
@@ -64,4 +54,15 @@ public class CategoryServiceImpl implements CategoryService {
                 categoryColorConfig.getBackgroundColorsList(),
                 categoryColorConfig.getTextColorsList());
     }
+
+    @Override
+    public CategoryDto updateCategory(Long categoryId, CategoryDto categoryDto, User user) {
+        Category category = entityAccessProviderImpl.requireOwnedCategory(categoryId, user.getId());
+        category.setName(categoryDto.getName());
+        category.setColor(categoryDto.getColor());
+        category.setTextColor(categoryDto.getTextColor());
+        category.setUser(user);
+        return categoryMapper.toCategoryDto(categoryRepository.save(category));
+    }
+
 }

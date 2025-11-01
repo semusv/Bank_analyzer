@@ -12,7 +12,9 @@ import ru.vvsem.bank.analyzer.dto.account.NewBankAccountDto;
 import ru.vvsem.bank.analyzer.models.BankAccount;
 import ru.vvsem.bank.analyzer.dto.account.BankAccountSimpleDto;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {CardMapper.class})
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        componentModel = MappingConstants.ComponentModel.SPRING,
+        uses = {CardMapper.class})
 public interface BankAccountMapper {
     @Mapping(source = "userId", target = "user.id")
     @Mapping(source = "currencyCode", target = "currency.code")

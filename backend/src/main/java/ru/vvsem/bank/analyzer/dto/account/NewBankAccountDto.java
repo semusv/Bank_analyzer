@@ -1,4 +1,5 @@
 package ru.vvsem.bank.analyzer.dto.account;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -21,7 +22,7 @@ public class NewBankAccountDto {
     private String name;
 
     @NotBlank(message = "{validation.BankAccount.accountNumber.notBlank}")
-    @Size( min = 20, max = 20, message = "{validation.BankAccount.accountNumber.size}")
+    @Size(min = 20, max = 20, message = "{validation.BankAccount.accountNumber.size}")
     private String accountNumber;
 
     @NotNull(message = "{validation.BankAccount.bankId.notNull}")

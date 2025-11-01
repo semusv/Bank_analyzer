@@ -18,7 +18,6 @@ public class BankThemeServiceImpl implements BankThemeService {
     @Override
     public BankThemeDto getBankTheme(String bankCode) {
         BankTheme theme = bankThemeConfig.getThemeForBank(bankCode);
-        BankThemeDto dto = bankThemeMapper.toBankThemeDto(theme);
-        return dto;
+        return bankThemeMapper.toBankThemeDto(theme);
     }
 }

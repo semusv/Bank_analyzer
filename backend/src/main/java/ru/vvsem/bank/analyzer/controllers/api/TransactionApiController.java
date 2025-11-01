@@ -33,7 +33,8 @@ public class TransactionApiController {
 
     private final TransactionService transactionService;
 
-    @SuppressWarnings("CheckStyle")
+
+    @SuppressWarnings("checkstyle:ParameterNumber")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<TransactionDto> getListTransactions(
@@ -112,7 +113,7 @@ public class TransactionApiController {
     @Setter
     @Getter
     public static class PageResponse<T> {
-        // Getters and Setters
+
         private java.util.List<T> content;
 
         private long totalElements;
@@ -130,9 +131,14 @@ public class TransactionApiController {
         public PageResponse() {
         }
 
-        @SuppressWarnings("CheckStyle")
-        public PageResponse(java.util.List<T> content, long totalElements, int totalPages,
-                            int pageNumber, int pageSize, boolean first, boolean last) {
+        @SuppressWarnings("checkstyle:ParameterNumber")
+        public PageResponse(List<T> content,
+                            long totalElements,
+                            int totalPages,
+                            int pageNumber,
+                            int pageSize,
+                            boolean first,
+                            boolean last) {
             this.content = content;
             this.totalElements = totalElements;
             this.totalPages = totalPages;
