@@ -45,89 +45,15 @@
         </div>
     </div>
 
-    <!-- Модальное окно добавления счета -->
-    <div class="modal fade" id="addAccountModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Добавить новый счет</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form id="addAccountForm">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="accountName" class="form-label">Название счета *</label>
-                            <input type="text" class="form-control" id="accountName" name="accountName" required
-                                placeholder="Например: Основной счет RUB">
-                        </div>
-                        <div class="mb-3">
-                            <label for="accountNumber" class="form-label">Номер счета *</label>
-                            <input type="text" class="form-control" id="accountNumber" name="accountNumber" required
-                                placeholder="40817810099910004321">
-                        </div>
-                        <div class="mb-3">
-                            <label for="bank-list" class="form-label">Банк *</label>
-                            <select class="form-select" id="bank-list" name="bankId" required>
-                                <option value="">Выберите банк</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="currency-list" class="form-label">Валюта *</label>
-                            <select class="form-select" id="currency-list" name="currencyId" required>
-                                <option value="">Выберите валюту счета</option>
-                            </select>
-                        </div>
+    <!-- Подключаем модальные окна как фрагменты -->
+    <div th:replace="~{fragments/add-account-modal}"></div>
+    <div th:replace="~{fragments/add-card-modal}"></div>
 
-                        <div class="mb-3">
-                            <label for="initialBalance" class="form-label">Начальный баланс</label>
-                            <input type="number" step="0.01" class="form-control" id="initialBalance"
-                                name="initialBalance" value="0.00" placeholder="0.00">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                        <button type="submit" class="btn btn-primary">Добавить счет</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно добавления карты -->
-    <div class="modal fade" id="addCardModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Добавить карту к счету</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form id="addCardForm">
-                    <input type="hidden" id="cardAccountId" name="cardAccountId">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="cardName" class="form-label">Название карты *</label>
-                            <input type="text" class="form-control" id="cardName" name="cardName" required
-                                placeholder="Например: Tinkoff Black">
-                        </div>
-                        <div class="mb-3">
-                            <label for="lastFourDigits" class="form-label">Последние 4 цифры *</label>
-                            <input type="text" class="form-control" id="lastFourDigits" name="lastFourDigits" required
-                                maxlength="4" pattern="[0-9]{4}" placeholder="1234">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                        <button type="submit" class="btn btn-primary">Добавить карту</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
+    <!-- Уведомления -->
     <div class="notification-container" id="notification-container"></div>
 
+    <!-- Скрипты -->
     <div th:replace="~{layout :: scripts}"></div>
-
     <script type="module" th:src="@{/js/ui/accounts-view.js}"></script>
 </body>
 

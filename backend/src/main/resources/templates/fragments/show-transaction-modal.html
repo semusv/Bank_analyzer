@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<!-- Модальное окно деталей транзакции -->
+<div class="modal fade" id="transactionDetailsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Детали транзакции</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold" for="detailDescription">Описание</label>
+                    <p id="detailDescription"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold" for="detailAmount">Сумма</label>
+                    <strong>
+                        <p id="detailAmount" class="amount"></p>
+                    </strong>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold" for="detailDateTime">Дата и время</label>
+                    <p id="detailDateTime"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold" for="detailBank">Банк</label>
+                    <p id="detailBank">
+                        <span class="badge" id="detailBankBadge">
+
+                        </span>
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold" for="detailCard">Карта</label>
+                    <p id="detailCard"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold" for="detailCategory">Категория</label>
+                    <p id="detailCategory"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold" for="detailHideStatus">Статус видимости</label>
+                    <p id="detailHideStatus"></p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="detailHide" disabled>
+                        <label class="form-check-label" for="detailHide">
+                            Скрыть из статистики
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-warning" id="toggleHideBtn">
+                    <i class="fas fa-eye-slash"></i> Изменить видимость
+                </button>
+                <button type="button" class="btn btn-info" id="splitTransactionBtn">
+                    <i class="fas fa-cut"></i> Разделить
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

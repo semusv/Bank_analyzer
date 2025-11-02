@@ -151,7 +151,7 @@ async function handleAddCategory(event) {
 
     const categoryData = {
         name: formData.get('name'),
-        backgroundColor: formData.get('backgroundColor'),
+        color: formData.get('backgroundColor'),
         textColor: formData.get('textColor')
     };
 

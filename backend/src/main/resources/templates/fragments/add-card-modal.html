@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
+<!-- Модальное окно добавления карты -->
+<div class="modal fade" id="addCardModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавить карту к счету</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addCardForm">
+                <input type="hidden" id="cardAccountId" name="cardAccountId">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="cardName" class="form-label">Название карты *</label>
+                        <input type="text" class="form-control" id="cardName" name="cardName" required
+                               placeholder="Например: Tinkoff Black">
+                    </div>
+                    <div class="mb-3">
+                        <label for="lastFourDigits" class="form-label">Последние 4 цифры *</label>
+                        <input type="text" class="form-control" id="lastFourDigits" name="lastFourDigits" required
+                               maxlength="4" pattern="[0-9]{4}" placeholder="1234">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Добавить карту</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
