@@ -22,7 +22,7 @@
 
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="loadData()">
+                        <button class="btn btn-sm btn-outline-secondary" id="refreshBtn">
                             <i class="fas fa-sync-alt"></i> Обновить
                         </button>
                     </div>
@@ -79,13 +79,13 @@
                             </div>
                             <div class="card-body">
                                 <div class="d-grid gap-2">
-                                    <a href="/transactions/new" class="btn btn-outline-primary">
+                                    <button class="btn btn-outline-primary" onclick="openAddTransactionModal()">
                                         <i class="fas fa-plus"></i> Новая транзакция
-                                    </a>
+                                    </button>
                                     <a href="/accounts" class="btn btn-outline-secondary">
                                         <i class="fas fa-credit-card"></i> Управление счетами
                                     </a>
-                                    <a href="/analysis" class="btn btn-outline-info">
+                                    <a href="/analytics" class="btn btn-outline-info">
                                         <i class="fas fa-chart-bar"></i> Аналитика
                                     </a>
                                 </div>
@@ -97,9 +97,12 @@
         </div>
     </div>
 
-    <div class="notification-container" id="notification-container"></div>
-
     <div th:replace="~{layout :: scripts}"></div>
+
+    <!-- Подключаем модальные окна как фрагменты -->
+    <div th:replace="~{fragments/add-transaction-modal}"></div>
+    <!-- Уведомления -->
+    <div class="notification-container" id="notification-container"></div>
 
     <script type="module" th:src="@{/js/ui/dashboards-view.js}"></script>
 </body>

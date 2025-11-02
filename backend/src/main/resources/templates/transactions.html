@@ -105,13 +105,13 @@
     <div th:replace="~{fragments/add-transaction-modal}"></div>
     <div th:replace="~{fragments/show-transaction-modal}"></div>
     <div th:replace="~{fragments/split-transaction-modal}"></div>
-
-
+    <!-- Уведиоления-->
     <div class="notification-container" id="notification-container"></div>
 
     <div th:replace="~{layout :: scripts}"></div>
 
     <script type="module" th:src="@{/js/ui/transactions-view.js}"></script>
+    <script type="module" th:src="@{/js/ui/fragments/add-transaction-view.js}"></script>
 </body>
 
 </html>

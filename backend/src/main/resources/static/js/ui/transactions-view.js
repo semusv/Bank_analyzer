@@ -1,7 +1,6 @@
 import {
     fetchTransactions,
     fetchTransactionById,
-    createTransaction,
     deleteTransaction,
     toggleHideTransaction,
     splitTransaction
@@ -17,6 +16,10 @@ import {
     formatCurrency,
     showApiErrors
 } from "../modules/utils.js";
+import {
+    handleAddTransaction,
+    populateAddTransactionModal
+} from "./fragments/add-transaction-view.js";
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -86,8 +89,6 @@ async function loadCurrencies() {
         throw error;
     }
 }
-
-
 
 async function loadTransactions(page = 0) {
     try {
@@ -182,18 +183,18 @@ function renderTransactions(transactions) {
 
 async function applyBankThemesToTransactions(transactions) {
     if (!transactions || transactions.length === 0) return;
-    
+
     const themePromises = transactions.map(async (txn) => {
         const { bank: { bankCode }, id } = txn;
         const cardElement = document.querySelector(
             `.transaction-card[data-transaction-id="${id}"] .card-info`
         );
-        
+
         if (cardElement) {
             await getBankColorsForElem(bankCode, cardElement);
         }
     });
-    
+
     try {
         await Promise.all(themePromises);
     } catch (error) {
@@ -242,37 +243,9 @@ function setupEventListeners() {
     }
 }
 
-async function handleAddTransaction(event) {
-    event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
-
-    const transactionData = {
-        description: formData.get('description'),
-        amount: Number.parseFloat(formData.get('amount')),
-        operationTime: formData.get('operationTime'),
-        categoryId: formData.get('categoryId') ? Number.parseInt(formData.get('categoryId')) : null,
-        cardId: formData.get('cardId') ? Number.parseInt(formData.get('cardId')) : null,
-        operationType: formData.get("operationType")
-    };
-
-    try {
-        await createTransaction(transactionData);
-        showSuccessMessage('Транзакция успешно добавлена!');
-
-        if (typeof bootstrap !== 'undefined') {
-            const modalElement = document.getElementById('addTransactionModal');
-            const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-            modal.hide();
-        }
-
-        event.target.reset();
-        await loadTransactions();
-    } catch (error) {
-        console.error('Failed create transaction', error);
-        showApiErrors(error);
-    }
-}
+document.addEventListener('transactionAddSuccess', async function (event) {
+    await loadTransactions();
+});
 
 
 
@@ -438,7 +411,7 @@ globalThis.openAddTransactionModal = function () {
         return;
     }
 
-    populateAddTransactionModal();
+    populateAddTransactionModal(categoriesCache, cardsCache);
     const modal = new bootstrap.Modal(document.getElementById('addTransactionModal'));
     modal.show();
 };
@@ -641,70 +614,6 @@ function populateTransactionDetailsModal(transaction) {
 
     const splitBtn = document.getElementById('splitTransactionBtn');
     splitBtn.onclick = () => openSplitTransactionModal(transaction.id, transaction.amount);
-}
-
-function populateAddTransactionModal() {
-
-    // Заполнить выбор категорий
-    const categorySelect = document.getElementById('addCategoryId');
-    categorySelect.innerHTML = '<option value="">Не выбрано</option>';
-    categoriesCache.forEach(category => {
-        const option = document.createElement('option');
-        option.value = category.id;
-        option.textContent = category.name;
-        categorySelect.appendChild(option);
-    });
-
-    // Заполнить текущее время
-    if (document.getElementById('addOperationTime')) {
-        document.getElementById('addOperationTime').value = getLocalDateTimeString();
-    }
-
-    // Заполнить выбор карт
-    const cardSelect = document.getElementById('addCardId');
-    cardSelect.innerHTML = '<option value="">Не выбрано</option>';
-    cardsCache.forEach(card => {
-        const option = document.createElement('option');
-        option.value = card.id;
-        option.textContent = `${card.cardName} (****${card.lastFourDigits}) - ${card.currency.code}`;
-        cardSelect.appendChild(option);
-    });
-
-    // изменяем цвет суммы в зависимости от типа операции
-    document.querySelectorAll('input[type="radio"][name="operationType"]')
-        .forEach(radio => {
-            radio.addEventListener('change', () => {
-                changeAddAmountColor(radio);
-            });
-        });
-
-    document.getElementById('addCardId').addEventListener('change', () => {
-        cardsCache.forEach(card => {
-            if (card.id === Number.parseInt(document.getElementById('addCardId').value)) {
-                document.getElementById('addAmount').textContent = formatCurrency(document.getElementById('addAmount').value, card.currency.code);
-            }
-        });
-    });
-}
-
-function changeAddAmountColor(radio) {
-    const amountInput = document.getElementById('addAmount');
-    amountInput.classList.remove('text-danger', 'text-success', 'text-info');
-
-    if (radio.value == 0) {
-        amountInput.classList.add('text-danger');
-    } else if (radio.value == 1) {
-        amountInput.classList.add('text-success');
-    } else if (radio.value == 2) {
-        amountInput.classList.add('text-info');
-    }
-}
-
-function getLocalDateTimeString(date = new Date()) {
-    // Смещаем дату на разницу с UTC чтобы получить локальное время
-    const timezoneOffset = date.getTimezoneOffset() * 60000;
-    const localDate = new Date(date.getTime() + timezoneOffset);
-    return localDate.toISOString().slice(0, 16);
 }
 
 
