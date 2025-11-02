@@ -1,3 +1,7 @@
+cbr:
+  poll:
+    interval: 3600000
+
 spring:
   profiles:
     active: security6
@@ -48,6 +52,11 @@ spring:
 app:
   templates:
     error: "static/error-template.txt"
+
+logging:
+  level:
+    org.springframework.integration: DEBUG
+
 
 colors:
   bank:
