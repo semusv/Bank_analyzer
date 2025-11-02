@@ -1,6 +1,8 @@
 cbr:
-  poll:
-    interval: 3600000
+  integration:
+    enabled: false
+    poll:
+      interval: 3600000
 
 spring:
   profiles:
