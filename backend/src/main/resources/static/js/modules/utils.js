@@ -148,3 +148,14 @@ export function getLocalDateTimeString(date = new Date()) {
     const localDate = new Date(date.getTime() + timezoneOffset);
     return localDate.toISOString().slice(0, 16);
 }
+
+export function formatDateTime(dateTimeString) {
+    const date = new Date(dateTimeString);
+    return date.toLocaleString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}

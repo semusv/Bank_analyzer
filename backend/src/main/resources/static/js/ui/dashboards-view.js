@@ -3,8 +3,12 @@ import {
     fetchTransactionsRes
 } from "../modules/api/dashboards-api.js";
 import {
+    fetchTransactionById
+} from "../modules/api/transactions-api.js";
+import {
     showErrorMessage,
-    formatCurrency
+    formatCurrency,
+    formatDateTime
 } from "../modules/utils.js";
 import {
     handleAddTransaction,
@@ -12,7 +16,9 @@ import {
 } from "./fragments/add-transaction-view.js";
 import { fetchCards } from "../modules/api/cards-api.js";
 import { fetchCategories } from "../modules/api/categories-api.js";
-
+import {
+    populateTransactionDetailsModal
+} from "./fragments/show-transaction-view.js";
 
 
 document.addEventListener('DOMContentLoaded', init);
@@ -118,22 +124,50 @@ function renderTransactions(transactions) {
         return;
     }
 
-    container.innerHTML = transactions.map(txn => `
-                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                    <div>
-                        <strong>${txn.description}</strong>
-                        <br>
-                        <small class="text-muted">${new Date(txn.operationTime).toLocaleDateString()}</small>
+    container.innerHTML = transactions.map(thx => `
+                    <div class="transaction-card row align-items-center border-bottom ${thx.hide ? 'opacity-50' : ''}"
+                            onclick="viewTransactionDetails(${thx.id})">
+                        <div class="col-12 col-md-8 col-lg-8 mb-1">
+                            <div class="transaction-info">
+                                <h6 class="mb-1">
+                                        ${thx.description}
+                                    ${thx.hide ? '<span class="badge bg-secondary ms-2">Скрыто</span>' : ''}
+                                </h6>
+                                ${thx.category ? `
+                                    <div class="category-badge d-inline-block">
+                                        <span class="badge" style="background-color: ${thx.category.color || '#6c757d'}; color: white;">
+                                            ${thx.category.name}
+                                        </span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+    
+                        <div class="col-12 col-md-4 col-lg-4 text-end">
+                            <div class="amount ${thx.amount >= 0 ? 'text-success' : 'text-danger'} ">
+                                <strong>
+                                ${formatCurrency(thx.amount, thx.currency.code)}
+                                </strong>
+                            </div>
+                            <small class="text-muted text-end">
+                                ${formatDateTime(thx.operationTime)}
+                            </small>
+                        </div>
                     </div>
-                    <div class="text-end">
-                        <span class="amount ${txn.amount > 0 ? 'text-success' : 'text-danger'}">
-                            <strong>
-                                ${formatCurrency(txn.amount, txn.currency.code)}
-                            </strong>
-                        </span>
-                        <br>
-                        <small class="text-muted">${txn.category?.name || 'Без категории'}</small>
-                    </div>
-                </div>
-            `).join('');
+        `).join('');
 }
+
+globalThis.viewTransactionDetails = async function (transactionId) {
+    try {
+        const transaction = await fetchTransactionById(transactionId);
+        populateTransactionDetailsModal(transaction);
+
+        if (typeof bootstrap !== 'undefined') {
+            const modal = new bootstrap.Modal(document.getElementById('transactionDetailsModal'));
+            modal.show();
+        }
+    } catch (error) {
+        console.error('Failed to load transaction details:', error);
+        showApiErrors(error);
+    }
+};

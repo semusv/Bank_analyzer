@@ -1,3 +1,5 @@
+
+
 import {
     fetchTransactions,
     fetchTransactionById,
@@ -8,18 +10,24 @@ import {
 import { fetchCards } from "../modules/api/cards-api.js";
 import { fetchCategories } from "../modules/api/categories-api.js";
 import { fetchBanks } from "../modules/api/banks-api.js";
-import { getBankColorsForElem } from "./themes.js";
 import { fetchCurrencies } from "../modules/api/currency-api.js";
 import {
     showErrorMessage,
     showSuccessMessage,
     formatCurrency,
-    showApiErrors
+    showApiErrors,
+    formatDateTime
 } from "../modules/utils.js";
 import {
     handleAddTransaction,
     populateAddTransactionModal
 } from "./fragments/add-transaction-view.js";
+import {
+    populateTransactionDetailsModal
+} from "./fragments/show-transaction-view.js";
+import {
+    getBankColorsForElem
+} from "./themes.js";
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -103,7 +111,7 @@ async function loadTransactions(page = 0) {
         const transactions = response.content || response;
         totalPages = response.totalPages || 1;
 
-        renderTransactions(transactions);
+        await renderTransactions(transactions);
         renderPagination();
     } catch (error) {
         console.error('Failed to load transactions:', error);
@@ -112,7 +120,7 @@ async function loadTransactions(page = 0) {
     }
 }
 
-function renderTransactions(transactions) {
+async function renderTransactions(transactions) {
     const container = document.getElementById('transactionsContainer');
 
     if (!transactions || transactions.length === 0) {
@@ -120,76 +128,83 @@ function renderTransactions(transactions) {
         return;
     }
 
-    container.innerHTML = transactions.map(transaction =>
-        `<div class="card transaction-card mb-3 ${transaction.hide ? 'opacity-50' : ''}" data-transaction-id="${transaction.id}" data-bank="${transaction.bank.name}">
-            <div class="card-body">
-                <div class="row align-items-center" ">
-                    <div class="col-12 col-md-6 col-lg-6">
+    const fragment = document.createDocumentFragment();
+
+    const tempContainer = document.createElement('div');
+
+    tempContainer.innerHTML = transactions.map(thx => `
+                <div class="transaction-card row align-items-center border-bottom ${thx.hide ? 'opacity-50' : ''}"
+                                data-transaction-id="${thx.id}"
+                                data-transaction-card="${thx.id}"
+                                data-bank-theme="${thx.bank.bankCode}"
+                                onclick="viewTransactionDetails(${thx.id})">
+                    <div class="col-7 col-md-6 col-lg-6 mb-1">
                         <div class="transaction-info">
                             <h6 class="mb-1">
-                                    ${transaction.description}
-                                ${transaction.hide ? '<span class="badge bg-secondary ms-2">Скрыто</span>' : ''}
+                                    ${thx.description}
+                                ${thx.hide ? '<span class="badge bg-secondary ms-2">Скрыто</span>' : ''}
                             </h6>
-                            ${transaction.category ? `
+                            ${thx.category ? `
                                 <div class="category-badge d-inline-block">
-                                    <span class="badge" style="background-color: ${transaction.category.color || '#6c757d'}; color: white;">
-                                        ${transaction.category.name}
+                                    <span class="badge" style="background-color: ${thx.category.color || '#6c757d'}; color: white;">
+                                        ${thx.category.name}
                                     </span>
                                 </div>
                             ` : ''}
                         </div>
                     </div>
 
-                    <div class="col-12 col-md-6 col-lg-2">
-                        <div class="amount ${transaction.amount >= 0 ? 'text-success' : 'text-danger'}">
+                    <div class="col-5 col-md-6 col-lg-2 text-end">
+                        <div class="amount ${thx.amount >= 0 ? 'text-success' : 'text-danger'}">
                             <strong>
-                            ${formatCurrency(transaction.amount, transaction.currency.code)}
+                            ${formatCurrency(thx.amount, thx.currency.code)}
                             </strong>
                         </div>
                         <small class="text-muted">
-                            ${formatDateTime(transaction.operationTime)}
+                            ${formatDateTime(thx.operationTime)}
                         </small>
                     </div>
 
                     <div class="col-12 col-md-9 col-lg-3"  >
-                        ${transaction.card ? `
-                            <div class="card-info mb-2 card-header" data-bank-theme="${transaction.bank.bankCode}">
+                        ${thx.card ? `
+                            <div class="card-info mb-2 card-header" data-bank-theme="${thx.bank.bankCode}">
                                 <i class="fas fa-credit-card"></i>
-                                <span>**** ${transaction.card.lastFourDigits}</span>
+                                <span>**** ${thx.card.lastFourDigits}</span>
                             </div>
                         ` : ''}
                     </div>
 
 
 
-                    <div class="col-12 col-md-3 col-lg-1">
-                        <div class="d-flex gap-2 flex-wrap">
-                            <button class="btn btn-sm btn-outline-primary" onclick="viewTransactionDetails(${transaction.id})">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteTransactionById(${transaction.id})">
+                    <div class="col-12 col-md-3 col-lg-1 ">
+                        <div class="d-flex gap-2 flex-wrap flex-row-reverse">
+                            <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteTransactionById(${thx.id})">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+
     `).join('');
 
-    // Динамическое применение темы
-    applyBankThemesToTransactions(transactions);
+    while (tempContainer.firstChild) {
+        fragment.appendChild(tempContainer.firstChild);
+    }
+    await applyBankThemesToTransactions(transactions, fragment);
+
+    container.innerHTML = '';
+    container.appendChild(fragment);
 }
 
-async function applyBankThemesToTransactions(transactions) {
+async function applyBankThemesToTransactions(transactions, containerElement) {
     if (!transactions || transactions.length === 0) return;
 
     const themePromises = transactions.map(async (txn) => {
-        const { bank: { bankCode }, id } = txn;
-        const cardElement = document.querySelector(
-            `.transaction-card[data-transaction-id="${id}"] .card-info`
+        const { bank: { bankCode }, id, card } = txn;
+        if (!card) return;
+        const cardElement = containerElement.querySelector(
+            `.transaction-card[data-transaction-card="${id}"] .card-info`
         );
-
         if (cardElement) {
             await getBankColorsForElem(bankCode, cardElement);
         }
@@ -384,24 +399,16 @@ function renderPagination() {
     paginationHTML += '</ul></nav>';
     container.innerHTML = paginationHTML;
 }
-
 globalThis.changePage = async function (page) {
     if (page < 0 || page >= totalPages) return;
     await loadTransactions(page);
-    // Scroll to top of transactions list
-    document.getElementById('transactionsContainer')?.scrollIntoView({ behavior: 'smooth' });
-};
 
-function formatDateTime(dateTimeString) {
-    const date = new Date(dateTimeString);
-    return date.toLocaleString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+    // Простой скролл к верху страницы
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
     });
-}
+};
 
 // Глобальные функции для вызова из HTML
 globalThis.openAddTransactionModal = function () {
@@ -419,7 +426,7 @@ globalThis.openAddTransactionModal = function () {
 globalThis.viewTransactionDetails = async function (transactionId) {
     try {
         const transaction = await fetchTransactionById(transactionId);
-        populateTransactionDetailsModal(transaction);
+        populateTransactionDetailsModal(transaction, false);
 
         if (typeof bootstrap !== 'undefined') {
             const modal = new bootstrap.Modal(document.getElementById('transactionDetailsModal'));
@@ -558,63 +565,6 @@ globalThis.updateRemainingAmount = function () {
         }
     }
 };
-
-function populateTransactionDetailsModal(transaction) {
-    document.getElementById('detailDescription').textContent = transaction.description;
-
-    // Сумма операции
-    document.getElementById('detailAmount').textContent = formatCurrency(transaction.amount, transaction.currency.code);
-    document.getElementById('detailAmount').className =
-        `amount ${transaction.amount >= 0 ? 'text-success' : 'text-danger'}`;
-
-
-    document.getElementById('detailDateTime').textContent = formatDateTime(transaction.operationTime);
-
-    // Card information with badge
-    const cardElement = document.getElementById('detailCard');
-    if (transaction.card) {
-        cardElement.innerHTML = `<span class="badge bg-primary">**** ${transaction.card.lastFourDigits}</span>`;
-        cardElement.innerHTML += ` <span class="text-muted">${transaction.card.cardName}</span>`;
-    } else {
-        cardElement.textContent = 'Не указана';
-    }
-
-    // Bank information with badge
-    const bankElement = document.getElementById('detailBank');
-    if (transaction.bank) {
-        const bankElementBadge = document.getElementById('detailBankBadge');
-        bankElementBadge.innerHTML = transaction.bank.name;
-        getBankColorsForElem(transaction.bank.bankCode, bankElementBadge);
-    } else if (transaction.card) {
-        bankElement.textContent = 'Не указан';
-    } else {
-        bankElement.textContent = 'Не указан';
-    }
-
-
-    // Category with color
-    const categoryElement = document.getElementById('detailCategory');
-    if (transaction.category) {
-        const color = transaction.category.color || '#6c757d';
-        categoryElement.innerHTML = `<span class="badge" style="background-color: ${color}; color: white;">${transaction.category.name}</span>`;
-    } else {
-        categoryElement.textContent = 'Не указана';
-    }
-
-    document.getElementById('detailHide').checked = transaction.hide;
-    document.getElementById('detailHideStatus').textContent = transaction.hide ? 'Скрыта из статистики' : 'Отображается в статистике';
-    document.getElementById('detailHideStatus').className = transaction.hide ? 'text-warning' : 'text-success';
-
-    const hideToggleBtn = document.getElementById('toggleHideBtn');
-    hideToggleBtn.onclick = () => toggleHideTransactionById(transaction.id, !transaction.hide);
-    hideToggleBtn.innerHTML = transaction.hide ?
-        '<i class="fas fa-eye"></i> Показать в статистике' :
-        '<i class="fas fa-eye-slash"></i> Скрыть из статистики';
-    hideToggleBtn.className = transaction.hide ? 'btn btn-success' : 'btn btn-warning';
-
-    const splitBtn = document.getElementById('splitTransactionBtn');
-    splitBtn.onclick = () => openSplitTransactionModal(transaction.id, transaction.amount);
-}
 
 
 function populateFilters() {
