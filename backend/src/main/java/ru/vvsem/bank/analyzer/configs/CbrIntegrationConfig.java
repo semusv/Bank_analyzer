@@ -19,7 +19,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.vvsem.bank.analyzer.models.xml.ValCurs;
 import ru.vvsem.bank.analyzer.models.xml.Valute;
-import ru.vvsem.bank.analyzer.services.ExchangeRateService;
+import ru.vvsem.bank.analyzer.services.exchangeRate.ExchangeRateServiceImpl;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -62,7 +62,7 @@ public class CbrIntegrationConfig {
     }
 
     @Bean
-    public IntegrationFlow cbrExchangeRateFlow(ExchangeRateService exchangeRateService) {
+    public IntegrationFlow cbrExchangeRateFlow(ExchangeRateServiceImpl exchangeRateServiceImpl) {
         return IntegrationFlow
                 .from("exchangeRateChannel")
                 .enrichHeaders(h -> h
@@ -70,7 +70,7 @@ public class CbrIntegrationConfig {
                 // Преобразуем строку "dd/MM/yyyy" в LocalDate
                 .transform(payload -> LocalDate.parse((String) payload, DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                 // Проверяем, есть ли уже данные в БД
-                .filter(exchangeRateService, "needLoadForDate", spec -> spec
+                .filter(exchangeRateServiceImpl, "needLoadForDate", spec -> spec
                         .discardChannel("rateCheckChannel"))
                 // Обратно в строку для использования в URL
                 .transform(LocalDate.class,
@@ -87,7 +87,7 @@ public class CbrIntegrationConfig {
     }
 
     @Bean
-    public IntegrationFlow manualCbrFlow(ExchangeRateService cacheService) {
+    public IntegrationFlow manualCbrFlow(ExchangeRateServiceImpl cacheService) {
         return IntegrationFlow
                 .from("exchangeRateRequestChannel")
                 .enrichHeaders(h -> h

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.vvsem.bank.analyzer.dto.account.NewBankAccountDto;
 import ru.vvsem.bank.analyzer.dto.account.BankAccountSimpleDto;
 import ru.vvsem.bank.analyzer.models.User;
-import ru.vvsem.bank.analyzer.services.BankAccountService;
+import ru.vvsem.bank.analyzer.services.bankAccount.BankAccountService;
 
 import java.util.List;
 

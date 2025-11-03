@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.services;
+package ru.vvsem.bank.analyzer.services.category;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

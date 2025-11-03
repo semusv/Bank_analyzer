@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.vvsem.bank.analyzer.dto.bank.BankDto;
 import ru.vvsem.bank.analyzer.models.User;
-import ru.vvsem.bank.analyzer.services.BankService;
+import ru.vvsem.bank.analyzer.services.bank.BankService;
 
 import java.util.List;
 

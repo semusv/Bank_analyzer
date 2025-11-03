@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.services;
+package ru.vvsem.bank.analyzer.services.transaction;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,7 @@ import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
+import ru.vvsem.bank.analyzer.services.bankAccount.BankAccountService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

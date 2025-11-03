@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.services;
+package ru.vvsem.bank.analyzer.services.card;
 
 import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.card.CardDto;

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.vvsem.bank.analyzer.dto.CurrencyDto;
-import ru.vvsem.bank.analyzer.services.CurrencyService;
+import ru.vvsem.bank.analyzer.services.currency.CurrencyService;
 
 import java.util.List;
 

@@ -11,8 +11,8 @@ import ru.vvsem.bank.analyzer.models.Transaction;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
-import ru.vvsem.bank.analyzer.services.CardService;
-import ru.vvsem.bank.analyzer.services.CategoryService;
+import ru.vvsem.bank.analyzer.services.card.CardService;
+import ru.vvsem.bank.analyzer.services.category.CategoryService;
 import ru.vvsem.bank.analyzer.services.security.UserServiceImpl;
 
 import java.math.BigDecimal;

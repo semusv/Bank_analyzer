@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.vvsem.bank.analyzer.dto.category.CategoryColorsDto;
 import ru.vvsem.bank.analyzer.dto.category.CategoryDto;
 import ru.vvsem.bank.analyzer.models.User;
-import ru.vvsem.bank.analyzer.services.CategoryService;
+import ru.vvsem.bank.analyzer.services.category.CategoryService;
 
 import java.util.List;
 

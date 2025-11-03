@@ -20,7 +20,7 @@ import ru.vvsem.bank.analyzer.dto.transaction.NewTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.models.User;
-import ru.vvsem.bank.analyzer.services.TransactionService;
+import ru.vvsem.bank.analyzer.services.transaction.TransactionService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

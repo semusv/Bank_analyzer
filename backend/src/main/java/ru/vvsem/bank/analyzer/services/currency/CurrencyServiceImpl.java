@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.services;
+package ru.vvsem.bank.analyzer.services.currency;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

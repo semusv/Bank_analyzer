@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public interface ExchangeRateRepository extends JpaRepository<ExchangeRate, Long> {
+    Optional<ExchangeRate> findFirstByCurrencyCodeAndCurrencyDateLessThanEqualOrderByCurrencyDateAsc(String currencyCode, LocalDate currencyDate);
+
     Optional<ExchangeRate> findByCurrencyCodeAndCurrencyDate(String currencyCode, LocalDate currencyDate);
 
     Optional<ExchangeRate> findFirstByCurrencyCodeOrderByCurrencyDateDesc(String currencyCode);

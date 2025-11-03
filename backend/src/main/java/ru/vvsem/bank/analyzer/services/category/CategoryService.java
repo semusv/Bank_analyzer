@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.services;
+package ru.vvsem.bank.analyzer.services.category;
 
 import jakarta.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
