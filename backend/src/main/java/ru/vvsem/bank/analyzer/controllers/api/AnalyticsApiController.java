@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.vvsem.bank.analyzer.dto.analytics.CategoryBreakdownDto;
 import ru.vvsem.bank.analyzer.dto.analytics.TimeSeriesDto;
+import ru.vvsem.bank.analyzer.mappers.OperationTypeMapper;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
 import ru.vvsem.bank.analyzer.services.analytics.AnalyticsService;
@@ -16,6 +17,7 @@ import ru.vvsem.bank.analyzer.services.analytics.AnalyticsService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +25,8 @@ import java.util.List;
 public class AnalyticsApiController {
 
     private final AnalyticsService analyticsService;
+
+    private final OperationTypeMapper operationTypeMapper;
 
     @RequestMapping("/time-series")
     @ResponseStatus(HttpStatus.OK)
@@ -35,15 +39,15 @@ public class AnalyticsApiController {
 
         LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
         LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;
-        List<OperationType> operationTypeList =
-                operationTypeIdList == null ? null :
-                        operationTypeIdList.stream()
-                        .map(value -> OperationType.values()[value])
-                        .toList();
+        List<OperationType> operationTypeList = operationTypeIdList == null
+                ? null
+                : operationTypeIdList.stream()
+                .map(operationTypeMapper::mapOperationType)
+                .filter(Objects::nonNull)
+                .toList();
         return analyticsService.getTimeSeries(startDateTime, endDateTime, cardIdList, operationTypeList, user);
-
-
     }
+
 
     @RequestMapping("/category-breakdown")
     @ResponseStatus(HttpStatus.OK)
@@ -51,12 +55,18 @@ public class AnalyticsApiController {
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate,
             @RequestParam(required = false) List<Long> cardIdList,
+            @RequestParam(required = false) List<Integer> operationTypeIdList,
             @AuthenticationPrincipal User user) {
 
         LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
         LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;
-
-        return analyticsService.getCategoryBreakdown(startDateTime, endDateTime, cardIdList, user);
+        List<OperationType> operationTypeList = operationTypeIdList == null
+                ? null
+                : operationTypeIdList.stream()
+                .map(operationTypeMapper::mapOperationType)
+                .filter(Objects::nonNull)
+                .toList();
+        return analyticsService.getCategoryBreakdown(startDateTime, endDateTime, cardIdList, operationTypeList, user);
 
     }
 }

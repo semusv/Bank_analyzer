@@ -5,14 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.DashboardStatsDto;
+import ru.vvsem.bank.analyzer.dto.currency.CurrencyAmountDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.mappers.TransactionMapper;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
+import ru.vvsem.bank.analyzer.services.exchange_rate.ExchangeRateService;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,28 +27,34 @@ public class DashboardServiceImpl implements DashboardService {
 
     private final TransactionMapper transactionMapper;
 
+    private final ExchangeRateService exchangeRateService;
+
     @Transactional(readOnly = true)
     @Override
     public DashboardStatsDto getDashboardStats(User user) {
         log.info("Getting dashboard stats for user: {}", user.getId());
         LocalDateTime startOfMonth = getStartOfMonth();
         LocalDateTime endOfMonth = getEndOfMonth();
+
+        List<CurrencyAmountDto> monthlyIncome = transactionRepository.calculateMonthlyIncome(user.getId(), startOfMonth, endOfMonth);
+
+        List<CurrencyAmountDto> monthlyExpense = transactionRepository.calculateMonthlyExpense(user.getId(), startOfMonth, endOfMonth);
+
+        List<CurrencyAmountDto> totalBalances = bankAccountRepository.calculateTotalBalanceByUserId(user.getId());
+
+
         return DashboardStatsDto.builder()
-                .monthlyIncome(getSafeBigDecimal(
-                        transactionRepository.calculateMonthlyIncome(user.getId(), startOfMonth, endOfMonth)))
-                .monthlyExpense(getSafeBigDecimal(
-                        transactionRepository.calculateMonthlyExpense(user.getId(), startOfMonth, endOfMonth)))
-                .totalBalance(getSafeBigDecimal(
-                        bankAccountRepository.calculateTotalBalanceByUserId(user.getId())))
+                .monthlyIncomeRub(exchangeRateService.convertListToRub(monthlyIncome) )
+                .monthlyIncomes(monthlyIncome)
+                .monthlyExpenseRub(exchangeRateService.convertListToRub(monthlyExpense) )
+                .monthlyExpenses(monthlyExpense)
+                .totalBalanceRub( exchangeRateService.convertListToRub(totalBalances)  )
+                .totalBalances(totalBalances)
                 .totalTransactions(getSafeLong(
                         transactionRepository.countByUserId(user.getId())))
                 .uncategorizedTransactions(getSafeLong(
                         transactionRepository.countUncategorizedByUserId(user.getId())))
                 .build();
-    }
-
-    private BigDecimal getSafeBigDecimal(BigDecimal value) {
-        return value != null ? value.setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
     }
 
     private Long getSafeLong(Long value) {

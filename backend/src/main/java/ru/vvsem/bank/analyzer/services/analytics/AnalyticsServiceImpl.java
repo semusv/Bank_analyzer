@@ -13,6 +13,7 @@ import ru.vvsem.bank.analyzer.models.enums.OperationType;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
 import ru.vvsem.bank.analyzer.services.card.CardService;
 import ru.vvsem.bank.analyzer.services.category.CategoryService;
+import ru.vvsem.bank.analyzer.services.exchange_rate.ExchangeRateService;
 import ru.vvsem.bank.analyzer.services.security.UserServiceImpl;
 
 import java.math.BigDecimal;
@@ -37,6 +38,8 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     private final CategoryService categoryService;
 
+    private final ExchangeRateService exchangeRateService;
+
     @Override
     public List<TimeSeriesDto> getTimeSeries(
             LocalDateTime startDateTime,
@@ -52,7 +55,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         for (Transaction transaction : transactions) {
             LocalDate operationDate = transaction.getOperationTime().toLocalDate();
             BigDecimal currentAmount = mapTimeseries.getOrDefault(operationDate, BigDecimal.ZERO);
-            mapTimeseries.put(operationDate, currentAmount.add(transaction.getAmount()));
+            mapTimeseries.put(operationDate, currentAmount.add(exchangeRateService.convertToRub(
+                    transaction.getAmount(),
+                    transaction.getCurrency().getCode())));
         }
         for (int i = 0; i <= ChronoUnit.DAYS.between(
                 startDateTime.toLocalDate().atStartOfDay(),
@@ -72,20 +77,26 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     @Override
     public List<CategoryBreakdownDto> getCategoryBreakdown(LocalDateTime startDateTime,
                                                            LocalDateTime endDateTime,
-                                                           List<Long> cardIdList, User user) {
+                                                           List<Long> cardIdList,
+                                                           List<OperationType> operationTypeList,
+                                                           User user) {
         Map<Long, BigDecimal> countedCategoriesMap = new HashMap<>();
         Map<Long, CategoryDto> categoryMap = new HashMap<>();
         categoryService.getCategoriesForUser(user)
                 .forEach(category -> categoryMap.put(category.getId(), category));
 
-        Specification<Transaction> spec = buildSpecificationCategories(
-                user.getId(), startDateTime, endDateTime, cardIdList);
+        Specification<Transaction> spec = buildSpecification(
+                user.getId(), startDateTime, endDateTime, cardIdList, operationTypeList);
         List<Transaction> transactions = transactionRepository.findAll(spec);
 
         for (Transaction transaction : transactions) {
             Long operationId = transaction.getCategory().getId();
             BigDecimal currentAmount = countedCategoriesMap.getOrDefault(operationId, BigDecimal.ZERO);
-            countedCategoriesMap.put(operationId, currentAmount.add(transaction.getAmount()));
+            countedCategoriesMap.put(
+                    operationId,
+                    currentAmount.add(exchangeRateService.convertToRub(
+                            transaction.getAmount(),
+                            transaction.getCurrency().getCode())));
         }
 
         return countedCategoriesMap.entrySet().stream()
@@ -95,7 +106,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                                 entry.getValue().abs()))
                 .sorted(Comparator.comparing(CategoryBreakdownDto::getAmount))
                 .toList();
-
     }
 
     @SuppressWarnings("CheckStyle")
@@ -126,34 +136,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 predicates.add(root.get("operationType").in(operationTypeList));
             }
             predicates.add(criteriaBuilder.equal(root.get("hide"), false));
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        };
-    }
-
-    @SuppressWarnings("CheckStyle")
-    private Specification<Transaction> buildSpecificationCategories(
-            Long userId,
-            LocalDateTime startDate,
-            LocalDateTime endDate,
-            List<Long> cardIdList) {
-
-        return (root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            // User
-            predicates.add(criteriaBuilder.equal(root.get("user").get("id"), userId));
-            // Operation time
-            if (startDate != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("operationTime"), startDate));
-            }
-            if (endDate != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("operationTime"), endDate));
-            }
-            // Card filter
-            if (cardIdList != null && !cardIdList.isEmpty()) {
-                predicates.add(root.get("card").get("id").in(cardIdList));
-            }
-            predicates.add(criteriaBuilder.equal(root.get("hide"), false));
-            predicates.add(criteriaBuilder.equal(root.get("operationType"), OperationType.OUTGOING));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

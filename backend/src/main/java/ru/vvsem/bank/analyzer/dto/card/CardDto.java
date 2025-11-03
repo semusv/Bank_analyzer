@@ -3,7 +3,7 @@ package ru.vvsem.bank.analyzer.dto.card;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import ru.vvsem.bank.analyzer.dto.CurrencyDto;
+import ru.vvsem.bank.analyzer.dto.currency.CurrencyDto;
 import ru.vvsem.bank.analyzer.models.Card;
 
 /**

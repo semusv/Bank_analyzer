@@ -28,6 +28,7 @@ let cardsCache = null;
 
 function init() {
     setupEventListeners();
+    initTooltips()
     loadData();
 }
 
@@ -43,6 +44,17 @@ async function loadData() {
         console.error('Failed init page while getting data:', error);
         showErrorMessage(error.message);
     }
+}
+
+function initTooltips() {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(
+        tooltipTrigger => new bootstrap.Tooltip(tooltipTrigger, {
+            html: true,
+            placement: 'top'
+        })
+    );
+    return tooltipList;
 }
 
 function setupEventListeners() {
@@ -89,11 +101,29 @@ globalThis.openAddTransactionModal = async function () {
 };
 
 function renderStats(stats) {
-    // TODO: Валюты поправить
-    document.getElementById('totalBalance').textContent = formatCurrency(stats.totalBalance, 'RUB');
-    document.getElementById('monthlyIncome').textContent = formatCurrency(stats.monthlyIncome, 'RUB');
-    document.getElementById('monthlyExpense').textContent = formatCurrency(stats.monthlyExpense, 'RUB');
+    document.getElementById('totalBalance').textContent = formatCurrency(stats.totalBalanceRub, 'RUB');
+    document.getElementById('monthlyIncome').textContent = formatCurrency(stats.monthlyIncomeRub, 'RUB');
+    document.getElementById('monthlyExpense').textContent = formatCurrency(stats.monthlyExpenseRub, 'RUB');
+
+    document.getElementById('totalBalance').setAttribute('title', createTooltipHtml(stats.totalBalances));
+    document.getElementById('monthlyIncome').setAttribute('title', createTooltipHtml(stats.monthlyIncomes));
+    document.getElementById('monthlyExpense').setAttribute('title', createTooltipHtml(stats.monthlyExpenses));
+
+    initTooltips();
 }
+function createTooltipHtml(currencyAmounts) {
+    if (!currencyAmounts || currencyAmounts.length === 0) {
+        return 'Нет данных';
+    }
+
+    return currencyAmounts
+        .map(item => {
+            const amount = formatCurrency(item.amount, item.currencyCode);
+            return `<div>${item.currencyCode}: ${amount}</div>`;
+        })
+        .join('');
+}
+
 
 async function loadCategories() {
     try {

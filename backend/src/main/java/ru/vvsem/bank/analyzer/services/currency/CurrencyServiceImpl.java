@@ -2,7 +2,7 @@ package ru.vvsem.bank.analyzer.services.currency;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.vvsem.bank.analyzer.dto.CurrencyDto;
+import ru.vvsem.bank.analyzer.dto.currency.CurrencyDto;
 import ru.vvsem.bank.analyzer.mappers.CurrencyMapper;
 import ru.vvsem.bank.analyzer.repositories.CurrencyRepository;
 

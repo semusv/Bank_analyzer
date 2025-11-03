@@ -120,9 +120,7 @@ export function getCurrencyFormatter(currency) {
 export function formatCurrency(value, currency) {
     try {
         const formatter = getCurrencyFormatter(currency);
-        const formattedValue = formatter.format(value);
-        return value > 0 ? '+' + formattedValue : formattedValue;
-
+        return formatter.format(value);
     } catch (error) {
         console.error('Error formatting currency:', error);
         return value;
@@ -140,7 +138,6 @@ export function showApiErrors(error) {
         showErrorMessage(error.message);
     }
 }
-
 
 export function getLocalDateTimeString(date = new Date()) {
     // Смещаем дату на разницу с UTC чтобы получить локальное время

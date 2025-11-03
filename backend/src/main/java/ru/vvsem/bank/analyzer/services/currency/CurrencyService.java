@@ -1,6 +1,6 @@
 package ru.vvsem.bank.analyzer.services.currency;
 
-import ru.vvsem.bank.analyzer.dto.CurrencyDto;
+import ru.vvsem.bank.analyzer.dto.currency.CurrencyDto;
 
 import java.util.List;
 

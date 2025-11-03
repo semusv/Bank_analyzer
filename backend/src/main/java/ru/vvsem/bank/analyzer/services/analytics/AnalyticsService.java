@@ -22,5 +22,7 @@ public interface AnalyticsService {
     List<CategoryBreakdownDto> getCategoryBreakdown(
             LocalDateTime startDateTime,
             LocalDateTime endDateTime,
-            List<Long> cardIdList, User user);
+            List<Long> cardIdList,
+            List<OperationType> operationTypeList,
+            User user);
 }
