@@ -22,12 +22,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
-import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
@@ -44,13 +42,18 @@ public class SecurityConfig {
     @Bean
     @Profile("security")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        //noinspection removal
         http
                 .csrf(this::configureCsrf)
                 .authorizeHttpRequests(this::configureAuthorization)
                 .formLogin(this::configureFormLogin)
                 .logout(this::configureLogout)
                 .sessionManagement(session -> session
-                        .sessionAuthenticationStrategy(sessionAuthenticationStrategy()) // ДОБАВИТЬ здесь
+                        .maximumSessions(1)
+                        .sessionRegistry(sessionRegistry())
+                        .expiredUrl("/login?expired=true")
+                        .and()
+                        .sessionFixation().migrateSession()
                 )
                 .userDetailsService(userDetailsService);
         return http.build();
@@ -62,7 +65,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityDisabled(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(this::configureAuthorization)
+                .authorizeHttpRequests(authz -> authz.anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults()) // Включаем BASIC аутентификацию
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -70,7 +73,7 @@ public class SecurityConfig {
     }
 
     private void configureCsrf(CsrfConfigurer<HttpSecurity> csrf) {
-        csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+        csrf.disable();
     }
 
     private void configureAuthorization(
@@ -106,15 +109,6 @@ public class SecurityConfig {
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
                 .permitAll();
-    }
-
-    private void configureSessionManagement(SessionManagementConfigurer<HttpSecurity> session) {
-        session
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                .maximumSessions(1)
-                .sessionRegistry(sessionRegistry())
-                .expiredUrl("/login?expired=true")
-                .maxSessionsPreventsLogin(false);
     }
 
     @Bean

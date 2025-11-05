@@ -9,10 +9,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.RequestToViewNameTranslator;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
+import ru.vvsem.bank.analyzer.models.enums.Role;
 import ru.vvsem.bank.analyzer.repositories.UserRepository;
+
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -23,7 +26,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final PasswordService passwordService;
 
-    private final RequestToViewNameTranslator requestToViewNameTranslator;
 
     @Override
     @Transactional(readOnly = true)
@@ -59,6 +61,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         user.setPassword(passwordService.encodePassword(user.getPassword()));
 
+        user.setRoles(Set.of(Role.USER));
         userRepository.save(user);
     }
 
@@ -72,16 +75,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         Object principal = authentication.getPrincipal();
 
-        if (principal instanceof User) {
-            // Если principal уже является объектом User
-            return (User) principal;
-        } else if (principal instanceof UserDetails userDetails) {
-            // Если principal - стандартный UserDetails
-            String username = userDetails.getUsername();
-            return userRepository.findByLogin(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        if (principal instanceof SecurityUser securityUser) {
+            // Получаем User из БД по ID из SecurityUser
+            return userRepository.findById(securityUser.getId())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + securityUser.getId()));
         } else if (principal instanceof String username) {
-            // Если principal - просто строка (username)
             return userRepository.findByLogin(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
         } else {

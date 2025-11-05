@@ -11,8 +11,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
-
-
     @EntityGraph("user-accounts-category-budget-graph")
     Optional<User> findDataByLogin(String login);
 
