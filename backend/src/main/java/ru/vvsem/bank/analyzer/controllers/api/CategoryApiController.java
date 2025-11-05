@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.vvsem.bank.analyzer.dto.category.CategoryColorsDto;
 import ru.vvsem.bank.analyzer.dto.category.CategoryDto;
+import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.services.category.CategoryService;
 
@@ -32,27 +33,27 @@ public class CategoryApiController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<CategoryDto> getAllCategories(
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal SecurityUser securityUser
     ) {
-        return categoryService.getCategoriesForUser(user);
+        return categoryService.getCategoriesForUser(securityUser);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CategoryDto getCategoryById(
             @PathVariable("id") Long categoryId,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal SecurityUser securityUser
     ) {
-        return categoryService.getCategoryDtoById(categoryId, user);
+        return categoryService.getCategoryDtoById(categoryId, securityUser);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto createCategory(
             @Valid @RequestBody CategoryDto categoryDto,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal SecurityUser securityUser
     ) {
-        return categoryService.createCategory(categoryDto, user);
+        return categoryService.createCategory(categoryDto, securityUser);
     }
 
     @GetMapping("/colors")
@@ -66,17 +67,17 @@ public class CategoryApiController {
     public CategoryDto updateCategory(
             @PathVariable("id") Long categoryId,
             @Valid @RequestBody CategoryDto categoryDto,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal SecurityUser securityUser
     ) {
-        return categoryService.updateCategory(categoryId, categoryDto, user);
+        return categoryService.updateCategory(categoryId, categoryDto, securityUser);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(
             @PathVariable("id") Long categoryId,
-            @AuthenticationPrincipal User user)
+            @AuthenticationPrincipal SecurityUser securityUser)
     {
-        categoryService.deleteCategory(categoryId, user);
+        categoryService.deleteCategory(categoryId, securityUser);
     }
 }

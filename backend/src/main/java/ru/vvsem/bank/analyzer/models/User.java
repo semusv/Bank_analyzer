@@ -50,7 +50,7 @@ import java.util.Set;
         attributeNodes = {
                 @NamedAttributeNode("roles")
         })
-public class User extends AbstractBaseEntity implements UserDetails {
+public class User extends AbstractBaseEntity {
 
     @NotNull
     @Column(name = "name", nullable = false)
@@ -102,7 +102,6 @@ public class User extends AbstractBaseEntity implements UserDetails {
             orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Category> categories = new LinkedHashSet<>();
 
-    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles
                 .stream()
@@ -110,8 +109,4 @@ public class User extends AbstractBaseEntity implements UserDetails {
                 .toList();
     }
 
-    @Override
-    public String getUsername() {
-        return login;
-    }
 }

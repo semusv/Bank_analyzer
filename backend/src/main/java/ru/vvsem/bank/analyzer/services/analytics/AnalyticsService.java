@@ -3,7 +3,7 @@ package ru.vvsem.bank.analyzer.services.analytics;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.analytics.CategoryBreakdownDto;
 import ru.vvsem.bank.analyzer.dto.analytics.TimeSeriesDto;
-import ru.vvsem.bank.analyzer.models.User;
+import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
 
 import java.time.LocalDateTime;
@@ -17,12 +17,12 @@ public interface AnalyticsService {
             LocalDateTime endDateTime,
             List<Long> cardIdList,
             List<OperationType> operationTypeList,
-            User user);
+            SecurityUser securityUser);
 
     List<CategoryBreakdownDto> getCategoryBreakdown(
             LocalDateTime startDateTime,
             LocalDateTime endDateTime,
             List<Long> cardIdList,
             List<OperationType> operationTypeList,
-            User user);
+            SecurityUser securityUser);
 }

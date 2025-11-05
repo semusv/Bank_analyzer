@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.vvsem.bank.analyzer.dto.card.CardDto;
 import ru.vvsem.bank.analyzer.dto.card.NewCardDto;
+import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.services.card.CardService;
 
@@ -30,26 +31,26 @@ public class CardApiController {
     @ResponseStatus(HttpStatus.CREATED)
     public CardDto createCard(
             @Valid @RequestBody NewCardDto newCardDto,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal SecurityUser securityUser
     ) {
-        return cardService.createCard(newCardDto, user);
+        return cardService.createCard(newCardDto, securityUser);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCard(
             @PathVariable("id") Long id,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal SecurityUser securityUser
     ) {
-        cardService.deleteCard(id, user);
+        cardService.deleteCard(id, securityUser);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<CardDto> getCardList(
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal SecurityUser securityUser
     ) {
-        return cardService.getCardList(user);
+        return cardService.getCardList(securityUser);
     }
 }
 

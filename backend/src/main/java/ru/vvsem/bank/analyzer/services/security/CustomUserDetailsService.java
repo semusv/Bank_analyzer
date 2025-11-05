@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.RequestToViewNameTranslator;
+import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.repositories.UserRepository;
 
@@ -28,8 +29,19 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        return userRepository.findByLogin(username)
+        User user = userRepository.findByLogin(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+        return new SecurityUser(
+                user.getId(),
+                user.getLogin(),
+                user.getPassword(),
+                user.getAuthorities(),
+                true, // accountNonExpired
+                true, // accountNonLocked
+                true, // credentialsNonExpired
+                true  // enabled
+        );
 
     }
 
@@ -82,4 +94,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         return getCurrentUser().getId();
     }
 
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userId));
+    }
 }

@@ -21,6 +21,7 @@ export async function handleAddTransaction(event) {
         operationTime: formData.get('operationTime'),
         categoryId: formData.get('categoryId') ? Number.parseInt(formData.get('categoryId')) : null,
         cardId: formData.get('cardId') ? Number.parseInt(formData.get('cardId')) : null,
+        revCardId: formData.get('revCardId') ? Number.parseInt(formData.get('revCardId')) : null,
         operationType: formData.get("operationType")
     };
 
@@ -33,14 +34,9 @@ export async function handleAddTransaction(event) {
             const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
             modal.hide();
         }
-
         event.target.reset();
-
         document.dispatchEvent(new CustomEvent('transactionAddSuccess', {
-            //detail: transaction
         }));
-
-
     } catch (error) {
         console.error('Failed create transaction', error);
         showApiErrors(error);
@@ -75,15 +71,33 @@ function fillCategoryDropdown(categoriesCache) {
             const childDropdownBtn = target.querySelector('.badge');
             categoryDropdownBtn.style.backgroundColor = childDropdownBtn ? childDropdownBtn.style.backgroundColor : '';
             categoryDropdownBtn.style.color = childDropdownBtn ? childDropdownBtn.style.color : '';
-
         }
     });
 }
 
-function fillCardDropdown(cardCache) {
-    const cardDropdownMenu = document.getElementById('cardDropdownMenu');
-    const cardDropdownBtn = document.getElementById('cardDropdownBtn');
-    const cardHiddenInput = document.getElementById('addCardId');
+function fillCardDropdown(cardCache, typeCard) {
+    // Объявляем переменные в общей области видимости
+    let cardDropdownMenu, cardDropdownBtn, cardHiddenInput;
+
+    // Присваиваем значения в зависимости от типа
+    if (typeCard === "card") {
+        cardDropdownMenu = document.getElementById('cardDropdownMenu');
+        cardDropdownBtn = document.getElementById('cardDropdownBtn');
+        cardHiddenInput = document.getElementById('addCardId');
+    } else {
+        cardDropdownMenu = document.getElementById('revCardDropdownMenu');
+        cardDropdownBtn = document.getElementById('revCardDropdownBtn');
+        cardHiddenInput = document.getElementById('addRevCardId');
+    }
+
+    // Проверяем, что элементы существуют
+    if (!cardDropdownMenu || !cardDropdownBtn || !cardHiddenInput) {
+        console.error('One or more dropdown elements not found for type:', typeCard);
+        return;
+    }
+
+    // Очищаем предыдущие элементы
+    cardDropdownMenu.innerHTML = '';
 
     cardCache.forEach(card => {
         const item = document.createElement('a');
@@ -94,7 +108,7 @@ function fillCardDropdown(cardCache) {
         const badge = document.createElement('span');
         badge.classList.add('badge', 'me-2');
         badge.textContent = `${card.cardName} (****${card.lastFourDigits}) - ${card.currency.code}`;
-        setBankColorsForElem(card.bankCode, badge)
+        setBankColorsForElem(card.bankCode, badge);
 
         item.appendChild(badge);
         cardDropdownMenu.appendChild(item);
@@ -109,7 +123,7 @@ function fillCardDropdown(cardCache) {
             const text = target.textContent.trim();
 
             cardHiddenInput.value = value;
-            cardDropdownBtn.textContent = text || 'Выберите категорию';
+            cardDropdownBtn.textContent = text || 'Выберите карту';
 
             const childDropdownBtn = target.querySelector('.badge');
             cardDropdownBtn.style.background = childDropdownBtn ? childDropdownBtn.style.background : '';
@@ -119,32 +133,19 @@ function fillCardDropdown(cardCache) {
 }
 export function populateAddTransactionModal(categoriesCache, cardsCache) {
     fillCategoryDropdown(categoriesCache);
-    fillCardDropdown(cardsCache);
+    fillCardDropdown(cardsCache, "card");
+    fillCardDropdown(cardsCache, "revCard");
 
     // Заполнить текущее время
     if (document.getElementById('addOperationTime')) {
         document.getElementById('addOperationTime').value = getLocalDateTimeString();
     }
 
-
-
-    // // Заполнить выбор карт
-    // const cardSelect = document.getElementById('addCardId');
-    // cardSelect.innerHTML = '<option value="">Не выбрано</option>';
-    // cardsCache.forEach(card => {
-    //     const option = document.createElement('option');
-    //     option.value = card.id;
-    //     option.textContent = `${card.cardName} (****${card.lastFourDigits}) - ${card.currency.code}`;
-
-    //     setBankColorsForElem(card.bankCode, option)
-    //     cardSelect.appendChild(option);
-    // });
-
     // изменяем цвет суммы в зависимости от типа операции
     document.querySelectorAll('input[type="radio"][name="operationType"]')
         .forEach(radio => {
             radio.addEventListener('change', () => {
-                changeAddAmountColor(radio);
+                changeOperationType(radio);
             });
         });
 
@@ -157,7 +158,7 @@ export function populateAddTransactionModal(categoriesCache, cardsCache) {
     });
 }
 
-function changeAddAmountColor(radio) {
+function changeOperationType(radio) {
     const amountInput = document.getElementById('addAmount');
     amountInput.classList.remove('text-danger', 'text-success', 'text-info');
 
@@ -168,4 +169,17 @@ function changeAddAmountColor(radio) {
     } else if (radio.value == 2) {
         amountInput.classList.add('text-info');
     }
+
+    //видимость карты списания
+    if (radio.value == 2) {
+        document.getElementById('revCard').hidden = false;
+        document.getElementById('revCardDropdownBtn').textContent = 'Выберите карту';
+        document.getElementById('addRevCardId').value = '';
+        document.getElementById('addRevCardId').color = '';
+        document.getElementById('addRevCardId').background = '';
+    }
+    else {
+        document.getElementById('revCard').hidden = true;
+    }
+
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import ru.vvsem.bank.analyzer.dto.analytics.CategoryBreakdownDto;
 import ru.vvsem.bank.analyzer.dto.analytics.TimeSeriesDto;
 import ru.vvsem.bank.analyzer.mappers.OperationTypeMapper;
+import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
 import ru.vvsem.bank.analyzer.services.analytics.AnalyticsService;
@@ -35,7 +36,7 @@ public class AnalyticsApiController {
             @RequestParam LocalDate endDate,
             @RequestParam(required = false) List<Long> cardIdList,
             @RequestParam(required = false) List<Integer> operationTypeIdList,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal SecurityUser securityUser) {
 
         LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
         LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;
@@ -45,7 +46,7 @@ public class AnalyticsApiController {
                 .map(operationTypeMapper::mapOperationType)
                 .filter(Objects::nonNull)
                 .toList();
-        return analyticsService.getTimeSeries(startDateTime, endDateTime, cardIdList, operationTypeList, user);
+        return analyticsService.getTimeSeries(startDateTime, endDateTime, cardIdList, operationTypeList, securityUser);
     }
 
 
@@ -56,7 +57,7 @@ public class AnalyticsApiController {
             @RequestParam LocalDate endDate,
             @RequestParam(required = false) List<Long> cardIdList,
             @RequestParam(required = false) List<Integer> operationTypeIdList,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal SecurityUser securityUser) {
 
         LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
         LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;
@@ -66,7 +67,7 @@ public class AnalyticsApiController {
                 .map(operationTypeMapper::mapOperationType)
                 .filter(Objects::nonNull)
                 .toList();
-        return analyticsService.getCategoryBreakdown(startDateTime, endDateTime, cardIdList, operationTypeList, user);
+        return analyticsService.getCategoryBreakdown(startDateTime, endDateTime, cardIdList, operationTypeList, securityUser);
 
     }
 }

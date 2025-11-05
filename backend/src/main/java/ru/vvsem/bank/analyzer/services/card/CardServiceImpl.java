@@ -9,10 +9,9 @@ import ru.vvsem.bank.analyzer.dto.card.NewCardDto;
 import ru.vvsem.bank.analyzer.mappers.CardMapper;
 import ru.vvsem.bank.analyzer.mappers.UserMapper;
 import ru.vvsem.bank.analyzer.models.Card;
-import ru.vvsem.bank.analyzer.models.User;
+import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
 import ru.vvsem.bank.analyzer.repositories.CardRepository;
-import ru.vvsem.bank.analyzer.services.security.UserService;
 
 import java.util.List;
 
@@ -22,8 +21,6 @@ import java.util.List;
 public class CardServiceImpl implements CardService {
     private final CardRepository cardRepository;
 
-    private final UserService userService;
-
     private final UserMapper userMapper;
 
     private final CardMapper cardMapper;
@@ -32,27 +29,27 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public CardDto createCard(NewCardDto newCardDto, User user) {
-        log.info("Creating new card for user: {}", user.getId());
+    public CardDto createCard(NewCardDto newCardDto, SecurityUser securityUser) {
+        log.info("Creating new card for user: {}", securityUser.getId());
         var card = cardMapper.toEntity(newCardDto);
         card.setAccount(entityAccessProvider.requireOwnedBankAccount(
-                card.getAccount().getId(),user.getId()));
+                card.getAccount().getId(), securityUser.getId()));
         card.setIssuerBank(entityAccessProvider.requireBank(card.getAccount().getBank().getId()));
         var newCard = cardRepository.save(card);
         return cardMapper.toCardDto(newCard);
     }
 
     @Override
-    public void deleteCard(Long cardId, User user) {
-        log.info("Deleting card: {} for user: {}", cardId, user.getId());
-        Card card = entityAccessProvider.requireOwnedCard(cardId, user.getId());
+    public void deleteCard(Long cardId, SecurityUser securityUser) {
+        log.info("Deleting card: {} for user: {}", cardId, securityUser.getId());
+        Card card = entityAccessProvider.requireOwnedCard(cardId, securityUser.getId());
         cardRepository.delete(card);
     }
 
     @Override
-    public List<CardDto> getCardList(User user) {
+    public List<CardDto> getCardList(SecurityUser securityUser) {
 
-        return cardRepository.findByAccountUserId(user.getId())
+        return cardRepository.findByAccountUserId(securityUser.getId())
                 .stream()
                 .map(cardMapper::toCardDto)
                 .toList();

@@ -7,14 +7,14 @@ import org.springframework.stereotype.Service;
 import ru.vvsem.bank.analyzer.dto.category.CategoryDto;
 import ru.vvsem.bank.analyzer.dto.analytics.CategoryBreakdownDto;
 import ru.vvsem.bank.analyzer.dto.analytics.TimeSeriesDto;
+import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.Transaction;
-import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
 import ru.vvsem.bank.analyzer.services.card.CardService;
 import ru.vvsem.bank.analyzer.services.category.CategoryService;
 import ru.vvsem.bank.analyzer.services.exchange_rate.ExchangeRateService;
-import ru.vvsem.bank.analyzer.services.security.UserServiceImpl;
+import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,8 +30,6 @@ import java.util.Map;
 @Service
 public class AnalyticsServiceImpl implements AnalyticsService {
 
-    private final UserServiceImpl userService;
-
     private final TransactionRepository transactionRepository;
 
     private final CardService cardService;
@@ -40,16 +38,18 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     private final ExchangeRateService exchangeRateService;
 
+    private final CustomUserDetailsService userService;
+
     @Override
     public List<TimeSeriesDto> getTimeSeries(
             LocalDateTime startDateTime,
             LocalDateTime endDateTime,
             List<Long> cardIdList,
             List<OperationType> operationTypeList,
-            User user) {
+            SecurityUser securityUser) {
         Map<LocalDate, BigDecimal> mapTimeseries = new HashMap<>();
         Specification<Transaction> spec = buildSpecification(
-                user.getId(), startDateTime, endDateTime, cardIdList, operationTypeList);
+                securityUser.getId(), startDateTime, endDateTime, cardIdList, operationTypeList);
         List<Transaction> transactions = transactionRepository.findAll(spec);
 
         for (Transaction transaction : transactions) {
@@ -79,14 +79,14 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                                                            LocalDateTime endDateTime,
                                                            List<Long> cardIdList,
                                                            List<OperationType> operationTypeList,
-                                                           User user) {
+                                                           SecurityUser securityUser) {
         Map<Long, BigDecimal> countedCategoriesMap = new HashMap<>();
         Map<Long, CategoryDto> categoryMap = new HashMap<>();
-        categoryService.getCategoriesForUser(user)
+        categoryService.getCategoriesForUser(securityUser)
                 .forEach(category -> categoryMap.put(category.getId(), category));
 
         Specification<Transaction> spec = buildSpecification(
-                user.getId(), startDateTime, endDateTime, cardIdList, operationTypeList);
+                securityUser.getId(), startDateTime, endDateTime, cardIdList, operationTypeList);
         List<Transaction> transactions = transactionRepository.findAll(spec);
 
         for (Transaction transaction : transactions) {

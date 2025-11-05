@@ -33,6 +33,8 @@ public class NewTransactionDto {
     @NotNull(message = "{validation.Transaction.cardId.NotNull}")
     private Long cardId;
 
+    private Long revCardId;
+
     @NotNull(message = "{validation.Transaction.operationType.NotNull}")
     private OperationType operationType;
 }

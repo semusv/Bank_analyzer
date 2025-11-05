@@ -142,7 +142,7 @@ export function showApiErrors(error) {
 export function getLocalDateTimeString(date = new Date()) {
     // Смещаем дату на разницу с UTC чтобы получить локальное время
     const timezoneOffset = date.getTimezoneOffset() * 60000;
-    const localDate = new Date(date.getTime() + timezoneOffset);
+    const localDate = new Date(date.getTime() - timezoneOffset);
     return localDate.toISOString().slice(0, 16);
 }
 

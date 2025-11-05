@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.vvsem.bank.analyzer.dto.bank.BankDto;
-import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.services.bank.BankService;
 
 import java.util.List;
@@ -25,7 +23,7 @@ public class BankApiController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<BankDto>> getUserAccounts(@AuthenticationPrincipal User user) {
+    public ResponseEntity<List<BankDto>> getUserAccounts() {
         List<BankDto> banks = banksService.getBanks();
         return ResponseEntity.ok(banks);
     }

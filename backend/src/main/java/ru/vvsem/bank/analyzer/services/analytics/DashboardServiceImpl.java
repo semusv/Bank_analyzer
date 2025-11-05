@@ -2,16 +2,20 @@ package ru.vvsem.bank.analyzer.services.analytics;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.DashboardStatsDto;
 import ru.vvsem.bank.analyzer.dto.currency.CurrencyAmountDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.mappers.TransactionMapper;
+import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
+import ru.vvsem.bank.analyzer.repositories.UserRepository;
 import ru.vvsem.bank.analyzer.services.exchange_rate.ExchangeRateService;
+import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,10 +33,14 @@ public class DashboardServiceImpl implements DashboardService {
 
     private final ExchangeRateService exchangeRateService;
 
+    private final CustomUserDetailsService userService;
+
     @Transactional(readOnly = true)
     @Override
-    public DashboardStatsDto getDashboardStats(User user) {
+    public DashboardStatsDto getDashboardStats(SecurityUser securityUser) {
+        User user = userService.getUserById(securityUser.getId());
         log.info("Getting dashboard stats for user: {}", user.getId());
+
         LocalDateTime startOfMonth = getStartOfMonth();
         LocalDateTime endOfMonth = getEndOfMonth();
 
@@ -78,9 +86,8 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<TransactionDto> getRecentTransactions(User user, int limit) {
-        log.info("Getting recent {} transactions for user: {}", limit, user.getId());
-
+    public List<TransactionDto> getRecentTransactions(SecurityUser securityUser, int limit) {
+        User user = userService.getUserById(securityUser.getId());
         var transactions = transactionRepository.findTopNByUserIdOrderByOperationTimeDesc(user.getId(), limit);
         return transactions
                 .stream()

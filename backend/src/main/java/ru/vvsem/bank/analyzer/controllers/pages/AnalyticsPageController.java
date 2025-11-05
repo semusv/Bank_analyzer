@@ -5,15 +5,20 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
+import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 
 @Controller
 @RequiredArgsConstructor
 public class AnalyticsPageController {
+    private final CustomUserDetailsService userService;
 
     @GetMapping("/analytics")
-    public String accountsPage(@AuthenticationPrincipal User user, Model model) {
-        model.addAttribute("userName", user.getName() + " " + user.getSurname());
+    public String accountsPage(@AuthenticationPrincipal SecurityUser securityUser, Model model) {
+        User currentUser = userService.getUserById(securityUser.getId());
+
+        model.addAttribute("userName", currentUser.getName() + " " + currentUser.getSurname());
         model.addAttribute("pageTitle", "Счета и карты");
         model.addAttribute("activePage", "analytics");
         return "analytics";

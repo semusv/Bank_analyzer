@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.vvsem.bank.analyzer.dto.transaction.NewTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
+import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.services.transaction.TransactionService;
 
@@ -46,13 +47,13 @@ public class TransactionApiController {
             @RequestParam(required = false) String description,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal SecurityUser securityUser) {
 
         LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
         LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;
 
         Page<TransactionDto> result = transactionService.getListTransaction(
-                user,
+                securityUser,
                 startDateTime,
                 endDateTime,
                 cardId,
@@ -69,24 +70,24 @@ public class TransactionApiController {
     @ResponseStatus(HttpStatus.OK)
     public TransactionDto getTransaction(
             @PathVariable("id") Long transactionId,
-            @AuthenticationPrincipal User user) {
-        return transactionService.getTransaction(transactionId, user);
+            @AuthenticationPrincipal SecurityUser securityUser) {
+        return transactionService.getTransaction(transactionId, securityUser);
     }
 
     @RequestMapping("/{id}/hide")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void hideTransaction(
             @PathVariable("id") Long transactionId,
-            @AuthenticationPrincipal User user) {
-        transactionService.hideTransaction(transactionId, user);
+            @AuthenticationPrincipal SecurityUser securityUser) {
+        transactionService.hideTransaction(transactionId, securityUser);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTransaction(
             @PathVariable("id") Long transactionId,
-            @AuthenticationPrincipal User user) {
-        transactionService.deleteTransaction(transactionId, user);
+            @AuthenticationPrincipal SecurityUser securityUser) {
+        transactionService.deleteTransaction(transactionId, securityUser);
     }
 
     @PostMapping("/{id}/split")
@@ -94,20 +95,19 @@ public class TransactionApiController {
     public void splitTransaction(
             @PathVariable("id") Long transactionId,
             @Valid @RequestBody List<SubTransactionDto> subTransactions,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal SecurityUser securityUser) {
         transactionService.splitTransaction(
                 transactionId,
                 subTransactions,
-                user);
-
+                securityUser);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TransactionDto createTransaction(
+    public List<TransactionDto> createTransaction(
             @Valid @RequestBody NewTransactionDto newTransactionDto,
-            @AuthenticationPrincipal User user) {
-       return transactionService.insertTransaction(newTransactionDto, user);
+            @AuthenticationPrincipal SecurityUser securityUser) {
+       return transactionService.insertTransaction(newTransactionDto, securityUser);
     }
 
     @Setter

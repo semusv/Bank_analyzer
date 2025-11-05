@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.vvsem.bank.analyzer.dto.account.NewBankAccountDto;
 import ru.vvsem.bank.analyzer.dto.account.BankAccountSimpleDto;
-import ru.vvsem.bank.analyzer.models.User;
-import ru.vvsem.bank.analyzer.services.bankAccount.BankAccountService;
+import ru.vvsem.bank.analyzer.models.SecurityUser;
+import ru.vvsem.bank.analyzer.services.bank_account.BankAccountService;
 
 import java.util.List;
 
@@ -29,27 +29,26 @@ public class BankAccountApiController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<BankAccountSimpleDto> getUserAccounts(@AuthenticationPrincipal User user) {
-        log.info("GET /api/accounts for user: {}", user.getUsername());
-        return bankAccountService.getUserAccountsWithCards(user);
+    public List<BankAccountSimpleDto> getUserAccounts(@AuthenticationPrincipal SecurityUser securityUser) {
+        return bankAccountService.getUserAccountsWithCards(securityUser);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public BankAccountSimpleDto createAccount(
             @Valid @RequestBody NewBankAccountDto newBankAccountDto,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal SecurityUser securityUser
     ) {
-        return bankAccountService.createAccount(newBankAccountDto, user);
+        return bankAccountService.createAccount(newBankAccountDto, securityUser);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBankAccont(
             @PathVariable("id") Long id,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal SecurityUser securityUser
     ) {
-        bankAccountService.deleteAccount(id, user);
+        bankAccountService.deleteAccount(id, securityUser);
     }
 
 

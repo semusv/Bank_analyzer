@@ -7,10 +7,12 @@ import ru.vvsem.bank.analyzer.dto.category.CategoryColorsDto;
 import ru.vvsem.bank.analyzer.dto.category.CategoryDto;
 import ru.vvsem.bank.analyzer.mappers.CategoryMapper;
 import ru.vvsem.bank.analyzer.models.Category;
-import ru.vvsem.bank.analyzer.models.User;
+import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
 import ru.vvsem.bank.analyzer.repositories.CategoryRepository;
+import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -25,26 +27,28 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final EntityAccessProviderImpl entityAccessProviderImpl;
 
-    @Override
-    public List<CategoryDto> getCategoriesForUser(User user) {
+    private final CustomUserDetailsService userService;
 
-        return categoryRepository.findByUserId(user.getId())
+    @Override
+    public List<CategoryDto> getCategoriesForUser(SecurityUser securityUser) {
+
+        return categoryRepository.findByUserId(securityUser.getId())
                 .stream()
                 .map(categoryMapper::toCategoryDto)
-                .sorted( (categoryDto1, categoryDto2) -> categoryDto1.getName().compareTo(categoryDto2.getName()))
+                .sorted(Comparator.comparing(CategoryDto::getName))
                 .toList();
     }
 
     @Override
-    public CategoryDto getCategoryDtoById(Long categoryId, User user) {
-        return categoryMapper.toCategoryDto(entityAccessProviderImpl.requireOwnedCategory(categoryId, user.getId()));
+    public CategoryDto getCategoryDtoById(Long categoryId, SecurityUser securityUser) {
+        return categoryMapper.toCategoryDto(entityAccessProviderImpl.requireOwnedCategory(categoryId, securityUser.getId()));
     }
 
     @Override
-    public CategoryDto createCategory(CategoryDto categoryDto, User user) {
+    public CategoryDto createCategory(CategoryDto categoryDto, SecurityUser securityUser) {
 
         Category category = categoryMapper.toEntity(categoryDto);
-        category.setUser(user);
+        category.setUser( userService.getUserById(securityUser.getId()) );
 
         return categoryMapper.toCategoryDto(categoryRepository.save(category));
     }
@@ -57,18 +61,18 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto updateCategory(Long categoryId, CategoryDto categoryDto, User user) {
-        Category category = entityAccessProviderImpl.requireOwnedCategory(categoryId, user.getId());
+    public CategoryDto updateCategory(Long categoryId, CategoryDto categoryDto, SecurityUser securityUser) {
+        Category category = entityAccessProviderImpl.requireOwnedCategory(categoryId, securityUser.getId());
         category.setName(categoryDto.getName());
         category.setColor(categoryDto.getColor());
         category.setTextColor(categoryDto.getTextColor());
-        category.setUser(user);
+        category.setUser(userService.getUserById(securityUser.getId()));
         return categoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
     @Override
-    public void deleteCategory(Long categoryId, User user) {
-        Category category = entityAccessProviderImpl.requireOwnedCategory(categoryId, user.getId());
+    public void deleteCategory(Long categoryId, SecurityUser securityUser) {
+        Category category = entityAccessProviderImpl.requireOwnedCategory(categoryId, securityUser.getId());
         categoryRepository.delete(category);
     }
 
