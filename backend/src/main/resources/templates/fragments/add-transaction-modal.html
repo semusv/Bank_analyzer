@@ -44,17 +44,32 @@
                             required>
                     </div>
                     <div class="mb-3">
-                        <label for="addCategoryId" class="form-label">Категория</label>
-                        <select class="form-select" id="addCategoryId" name="categoryId">
-                            <option value="">Не выбрано</option>
-                        </select>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
+                                id="categoryDropdownBtn" data-bs-toggle="dropdown">
+                                Выберите категорию
+                            </button>
+                            <div class="dropdown-menu w-100" id="categoryDropdownMenu">
+                                <a class="dropdown-item" href="#" data-value="">Не выбрано</a>
+                            </div>
+                            <input type="hidden" id="addCategoryId" name="categoryId">
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="addCardId" class="form-label">Карта</label>
-                        <select class="form-select" id="addCardId" name="cardId">
-                            <option value="">Не выбрано</option>
-                        </select>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
+                                id="cardDropdownBtn" data-bs-toggle="dropdown">
+                                Выберите карту
+                            </button>
+                            <div class="dropdown-menu w-100" id="cardDropdownMenu">
+                                <a class="dropdown-item" href="#" data-value="">Не выбрано</a>
+                            </div>
+                            <input type="hidden" id="addCardId" name="cardId">
+                        </div>
                     </div>
+
+
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>

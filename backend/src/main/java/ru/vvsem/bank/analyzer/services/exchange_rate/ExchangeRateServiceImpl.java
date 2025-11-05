@@ -1,8 +1,10 @@
-package ru.vvsem.bank.analyzer.services.exchangeRate;
+package ru.vvsem.bank.analyzer.services.exchange_rate;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.RequestToViewNameTranslator;
+import ru.vvsem.bank.analyzer.dto.currency.CurrencyAmountDto;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.models.ExchangeRate;
 import ru.vvsem.bank.analyzer.models.xml.ValCurs;
@@ -22,9 +24,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ExchangeRateServiceImpl implements ExchangeRateService {
 
+    private static final String CURRENCY_CODE_RUB = "RUB";
     private final Map<LocalDate, Map<String, ExchangeRate>> rateCache = new HashMap<>();
 
     private final ExchangeRateRepository exchangeRateRepository;
+
+    private final RequestToViewNameTranslator requestToViewNameTranslator;
 
     @Override
     public void processExchangeRates(ValCurs valCurs) {
@@ -50,12 +55,33 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         return !exchangeRateRepository.existsByCurrencyDate(date);
     }
 
+    @Override
+    public BigDecimal convertListToRub(List<CurrencyAmountDto> amounts) {
+        if (amounts == null || amounts.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        return amounts.stream()
+                .map(dto -> convertToRub(dto.getAmount(), dto.getCurrencyCode()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    //    convertToRub(currencyAmountDto.getAmount(), currencyAmountDto.getCurrencyCode()
+    @Override
     public BigDecimal convertToRub(BigDecimal amount, String currencyCode, LocalDate date) {
+        if (CURRENCY_CODE_RUB.equals(currencyCode)) {
+            return amount;
+        }
         ExchangeRate rate = getRateForDate(currencyCode, date);
         return convertWithRate(amount, rate);
     }
 
+    @Override
     public BigDecimal convertToRub(BigDecimal amount, String currencyCode) {
+        if (CURRENCY_CODE_RUB.equals(currencyCode)) {
+            return amount;
+        }
+
         ExchangeRate rate = getRateForDate(currencyCode, LocalDate.now());
         return convertWithRate(amount, rate);
     }
@@ -71,7 +97,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     }
 
     private ExchangeRate getRateForDate(String currencyCode, LocalDate date) {
-        ExchangeRate rate = rateCache.get(date).get(currencyCode);
+        ExchangeRate rate = rateCache.getOrDefault(date, Map.of()).get(currencyCode);
         if (rate == null) {
             rate = exchangeRateRepository.findFirstByCurrencyCodeAndCurrencyDateLessThanEqualOrderByCurrencyDateAsc(currencyCode, date)
                     .orElseThrow(() -> new EntityNotFoundException(

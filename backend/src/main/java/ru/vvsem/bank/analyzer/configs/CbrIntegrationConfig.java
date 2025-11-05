@@ -19,7 +19,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.vvsem.bank.analyzer.models.xml.ValCurs;
 import ru.vvsem.bank.analyzer.models.xml.Valute;
-import ru.vvsem.bank.analyzer.services.exchangeRate.ExchangeRateServiceImpl;
+import ru.vvsem.bank.analyzer.services.exchange_rate.ExchangeRateServiceImpl;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

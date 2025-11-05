@@ -3,7 +3,7 @@ import {
     formatDateTime
 } from "../../modules/utils.js";
 import {
-    getBankColorsForElem
+    setBankColorsForElem
 } from "../themes.js";
 
 
@@ -32,7 +32,7 @@ export function populateTransactionDetailsModal(transaction, viewMode = true) {
     if (transaction.bank) {
         const bankElementBadge = document.getElementById('detailBankBadge');
         bankElementBadge.innerHTML = transaction.bank.name;
-        getBankColorsForElem(transaction.bank.bankCode, bankElementBadge);
+        setBankColorsForElem(transaction.bank.bankCode, bankElementBadge);
     } else if (transaction.card) {
         bankElement.textContent = 'Не указан';
     } else {
@@ -44,7 +44,8 @@ export function populateTransactionDetailsModal(transaction, viewMode = true) {
     const categoryElement = document.getElementById('detailCategory');
     if (transaction.category) {
         const color = transaction.category.color || '#6c757d';
-        categoryElement.innerHTML = `<span class="badge" style="background-color: ${color}; color: white;">${transaction.category.name}</span>`;
+        const textColor = transaction.category.textcolor || '#6c757d';
+        categoryElement.innerHTML = `<span class="badge" style="background-color: ${color}; color: ${textColor};">${transaction.category.name}</span>`;
     } else {
         categoryElement.textContent = 'Не указана';
     }

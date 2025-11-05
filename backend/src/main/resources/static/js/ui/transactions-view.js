@@ -26,7 +26,7 @@ import {
     populateTransactionDetailsModal
 } from "./fragments/show-transaction-view.js";
 import {
-    getBankColorsForElem
+    setBankColorsForElem
 } from "./themes.js";
 
 document.addEventListener('DOMContentLoaded', init);
@@ -146,7 +146,7 @@ async function renderTransactions(transactions) {
                             </h6>
                             ${thx.category ? `
                                 <div class="category-badge d-inline-block">
-                                    <span class="badge" style="background-color: ${thx.category.color || '#6c757d'}; color: white;">
+                                    <span class="badge" style="background-color: ${thx.category.color || '#6c757d'}; color: ${thx.category.textColor || '#000000ff'};">
                                         ${thx.category.name}
                                     </span>
                                 </div>
@@ -206,7 +206,7 @@ async function applyBankThemesToTransactions(transactions, containerElement) {
             `.transaction-card[data-transaction-card="${id}"] .card-info`
         );
         if (cardElement) {
-            await getBankColorsForElem(bankCode, cardElement);
+            await setBankColorsForElem(bankCode, cardElement);
         }
     });
 

@@ -7,7 +7,7 @@ import {
 import {
     createTransaction
 } from "../../modules/api/transactions-api.js";
-
+import { setBankColorsForElem } from "../themes.js";
 
 
 export async function handleAddTransaction(event) {
@@ -46,33 +46,99 @@ export async function handleAddTransaction(event) {
         showApiErrors(error);
     }
 }
+function fillCategoryDropdown(categoriesCache) {
+    const categoryDropdownMenu = document.getElementById('categoryDropdownMenu');
+    const categoryDropdownBtn = document.getElementById('categoryDropdownBtn');
+    const categoryHiddenInput = document.getElementById('addCategoryId');
 
-export function populateAddTransactionModal(categoriesCache, cardsCache) {
-
-    // Заполнить выбор категорий
-    const categorySelect = document.getElementById('addCategoryId');
-    categorySelect.innerHTML = '<option value="">Не выбрано</option>';
     categoriesCache.forEach(category => {
-        const option = document.createElement('option');
-        option.value = category.id;
-        option.textContent = category.name;
-        categorySelect.appendChild(option);
+        const item = document.createElement('a');
+        item.className = 'dropdown-item d-flex align-items-center';
+        item.href = '#';
+        item.innerHTML = `
+        <span class="badge me-2" style="background-color: ${category.color}; color: ${category.textColor};">${category.name}</span>`;
+        item.dataset.value = category.id;
+        categoryDropdownMenu.appendChild(item);
     });
+
+    // Обработчик выбора
+    categoryDropdownMenu.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = e.target.closest('.dropdown-item');
+        if (target) {
+            const value = target.dataset.value;
+            const text = target.textContent.trim();
+
+            categoryHiddenInput.value = value;
+            categoryDropdownBtn.textContent = text || 'Выберите категорию';
+
+            const childDropdownBtn = target.querySelector('.badge');
+            categoryDropdownBtn.style.backgroundColor = childDropdownBtn ? childDropdownBtn.style.backgroundColor : '';
+            categoryDropdownBtn.style.color = childDropdownBtn ? childDropdownBtn.style.color : '';
+
+        }
+    });
+}
+
+function fillCardDropdown(cardCache) {
+    const cardDropdownMenu = document.getElementById('cardDropdownMenu');
+    const cardDropdownBtn = document.getElementById('cardDropdownBtn');
+    const cardHiddenInput = document.getElementById('addCardId');
+
+    cardCache.forEach(card => {
+        const item = document.createElement('a');
+        item.className = 'dropdown-item d-flex align-items-center';
+        item.href = '#';
+        item.dataset.value = card.id;
+
+        const badge = document.createElement('span');
+        badge.classList.add('badge', 'me-2');
+        badge.textContent = `${card.cardName} (****${card.lastFourDigits}) - ${card.currency.code}`;
+        setBankColorsForElem(card.bankCode, badge)
+
+        item.appendChild(badge);
+        cardDropdownMenu.appendChild(item);
+    });
+
+    // Обработчик выбора
+    cardDropdownMenu.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = e.target.closest('.dropdown-item');
+        if (target) {
+            const value = target.dataset.value;
+            const text = target.textContent.trim();
+
+            cardHiddenInput.value = value;
+            cardDropdownBtn.textContent = text || 'Выберите категорию';
+
+            const childDropdownBtn = target.querySelector('.badge');
+            cardDropdownBtn.style.background = childDropdownBtn ? childDropdownBtn.style.background : '';
+            cardDropdownBtn.style.color = childDropdownBtn ? childDropdownBtn.style.color : '';
+        }
+    });
+}
+export function populateAddTransactionModal(categoriesCache, cardsCache) {
+    fillCategoryDropdown(categoriesCache);
+    fillCardDropdown(cardsCache);
 
     // Заполнить текущее время
     if (document.getElementById('addOperationTime')) {
         document.getElementById('addOperationTime').value = getLocalDateTimeString();
     }
 
-    // Заполнить выбор карт
-    const cardSelect = document.getElementById('addCardId');
-    cardSelect.innerHTML = '<option value="">Не выбрано</option>';
-    cardsCache.forEach(card => {
-        const option = document.createElement('option');
-        option.value = card.id;
-        option.textContent = `${card.cardName} (****${card.lastFourDigits}) - ${card.currency.code}`;
-        cardSelect.appendChild(option);
-    });
+
+
+    // // Заполнить выбор карт
+    // const cardSelect = document.getElementById('addCardId');
+    // cardSelect.innerHTML = '<option value="">Не выбрано</option>';
+    // cardsCache.forEach(card => {
+    //     const option = document.createElement('option');
+    //     option.value = card.id;
+    //     option.textContent = `${card.cardName} (****${card.lastFourDigits}) - ${card.currency.code}`;
+
+    //     setBankColorsForElem(card.bankCode, option)
+    //     cardSelect.appendChild(option);
+    // });
 
     // изменяем цвет суммы в зависимости от типа операции
     document.querySelectorAll('input[type="radio"][name="operationType"]')

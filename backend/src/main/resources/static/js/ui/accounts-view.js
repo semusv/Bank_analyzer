@@ -3,7 +3,7 @@ import { deleteCard as deleteCardApi } from "../modules/api/cards-api.js";
 import { fetchBanks } from "../modules/api/banks-api.js";
 import { showErrorMessage, showSuccessMessage, formatCurrency, showApiErrors } from "../modules/utils.js";
 import { fetchCurrencies } from "../modules/api/currency-api.js";
-import { getBankColorsForElem } from "./themes.js";
+import { setBankColorsForElem } from "./themes.js";
 
 document.addEventListener('DOMContentLoaded', init);
 let banksCache = null;
@@ -201,7 +201,7 @@ async function applyBankThemesToAccounts(accounts) {
         );
 
         if (cardElement) {
-            await getBankColorsForElem(txn.bankCode, cardElement);
+            await setBankColorsForElem(txn.bankCode, cardElement);
         }
     });
 

@@ -1,6 +1,6 @@
 import { fetchBankTheme } from "../modules/api/banks-api.js";
 
-export async function getBankColorsForElem(bankCode, txnElem) {
+export async function setBankColorsForElem(bankCode, txnElem) {
     try {
         const theme = await fetchBankTheme(bankCode);
         
@@ -13,7 +13,7 @@ export async function getBankColorsForElem(bankCode, txnElem) {
     }
 }
 
-export async function getBankColorsForBtn(bankCode, txnElem, isActive) {
+export async function setBankColorsForBtn(bankCode, txnElem, isActive) {
     try {
         const theme = await fetchBankTheme(bankCode);
 

@@ -1,7 +1,7 @@
 import { fetchCards } from "../modules/api/cards-api.js";
 import { fetchAnalyticsTimeSeries, fetchAnalyticsCategoryBreakdown } from "../modules/api/analytics-api.js";
 import { showErrorMessage, showApiErrors, formatCurrency } from "../modules/utils.js";
-import { getBankColorsForBtn } from "./themes.js";
+import { setBankColorsForBtn } from "./themes.js";
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -49,15 +49,15 @@ function populateFilters() {
                 btn.classList.toggle('active');
                 const bankCode = btn.dataset.bankCode;
                 if (btn.classList.contains('active')) {
-                    await getBankColorsForBtn(bankCode, btn, true);
+                    await setBankColorsForBtn(bankCode, btn, true);
                 } else {
-                    await getBankColorsForBtn(bankCode, btn, false);
+                    await setBankColorsForBtn(bankCode, btn, false);
                 }
             });
 
 
             // привести к активному виду
-            await getBankColorsForBtn(card.bankCode, btn, true);
+            await setBankColorsForBtn(card.bankCode, btn, true);
             chipContainer.appendChild(btn);
         });
     }
@@ -282,14 +282,14 @@ document.addEventListener('click', (e) => {
     if (e.target?.id === 'selectAllCards') {
         document.querySelectorAll('#filterCardsChips .chip').forEach(async btn => {
             const bankCode = btn.dataset.bankCode;
-            await getBankColorsForBtn(bankCode, btn, true);
+            await setBankColorsForBtn(bankCode, btn, true);
             btn.classList.add('active');
         });
     }
     if (e.target?.id === 'deselectAllCards') {
         document.querySelectorAll('#filterCardsChips .chip').forEach(async btn => {
             const bankCode = btn.dataset.bankCode;
-            await getBankColorsForBtn(bankCode, btn, false);
+            await setBankColorsForBtn(bankCode, btn, false);
             btn.classList.remove('active');
         });
     }
