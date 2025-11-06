@@ -1,8 +1,5 @@
 import { handleApiResponse } from "../utils.js";
 
-
-
-
 export async function fetchTransactions(filters = {}) {
     const params = new URLSearchParams();
 
@@ -54,18 +51,19 @@ export async function createTransaction(transactionData) {
     return await handleApiResponse(response);
 }
 
-export async function updateTransaction(transactionId, transactionData) {
+export async function updateTransaction(transactionId, updatedData) {
     const response = await fetch(`/api/transaction/${transactionId}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         },
-        body: JSON.stringify(transactionData)
+        body: JSON.stringify(updatedData)
     });
 
     return await handleApiResponse(response);
 }
+
 
 export async function deleteTransaction(transactionId) {
     const response = await fetch(`/api/transaction/${transactionId}`, {

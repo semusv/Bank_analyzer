@@ -47,6 +47,8 @@ function fillCategoryDropdown(categoriesCache) {
     const categoryDropdownBtn = document.getElementById('categoryDropdownBtn');
     const categoryHiddenInput = document.getElementById('addCategoryId');
 
+    categoryDropdownMenu.innerHTML = '';
+
     categoriesCache.forEach(category => {
         const item = document.createElement('a');
         item.className = 'dropdown-item d-flex align-items-center';

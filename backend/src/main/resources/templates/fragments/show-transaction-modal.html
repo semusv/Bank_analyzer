@@ -21,10 +21,9 @@
                         </strong>
                     </div>
                     <div id="editAmountContainer" style="display: none;">
-                        <label for="addAmount" class="form-label">Сумма *</label>
-                        <input type="number" step="0.01" class="form-control amount text-danger" id="addAmount"
-                            name="amount" onblur="this.value = parseFloat(this.value).toFixed(2)" required
-                            placeholder="100.00">
+                        <label for="editAmount" class="fw-bold form-label">Сумма *</label>
+                        <input type="number" step="0.01" class="form-control amount" id="editAmount" name="amount"
+                            onblur="this.value = parseFloat(this.value).toFixed(2)" required placeholder="100.00">
                     </div>
                 </div>
 
@@ -35,8 +34,8 @@
                     </div>
 
                     <div id="editDateTimeContainer" style="display: none;">
-                        <label for="addOperationTime" class="form-label">Дата и время *</label>
-                        <input type="datetime-local" class="form-control" id="addOperationTime" name="operationTime"
+                        <label for="editOperationTime" class="fw-bold form-label">Дата и время *</label>
+                        <input type="datetime-local" class="form-control" id="editOperationTime" name="operationTime"
                             required>
                     </div>
                 </div>
@@ -59,15 +58,15 @@
 
                     <div id="editCategoryContainer" style="display: none;">
                         <div class="dropdown">
-                            <label for="addCategoryId" class="form-label">Категория</label>
+                            <label for="editCategoryId" class="fw-bold form-label">Категория</label>
                             <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
-                                id="categoryDropdownBtn" data-bs-toggle="dropdown">
+                                id="editCategoryDropdownBtn" data-bs-toggle="dropdown">
                                 Выберите категорию
                             </button>
-                            <div class="dropdown-menu w-100" id="categoryDropdownMenu">
+                            <div class="dropdown-menu w-100" id="editCategoryDropdownMenu">
                                 <a class="dropdown-item" href="#" data-value="">Не выбрано</a>
                             </div>
-                            <input type="hidden" id="addCategoryId" name="categoryId">
+                            <input type="hidden" id="editCategoryId" name="categoryId">
                         </div>
                     </div>
                 </div>
@@ -84,20 +83,43 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary" id="editTransactionBtn">
-                    <i class="fas fa-edit"></i> Редактировать
-                </button>
-                <button type="button" class="btn btn-success" id="saveTransactionBtn" style="display: none;">
-                    <i class="fas fa-save"></i> Сохранить
-                </button>
-                <button type="button" class="btn btn-warning" id="toggleHideBtn">
-                    <i class="fas fa-eye-slash"></i> Изменить видимость
-                </button>
-                <button type="button" class="btn btn-info" id="splitTransactionBtn">
-                    <i class="fas fa-cut"></i> Разделить
-                </button>
+                <div class="buttons-grid w-100">
+                    <button type="button" class="btn btn-primary" id="editTransactionBtn">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </button>
+
+                    <button type="button" class="btn btn-warning" id="toggleHideBtn">
+                        <i class="fas fa-eye-slash"></i> Скрыть
+                    </button>
+                    <button type="button" class="btn btn-info" id="splitTransactionBtn">
+                        <i class="fas fa-cut"></i> Разделить
+                    </button>
+                    <button type="button" class="btn btn-success" id="saveTransactionBtn" style="display: none;">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                </div>
             </div>
+
+            <!-- <div class="modal-footer">
+                <div class="d-flex flex-wrap gap-2 w-100">
+                    <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Закрыть
+                    </button>
+                    <button type="button" class="btn btn-primary flex-fill" id="editTransactionBtn">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </button>
+                    <button type="button" class="btn btn-success flex-fill" id="saveTransactionBtn"
+                        style="display: none;">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                    <button type="button" class="btn btn-warning flex-fill" id="toggleHideBtn">
+                        <i class="fas fa-eye-slash"></i> Скрыть
+                    </button>
+                    <button type="button" class="btn btn-info flex-fill" id="splitTransactionBtn">
+                        <i class="fas fa-cut"></i> Разделить
+                    </button>
+                </div>
+            </div> -->
         </div>
     </div>
 </div>

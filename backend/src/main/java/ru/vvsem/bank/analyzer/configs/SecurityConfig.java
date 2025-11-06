@@ -42,7 +42,6 @@ public class SecurityConfig {
     @Bean
     @Profile("security")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        //noinspection removal
         http
                 .csrf(this::configureCsrf)
                 .authorizeHttpRequests(this::configureAuthorization)
@@ -59,19 +58,17 @@ public class SecurityConfig {
         return http.build();
     }
 
-
     @Bean
     @Profile("!security")
     public SecurityFilterChain securityDisabled(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authz -> authz.anyRequest().permitAll())
+                .authorizeHttpRequests(this::configureAuthorization)
                 .httpBasic(Customizer.withDefaults()) // Включаем BASIC аутентификацию
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
-
     private void configureCsrf(CsrfConfigurer<HttpSecurity> csrf) {
         csrf.disable();
     }

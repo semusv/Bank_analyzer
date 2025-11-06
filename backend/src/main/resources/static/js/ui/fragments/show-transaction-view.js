@@ -1,24 +1,29 @@
 import {
     formatCurrency,
-    formatDateTime
+    formatDateTime,
+    showApiErrors
 } from "../../modules/utils.js";
 import {
     setBankColorsForElem
 } from "../themes.js";
+import {
+    updateTransaction
+} from "../../modules/api/transactions-api.js";
 
-
-export function populateTransactionDetailsModal(transaction, viewMode = true) {
+export function populateTransactionDetailsModal(transaction, categoriesCache, viewMode = true) {
     document.getElementById('detailDescription').textContent = transaction.description;
 
     // Сумма операции
     document.getElementById('detailAmount').textContent = formatCurrency(transaction.amount, transaction.currency.code);
-    document.getElementById('detailAmount').className =
-        `amount ${transaction.amount >= 0 ? 'text-success' : 'text-danger'}`;
+    document.getElementById('editAmount').value = Number.parseFloat(transaction.amount).toFixed(2);
+    document.getElementById('detailAmount').classList.add(`${transaction.amount >= 0 ? 'text-success' : 'text-danger'}`);
+    document.getElementById('editAmount').classList.add(`${transaction.amount >= 0 ? 'text-success' : 'text-danger'}`);
 
-
+    //DateTime
     document.getElementById('detailDateTime').textContent = formatDateTime(transaction.operationTime);
+    document.getElementById('editOperationTime').value = transaction.operationTime;
 
-    // Card information with badge
+    // Card
     const cardElement = document.getElementById('detailCard');
     if (transaction.card) {
         cardElement.innerHTML = `<span class="badge bg-primary">**** ${transaction.card.lastFourDigits}</span>`;
@@ -27,7 +32,7 @@ export function populateTransactionDetailsModal(transaction, viewMode = true) {
         cardElement.textContent = 'Не указана';
     }
 
-    // Bank information with badge
+    // Bank
     const bankElement = document.getElementById('detailBank');
     if (transaction.bank) {
         const bankElementBadge = document.getElementById('detailBankBadge');
@@ -39,8 +44,7 @@ export function populateTransactionDetailsModal(transaction, viewMode = true) {
         bankElement.textContent = 'Не указан';
     }
 
-
-    // Category with color
+    // Category
     const categoryElement = document.getElementById('detailCategory');
     if (transaction.category) {
         const color = transaction.category.color || '#6c757d';
@@ -49,6 +53,7 @@ export function populateTransactionDetailsModal(transaction, viewMode = true) {
     } else {
         categoryElement.textContent = 'Не указана';
     }
+    fillCategoryDropdown(categoriesCache, transaction.category.id);
 
     document.getElementById('detailHide').checked = transaction.hide;
     document.getElementById('detailHideStatus').textContent = transaction.hide ? 'Скрыта из статистики' : 'Отображается в статистике';
@@ -67,6 +72,122 @@ export function populateTransactionDetailsModal(transaction, viewMode = true) {
     if (viewMode) {
         document.getElementById('toggleHideBtn').style.display = 'none';
         document.getElementById('splitTransactionBtn').style.display = 'none';
+        document.getElementById('editTransactionBtn').style.display = 'none';
+
+    } else {
+        setupEditHandlers(transaction.id);
+        switchToEditMode(false);
     }
 
 }
+function fillCategoryDropdown(categoriesCache, categoryId) {
+    if (!categoriesCache) {
+        return;
+    }
+
+    const categoryDropdownMenu = document.getElementById('editCategoryDropdownMenu');
+    const categoryDropdownBtn = document.getElementById('editCategoryDropdownBtn');
+    const categoryHiddenInput = document.getElementById('editCategoryId');
+
+    let defaultCategory = null;
+
+    categoryDropdownMenu.innerHTML = '';
+
+    categoriesCache.forEach(category => {
+        const item = document.createElement('a');
+        item.className = 'dropdown-item d-flex align-items-center';
+        item.href = '#';
+        item.innerHTML = `
+        <span class="badge me-2" style="background-color: ${category.color}; color: ${category.textColor};">${category.name}</span>`;
+        item.dataset.value = category.id;
+        categoryDropdownMenu.appendChild(item);
+
+        if (!defaultCategory || category.id === 0 || category.id === categoryId) {
+            defaultCategory = category;
+        }
+    });
+
+    if (defaultCategory) {
+        categoryHiddenInput.value = defaultCategory.id;
+        categoryDropdownBtn.textContent = defaultCategory.name;
+        categoryDropdownBtn.style.backgroundColor = defaultCategory.color;
+        categoryDropdownBtn.style.color = defaultCategory.textColor;
+    }
+
+    // Обработчик выбора
+    categoryDropdownMenu.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = e.target.closest('.dropdown-item');
+        if (target) {
+            const value = target.dataset.value;
+            const text = target.textContent.trim();
+
+            categoryHiddenInput.value = value;
+            categoryDropdownBtn.textContent = text || 'Выберите категорию';
+
+            const childDropdownBtn = target.querySelector('.badge');
+            categoryDropdownBtn.style.backgroundColor = childDropdownBtn ? childDropdownBtn.style.backgroundColor : '';
+            categoryDropdownBtn.style.color = childDropdownBtn ? childDropdownBtn.style.color : '';
+        }
+    });
+}
+
+
+function setupEditHandlers(transactionId) {
+    const editBtn = document.getElementById('editTransactionBtn');
+    const saveBtn = document.getElementById('saveTransactionBtn');
+
+    editBtn.onclick = () => {
+        switchToEditMode(true);
+    };
+
+    saveBtn.onclick = () => {
+        saveTransactionChanges(transactionId);
+    };
+}
+
+
+function switchToEditMode(isEditMode) {
+    // Скрываем/показываем элементы просмотра
+    document.getElementById('viewAmountContainer').style.display = isEditMode ? 'none' : 'block';
+    document.getElementById('viewDateTimeContainer').style.display = isEditMode ? 'none' : 'block';
+    document.getElementById('viewCategoryContainer').style.display = isEditMode ? 'none' : 'block';
+
+    // Показываем/скрываем элементы редактирования
+    document.getElementById('editAmountContainer').style.display = isEditMode ? 'block' : 'none';
+    document.getElementById('editDateTimeContainer').style.display = isEditMode ? 'block' : 'none';
+    document.getElementById('editCategoryContainer').style.display = isEditMode ? 'block' : 'none';
+
+    // Скрываем/показываем кнопки
+    document.getElementById('editTransactionBtn').style.display = isEditMode ? 'none' : 'block';
+    document.getElementById('saveTransactionBtn').style.display = isEditMode ? 'block' : 'none';
+    document.getElementById('toggleHideBtn').style.display = isEditMode ? 'none' : 'block';
+    document.getElementById('splitTransactionBtn').style.display = isEditMode ? 'none' : 'block';
+}
+
+
+async function saveTransactionChanges(transactionId) {
+    const updatedData = {
+        amount: Number.parseFloat(document.getElementById('editAmount').value),
+        operationTime: document.getElementById('editOperationTime').value,
+        categoryId: Number.parseInt(document.getElementById('editCategoryId').value)
+    };
+
+    try {
+        await updateTransaction(transactionId, updatedData);
+
+        document.dispatchEvent(new CustomEvent('transactionSaveSuccess', {
+        }));
+        if (typeof bootstrap !== 'undefined') {
+            const modalElement = document.getElementById('transactionDetailsModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            }
+        }
+    } catch (error) {
+        console.error('Failed update transaction', error);
+        showApiErrors(error);
+    }
+
+};

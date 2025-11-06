@@ -262,7 +262,9 @@ document.addEventListener('transactionAddSuccess', async function (event) {
     await loadTransactions();
 });
 
-
+document.addEventListener('transactionSaveSuccess', async function (event) {
+    await loadTransactions();
+});
 
 async function handleSplitTransaction(event) {
     event.preventDefault();
@@ -426,7 +428,7 @@ globalThis.openAddTransactionModal = function () {
 globalThis.viewTransactionDetails = async function (transactionId) {
     try {
         const transaction = await fetchTransactionById(transactionId);
-        populateTransactionDetailsModal(transaction, false);
+        populateTransactionDetailsModal(transaction, categoriesCache, false);
 
         if (typeof bootstrap !== 'undefined') {
             const modal = new bootstrap.Modal(document.getElementById('transactionDetailsModal'));

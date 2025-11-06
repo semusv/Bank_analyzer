@@ -6,7 +6,7 @@ cbr:
 
 spring:
   profiles:
-    active: security
+    active: security1
 
   messages:
     baseName: messages

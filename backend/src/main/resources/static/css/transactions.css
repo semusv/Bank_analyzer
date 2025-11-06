@@ -152,3 +152,19 @@
         width: 100%;
     }
 }
+
+
+.buttons-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.buttons-grid button {
+    width: 100%;
+}
+
+/* Если кнопка "Разделить" должна занимать всю ширину */
+.buttons-grid button:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+}
