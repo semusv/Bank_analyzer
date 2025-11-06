@@ -80,12 +80,12 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
-    public void updateAccountBalance(BankAccount bankAccount, BigDecimal amount) {
+    public void updateAccountBalance(Long accountId, BigDecimal amount, SecurityUser securityUser) {
+        var bankAccount = entityAccessProvider.requireOwnedBankAccount(accountId, securityUser.getId());
         var updatedBankAccount = bankAccountRepository.updateBalance(
                 bankAccount.getBalance().add(amount),
-                bankAccount.getId()
+                accountId
         );
-
         if (updatedBankAccount == 0) {
             throw new EntityNotFoundException(
                     "BankAccount with id %d not found".formatted(bankAccount.getId()),

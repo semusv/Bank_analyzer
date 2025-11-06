@@ -20,7 +20,8 @@ import ru.vvsem.bank.analyzer.dto.transaction.NewTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
-import ru.vvsem.bank.analyzer.models.User;
+import ru.vvsem.bank.analyzer.services.transaction.TransactionProcessingService;
+import ru.vvsem.bank.analyzer.services.transaction.TransactionSearchService;
 import ru.vvsem.bank.analyzer.services.transaction.TransactionService;
 
 import java.time.LocalDate;
@@ -34,6 +35,9 @@ public class TransactionApiController {
 
     private final TransactionService transactionService;
 
+    private final TransactionSearchService transactionSearchService;
+
+    private final TransactionProcessingService transactionProcessingService;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @GetMapping
@@ -52,7 +56,7 @@ public class TransactionApiController {
         LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
         LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;
 
-        Page<TransactionDto> result = transactionService.getListTransaction(
+        Page<TransactionDto> result = transactionSearchService.searchTransactions(
                 securityUser,
                 startDateTime,
                 endDateTime,
@@ -71,7 +75,7 @@ public class TransactionApiController {
     public TransactionDto getTransaction(
             @PathVariable("id") Long transactionId,
             @AuthenticationPrincipal SecurityUser securityUser) {
-        return transactionService.getTransaction(transactionId, securityUser);
+        return transactionService.getUserTransaction(transactionId,securityUser.getId());
     }
 
     @RequestMapping("/{id}/hide")
@@ -79,7 +83,7 @@ public class TransactionApiController {
     public void hideTransaction(
             @PathVariable("id") Long transactionId,
             @AuthenticationPrincipal SecurityUser securityUser) {
-        transactionService.hideTransaction(transactionId, securityUser);
+        transactionProcessingService.hideTransactionWithBalanceUpdate(transactionId,securityUser );
     }
 
     @DeleteMapping("/{id}")
@@ -87,7 +91,7 @@ public class TransactionApiController {
     public void deleteTransaction(
             @PathVariable("id") Long transactionId,
             @AuthenticationPrincipal SecurityUser securityUser) {
-        transactionService.deleteTransaction(transactionId, securityUser);
+        transactionProcessingService.deleteTransactionWithBalanceUpdate(transactionId,securityUser);
     }
 
     @PostMapping("/{id}/split")
@@ -96,10 +100,7 @@ public class TransactionApiController {
             @PathVariable("id") Long transactionId,
             @Valid @RequestBody List<SubTransactionDto> subTransactions,
             @AuthenticationPrincipal SecurityUser securityUser) {
-        transactionService.splitTransaction(
-                transactionId,
-                subTransactions,
-                securityUser);
+        transactionProcessingService.splitTransaction(transactionId,subTransactions,securityUser);
     }
 
     @PostMapping
@@ -107,7 +108,7 @@ public class TransactionApiController {
     public List<TransactionDto> createTransaction(
             @Valid @RequestBody NewTransactionDto newTransactionDto,
             @AuthenticationPrincipal SecurityUser securityUser) {
-       return transactionService.insertTransaction(newTransactionDto, securityUser);
+        return transactionProcessingService.createTransaction(newTransactionDto,securityUser);
     }
 
     @Setter

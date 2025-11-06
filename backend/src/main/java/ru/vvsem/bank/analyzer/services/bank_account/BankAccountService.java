@@ -4,7 +4,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.account.BankAccountDto;
 import ru.vvsem.bank.analyzer.dto.account.NewBankAccountDto;
 import ru.vvsem.bank.analyzer.dto.account.BankAccountSimpleDto;
-import ru.vvsem.bank.analyzer.models.BankAccount;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 
 import java.math.BigDecimal;
@@ -23,5 +22,5 @@ public interface BankAccountService {
     @Transactional
     void deleteAccount(Long accountId, SecurityUser securityUser);
 
-    void updateAccountBalance(BankAccount bankAccount, BigDecimal amount);
+    void updateAccountBalance(Long accountId, BigDecimal amount, SecurityUser securityUser );
 }

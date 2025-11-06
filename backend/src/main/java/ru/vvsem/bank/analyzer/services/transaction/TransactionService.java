@@ -1,47 +1,38 @@
 package ru.vvsem.bank.analyzer.services.transaction;
 
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
-import ru.vvsem.bank.analyzer.dto.transaction.NewTransactionDto;
-import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
+import ru.vvsem.bank.analyzer.models.Transaction;
 
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TransactionService {
 
     @Transactional(readOnly = true)
-    List<TransactionDto> getListTransaction(SecurityUser securityUser);
+    List<TransactionDto> getUserTransactions(Long userId);
 
     @Transactional(readOnly = true)
-    TransactionDto getTransaction(Long transactionId, SecurityUser securityUser);
-
-    @Transactional
-    void hideTransaction(Long transactionId, SecurityUser securityUser);
+    TransactionDto getUserTransaction(Long transactionId, Long userId);
 
     @Transactional
     void deleteTransaction(Long transactionId, SecurityUser securityUser);
 
-    @SuppressWarnings("checkstyle:ParameterNumber")
-    @Transactional(readOnly = true)
-    Page<TransactionDto> getListTransaction(
-            SecurityUser securityUser,
-            LocalDateTime startDate,
-            LocalDateTime endDate,
-            Long cardId,
-            Long bankId,
-            Long categoryId,
-            String description,
-            int page,
-            int size);
+    @Transactional
+    public Page<TransactionDto> searchTransactions(Specification<Transaction> criteria, Pageable pageable);
 
     @Transactional
-    void splitTransaction(Long transactionId, @Valid List<SubTransactionDto> subTransactions, SecurityUser securityUser);
+    public TransactionDto hideTransaction(Long transactionId, Long userId);
 
     @Transactional
-    List<TransactionDto>  insertTransaction(@Valid NewTransactionDto newTransactionDto, SecurityUser securityUser);
+    public TransactionDto updateTransaction(Transaction transaction, Long userId);
+
+    @Transactional
+    public TransactionDto createTransaction(Transaction transaction);
+
+
 }
