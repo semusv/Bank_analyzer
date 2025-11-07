@@ -2,7 +2,7 @@ package ru.vvsem.bank.analyzer.services.category;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.vvsem.bank.analyzer.configs.CategoryColorConfig;
+import ru.vvsem.bank.analyzer.configs.theme.CategoryColorConfig;
 import ru.vvsem.bank.analyzer.dto.category.CategoryColorsDto;
 import ru.vvsem.bank.analyzer.dto.category.CategoryDto;
 import ru.vvsem.bank.analyzer.mappers.CategoryMapper;

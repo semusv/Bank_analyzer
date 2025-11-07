@@ -2,7 +2,11 @@ cbr:
   integration:
     enabled: false
     poll:
-      interval: 3600000
+      interval: 3600000 # 1 час
+
+jwt:
+  secret: 518725ThisIsMy*VVSsecret-+KeyForBankAnalyzer16843
+  expiration.seconds: 3600  # 1 час
 
 spring:
   profiles:

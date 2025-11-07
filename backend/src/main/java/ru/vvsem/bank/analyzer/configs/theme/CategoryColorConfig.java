@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.configs;
+package ru.vvsem.bank.analyzer.configs.theme;
 
 import lombok.Getter;
 import lombok.Setter;

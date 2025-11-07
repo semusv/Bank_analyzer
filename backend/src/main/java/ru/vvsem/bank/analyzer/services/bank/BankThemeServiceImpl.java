@@ -2,7 +2,7 @@ package ru.vvsem.bank.analyzer.services.bank;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.vvsem.bank.analyzer.configs.BankThemeConfig;
+import ru.vvsem.bank.analyzer.configs.theme.BankThemeConfig;
 import ru.vvsem.bank.analyzer.dto.BankThemeDto;
 import ru.vvsem.bank.analyzer.mappers.BankThemeMapper;
 import ru.vvsem.bank.analyzer.models.BankTheme;

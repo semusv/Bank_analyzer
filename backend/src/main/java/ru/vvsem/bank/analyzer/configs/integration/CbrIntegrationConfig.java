@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.configs;
+package ru.vvsem.bank.analyzer.configs.integration;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
