@@ -3,6 +3,7 @@ package ru.vvsem.bank.analyzer.utils.security;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,25 +31,36 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
 
-        final String requestTokenHeader = request.getHeader("Authorization");
+
         String username = null;
         String jwtToken = null;
 
         // JWT Token в формате "Bearer token"
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
-            try {
-                username = jwtTokenUtil.extractUsername(jwtToken);
-            } catch (IllegalArgumentException e) {
-                logger.warn("Unable to get JWT Token");
-            } catch (ExpiredJwtException e) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("JWT token expired");
-                logger.warn("JWT Token has expired");
-            }
-        } else {
-            logger.debug("JWT not start with Bearer");
+        jwtToken = getTokenByRequest(request);
+        if (jwtToken == null) {
+            jwtToken = getTokenByCookie(request);
         }
+
+//        if (jwtToken == null) {
+//            if (request.getRequestURI().equals("/api/v1/auth/login")) {
+//                chain.doFilter(request, response);
+//                return;
+//            } else {
+//                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//                response.getWriter().write("JWT token is missing");
+//            }
+//        }
+
+        try {
+            username = jwtTokenUtil.extractUsername(jwtToken);
+        } catch (IllegalArgumentException e) {
+            logger.warn("Unable to get JWT Token");
+        } catch (ExpiredJwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("JWT token expired");
+            logger.warn("JWT Token has expired");
+        }
+
 
         // Валидация токена
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -65,6 +77,25 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
+    private static String getTokenByCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("JWT_TOKEN".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    private static String getTokenByRequest(HttpServletRequest request) {
+        final String requestTokenHeader = request.getHeader("Authorization");
+        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
+            return requestTokenHeader.substring(7);
+        }
+        return null;
+    }
 
 
 }
