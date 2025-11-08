@@ -1,8 +1,8 @@
 cbr:
   integration:
-    enabled: false
-    poll:
-      interval: 3600000 # 1 час
+    enabled: true
+    url: https://www.cbr.ru/scripts/XML_daily.asp
+    poll-interval: 3600000
 
 jwt:
   secret: 518725ThisIsMy*VVSsecret-+KeyForBankAnalyzer16843

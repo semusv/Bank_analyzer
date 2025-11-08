@@ -1,6 +1,8 @@
 package ru.vvsem.bank.analyzer.configs.integration;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -20,16 +22,18 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.vvsem.bank.analyzer.models.xml.ValCurs;
 import ru.vvsem.bank.analyzer.models.xml.Valute;
 import ru.vvsem.bank.analyzer.services.exchange_rate.ExchangeRateService;
-import ru.vvsem.bank.analyzer.services.exchange_rate.ExchangeRateServiceImpl;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @Configuration
 @EnableIntegration
+@Slf4j
 @ConditionalOnProperty(name = "cbr.integration.enabled", havingValue = "true", matchIfMissing = true)
+@ConfigurationProperties(prefix = "cbr.integration")
 public class CbrIntegrationConfig {
-    private static final String CBR_URL = "https://www.cbr.ru/scripts/XML_daily.asp";
+
+    private String cbrUrl;
 
     @Bean
     public MessageChannel exchangeRateChannel() {
@@ -53,7 +57,7 @@ public class CbrIntegrationConfig {
 
     @Bean
     @InboundChannelAdapter(channel = "exchangeRateChannel",
-            poller = @Poller(fixedDelay = "${cbr.integration.poll.interval:3600000}"))
+            poller = @Poller(fixedDelay = "${poll-interval:3600000}"))
     public MessageSource<String> exchangeRateTrigger() {
         return () -> {
             String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -62,7 +66,7 @@ public class CbrIntegrationConfig {
     }
 
     @Bean
-    public IntegrationFlow cbrExchangeRateFlow(ExchangeRateServiceImpl exchangeRateServiceImpl) {
+    public IntegrationFlow cbrExchangeRateFlow(ExchangeRateService exchangeRateServiceImpl) {
         return IntegrationFlow
                 .from("exchangeRateChannel")
                 .enrichHeaders(h -> h
@@ -77,7 +81,7 @@ public class CbrIntegrationConfig {
                         date -> date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                 // Теперь делаем HTTP-запрос
                 .handle(Http
-                        .outboundGateway(CBR_URL + "?date_req={date}")
+                        .outboundGateway(cbrUrl + "?date_req={date}")
                         .httpMethod(HttpMethod.GET)
                         .expectedResponseType(byte[].class)
                         .uriVariable("date", "payload"))
@@ -87,7 +91,7 @@ public class CbrIntegrationConfig {
     }
 
     @Bean
-    public IntegrationFlow manualCbrFlow(ExchangeRateServiceImpl cacheService) {
+    public IntegrationFlow manualCbrFlow(ExchangeRateService cacheService) {
         return IntegrationFlow
                 .from("exchangeRateRequestChannel")
                 .enrichHeaders(h -> h
@@ -95,7 +99,7 @@ public class CbrIntegrationConfig {
                 .transform(payload -> LocalDate.parse((String) payload, DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                 .filter(cacheService, "needLoadForDate")
                 .transform(LocalDate.class, date -> date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
-                .handle(Http.outboundGateway(CBR_URL + "?date_req={date}")
+                .handle(Http.outboundGateway(cbrUrl + "?date_req={date}")
                         .httpMethod(HttpMethod.GET)
                         .expectedResponseType(byte[].class)
                         .uriVariable("date", "payload"))
@@ -108,7 +112,7 @@ public class CbrIntegrationConfig {
     public IntegrationFlow rateCheckDiscardFlow() {
         return IntegrationFlow.from("rateCheckChannel")
                 .handle(message ->
-                        System.out.println("Пропуск: данные уже существуют для даты " + message.getPayload()))
+                        log.info("Пропуск: данные уже существуют для даты {}", message.getPayload()))
                 .get();
     }
 

@@ -1,5 +1,4 @@
 name;surname;email;password;telegram_chat_id;login
-Ivan;Ivanov;user1@example.com;$2a$10$x;123456789;login_1
-Sergey;Sergeev;user2@example.com;$2a$10$y;987654321;login_2
-Igor;Igoriev;user_Igor@example.com;$2a$10$x;123456789;login_3
-Lion;Lionov;user_Lion@example.com;$2a$10$x;123456789;login_4
+Ivan;Ivanov;ivan@example.com;$2a$12$ZHJCqXzGGMtiUfVQdam9A.W3N7S.MCbfpnodD6YqilebhynvcGP8.;123456789;login_01
+Petr;Petrov;petr@example.com;$2a$12$ZHJCqXzGGMtiUfVQdam9A.W3N7S.MCbfpnodD6YqilebhynvcGP8.;234567890;login_02
+Sergey;Sergeev;sergey@example.com;$2a$12$ZHJCqXzGGMtiUfVQdam9A.W3N7S.MCbfpnodD6YqilebhynvcGP8.;345678901;login_03

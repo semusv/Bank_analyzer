@@ -42,6 +42,8 @@ databaseChangeLog:
                   name: bic
               - column:
                   name: logo_url
+              - column:
+                  name: bank_code
 
   - changeSet:
       id: 2025-08-13--0003-users-data
@@ -140,28 +142,6 @@ databaseChangeLog:
                   name: name
               - column:
                   name: color
-              - column:
-                  name: user_id
-
-  - changeSet:
-      id: 2025-08-13--0007-budgets-data
-      author: vvsemenov
-      context: dev
-      runOnChange: true
-      changes:
-        - loadData:
-            file: csv/2025-08-13--0007-budgets.csv
-            relativeToChangelogFile: true
-            separator: ";"
-            quotchar: '"'
-            encoding: UTF-8
-            tableName: budgets
-            primaryKey: id
-            columns:
-              - column:
-                  name: limit_amount
-              - column:
-                  name: category_id
               - column:
                   name: user_id
 
