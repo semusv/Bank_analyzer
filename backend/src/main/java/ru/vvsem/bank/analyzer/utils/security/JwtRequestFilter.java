@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,58 +27,34 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtTokenUtil jwtTokenUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain chain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain chain)
             throws ServletException, IOException {
 
+        String jwtToken = extractJwtToken(request);
 
-        String username = null;
-        String jwtToken = null;
-
-        // JWT Token в формате "Bearer token"
-        jwtToken = getTokenByRequest(request);
-        if (jwtToken == null) {
-            jwtToken = getTokenByCookie(request);
+        if (jwtToken != null) {
+            processJwtToken(jwtToken, request, response);
         }
 
-//        if (jwtToken == null) {
-//            if (request.getRequestURI().equals("/api/v1/auth/login")) {
-//                chain.doFilter(request, response);
-//                return;
-//            } else {
-//                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//                response.getWriter().write("JWT token is missing");
-//            }
-//        }
-
-        try {
-            username = jwtTokenUtil.extractUsername(jwtToken);
-        } catch (IllegalArgumentException e) {
-            logger.warn("Unable to get JWT Token");
-        } catch (ExpiredJwtException e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("JWT token expired");
-            logger.warn("JWT Token has expired");
-        }
-
-
-        // Валидация токена
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.customUserDetailsService.loadUserByUsername(username);
-
-            if (Boolean.TRUE.equals(jwtTokenUtil.validateToken(jwtToken, userDetails))) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }
-        }
         chain.doFilter(request, response);
     }
 
-    private static String getTokenByCookie(HttpServletRequest request) {
+    private String extractJwtToken(HttpServletRequest request) {
+        String token = getTokenFromHeader(request);
+        return token != null ? token : getTokenFromCookie(request);
+    }
+
+    private String getTokenFromHeader(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        return null;
+    }
+
+    private String getTokenFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -89,13 +66,57 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         return null;
     }
 
-    private static String getTokenByRequest(HttpServletRequest request) {
-        final String requestTokenHeader = request.getHeader("Authorization");
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            return requestTokenHeader.substring(7);
+    private void processJwtToken(
+            String jwtToken, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            String username = extractUsernameFromToken(jwtToken);
+            if (username != null && isAuthenticationNotSet()) {
+                authenticateUser(username, jwtToken, request);
+            }
+        } catch (ExpiredJwtException e) {
+            handleExpiredToken(response);
+        } catch (Exception e) {
+            logger.warn("JWT token processing failed: " + e.getMessage());
         }
-        return null;
     }
 
+    private String extractUsernameFromToken(String jwtToken) {
+        try {
+            return jwtTokenUtil.extractUsername(jwtToken);
+        } catch (IllegalArgumentException e) {
+            logger.warn("Unable to get JWT Token");
+            return null;
+        }
+    }
+
+    private boolean isAuthenticationNotSet() {
+        return SecurityContextHolder.getContext().getAuthentication() == null;
+    }
+
+    private void authenticateUser(String username, String jwtToken, HttpServletRequest request) {
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+        if (isTokenValid(jwtToken, userDetails)) {
+            setAuthenticationInContext(userDetails, request);
+        }
+
+    }
+
+    private boolean isTokenValid(String jwtToken, UserDetails userDetails) {
+        return Boolean.TRUE.equals(jwtTokenUtil.validateToken(jwtToken, userDetails));
+    }
+
+    private void setAuthenticationInContext(UserDetails userDetails, HttpServletRequest request) {
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+    }
+
+    private void handleExpiredToken(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getWriter().write("JWT token expired");
+        logger.warn("JWT Token has expired");
+    }
 
 }

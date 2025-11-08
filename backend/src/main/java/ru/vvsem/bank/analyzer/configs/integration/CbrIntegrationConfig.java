@@ -19,17 +19,17 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import ru.vvsem.bank.analyzer.models.xml.ValCurs;
 import ru.vvsem.bank.analyzer.models.xml.Valute;
+import ru.vvsem.bank.analyzer.services.exchange_rate.ExchangeRateService;
 import ru.vvsem.bank.analyzer.services.exchange_rate.ExchangeRateServiceImpl;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
 @Configuration
 @EnableIntegration
 @ConditionalOnProperty(name = "cbr.integration.enabled", havingValue = "true", matchIfMissing = true)
 public class CbrIntegrationConfig {
     private static final String CBR_URL = "https://www.cbr.ru/scripts/XML_daily.asp";
-
-
 
     @Bean
     public MessageChannel exchangeRateChannel() {
@@ -113,10 +113,10 @@ public class CbrIntegrationConfig {
     }
 
     @Bean
-    public IntegrationFlow processExchangeRatesFlow() {
+    public IntegrationFlow processExchangeRatesFlow(ExchangeRateService exchangeRateService) {
         return IntegrationFlow
                 .from("exchangeRateProcessingChannel")
-                .handle("exchangeRateService", "processExchangeRates")
+                .handle(exchangeRateService, "processExchangeRates")
                 .get();
     }
 

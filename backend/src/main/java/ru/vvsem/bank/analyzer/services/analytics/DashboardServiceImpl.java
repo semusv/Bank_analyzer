@@ -2,7 +2,6 @@ package ru.vvsem.bank.analyzer.services.analytics;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.DashboardStatsDto;
@@ -13,7 +12,6 @@ import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
-import ru.vvsem.bank.analyzer.repositories.UserRepository;
 import ru.vvsem.bank.analyzer.services.exchange_rate.ExchangeRateService;
 import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 
@@ -44,19 +42,18 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDateTime startOfMonth = getStartOfMonth();
         LocalDateTime endOfMonth = getEndOfMonth();
 
-        List<CurrencyAmountDto> monthlyIncome = transactionRepository.calculateMonthlyIncome(user.getId(), startOfMonth, endOfMonth);
-
-        List<CurrencyAmountDto> monthlyExpense = transactionRepository.calculateMonthlyExpense(user.getId(), startOfMonth, endOfMonth);
-
+        List<CurrencyAmountDto> monthlyIncome = transactionRepository.calculateMonthlyIncome(
+                user.getId(), startOfMonth, endOfMonth);
+        List<CurrencyAmountDto> monthlyExpense = transactionRepository.calculateMonthlyExpense(
+                user.getId(), startOfMonth, endOfMonth);
         List<CurrencyAmountDto> totalBalances = bankAccountRepository.calculateTotalBalanceByUserId(user.getId());
 
-
         return DashboardStatsDto.builder()
-                .monthlyIncomeRub(exchangeRateService.convertListToRub(monthlyIncome) )
+                .monthlyIncomeRub(exchangeRateService.convertListToRub(monthlyIncome))
                 .monthlyIncomes(monthlyIncome)
-                .monthlyExpenseRub(exchangeRateService.convertListToRub(monthlyExpense) )
+                .monthlyExpenseRub(exchangeRateService.convertListToRub(monthlyExpense))
                 .monthlyExpenses(monthlyExpense)
-                .totalBalanceRub( exchangeRateService.convertListToRub(totalBalances)  )
+                .totalBalanceRub(exchangeRateService.convertListToRub(totalBalances))
                 .totalBalances(totalBalances)
                 .totalTransactions(getSafeLong(
                         transactionRepository.countByUserId(user.getId())))

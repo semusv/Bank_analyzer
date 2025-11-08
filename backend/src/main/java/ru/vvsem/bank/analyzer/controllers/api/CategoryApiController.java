@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.vvsem.bank.analyzer.dto.category.CategoryColorsDto;
 import ru.vvsem.bank.analyzer.dto.category.CategoryDto;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
-import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.services.category.CategoryService;
 
 import java.util.List;
@@ -76,8 +75,7 @@ public class CategoryApiController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(
             @PathVariable("id") Long categoryId,
-            @AuthenticationPrincipal SecurityUser securityUser)
-    {
+            @AuthenticationPrincipal SecurityUser securityUser) {
         categoryService.deleteCategory(categoryId, securityUser);
     }
 }

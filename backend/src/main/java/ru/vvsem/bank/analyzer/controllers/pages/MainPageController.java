@@ -2,7 +2,6 @@ package ru.vvsem.bank.analyzer.controllers.pages;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,9 +33,6 @@ public class MainPageController {
         }
         if (logout != null) {
             model.addAttribute("message", "Вы успешно вышли из системы");
-        }
-        if (expired != null) {
-            model.addAttribute("message", "Сессия истекла. Пожалуйста, войдите снова.");
         }
         return "login";
     }

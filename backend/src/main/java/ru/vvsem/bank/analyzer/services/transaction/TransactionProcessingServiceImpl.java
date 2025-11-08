@@ -61,7 +61,10 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
 
     }
 
-    private Transaction prepareNewTransaction(NewTransactionDto newTransactionDto, User user, @NotNull(message = "{validation.Transaction.cardId.NotNull}") Long cardId) {
+    private Transaction prepareNewTransaction(
+            NewTransactionDto newTransactionDto,
+            User user,
+            @NotNull(message = "{validation.Transaction.cardId.NotNull}") Long cardId) {
         Transaction transaction = new Transaction();
         transaction.setDescription(newTransactionDto.getDescription());
         transaction.setAmount(newTransactionDto.getAmount());
@@ -81,8 +84,10 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
     }
 
     @Override
-    public void splitTransaction(Long transactionId, List<SubTransactionDto> subTransactions, SecurityUser securityUser) {
-        Transaction parentTransaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, securityUser.getId());
+    public void splitTransaction(
+            Long transactionId, List<SubTransactionDto> subTransactions, SecurityUser securityUser) {
+        Transaction parentTransaction = entityAccessProviderImpl
+                .requireOwnedTransaction(transactionId, securityUser.getId());
 
         BigDecimal totalSubAmount = subTransactions.stream()
                 .map(SubTransactionDto::getAmount)
@@ -112,7 +117,9 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
         var transactionDto = transactionService.hideTransaction(transactionId, securityUser.getId());
         var cardDto = cardService.getCard(transactionDto.getCard().getId(), securityUser);
         bankAccountService.updateAccountBalance(cardDto.getAccountId(),
-                !transactionDto.isHide() ? transactionDto.getAmount() : transactionDto.getAmount().negate(), securityUser);
+                !transactionDto.isHide()
+                        ? transactionDto.getAmount()
+                        : transactionDto.getAmount().negate(), securityUser);
     }
 
     @Override
@@ -124,11 +131,13 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
     }
 
     @Override
-    public TransactionDto patchTransactionWithBalanceUpdate(Long transactionId, PatchTransactionData patchTransactionData, SecurityUser securityUser) {
+    public TransactionDto patchTransactionWithBalanceUpdate(
+            Long transactionId, PatchTransactionData patchTransactionData, SecurityUser securityUser) {
         var transaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, securityUser.getId());
         var cardDto = cardService.getCard(transaction.getCard().getId(), securityUser);
         var diffAmount = transaction.getAmount().subtract(patchTransactionData.getAmount());
-        transaction.setCategory(entityAccessProviderImpl.requireOwnedCategory(patchTransactionData.getCategoryId(), securityUser.getId()));
+        transaction.setCategory(entityAccessProviderImpl
+                .requireOwnedCategory(patchTransactionData.getCategoryId(), securityUser.getId()));
         transaction.setAmount(patchTransactionData.getAmount());
         transaction.setOperationTime(patchTransactionData.getOperationTime());
         if (!diffAmount.equals(BigDecimal.ZERO)) {

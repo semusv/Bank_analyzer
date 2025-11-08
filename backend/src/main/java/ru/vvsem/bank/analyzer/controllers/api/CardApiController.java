@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import ru.vvsem.bank.analyzer.dto.card.CardDto;
 import ru.vvsem.bank.analyzer.dto.card.NewCardDto;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
-import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.services.card.CardService;
 
 import java.util.List;

@@ -42,8 +42,10 @@
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-<!--        JWT-->
+        <!--JWT-->
         <jwt.version>0.11.5</jwt.version>
+        <!--swagger-->
+        <springdoc.openapi.version>2.7.0</springdoc.openapi.version>
     </properties>
     <dependencies>
         <dependency>
@@ -143,6 +145,11 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>${jwt.version}</version>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.openapi.version}</version>
         </dependency>
     </dependencies>
 

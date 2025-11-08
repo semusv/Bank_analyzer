@@ -36,7 +36,6 @@ public class SessionSecurityConfig {
     @Bean
     @Profile("security")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        //noinspection removal
         http
                 .csrf(this::configureCsrf)
                 .authorizeHttpRequests(this::configureAuthorization)
@@ -46,8 +45,6 @@ public class SessionSecurityConfig {
                         .maximumSessions(1)
                         .sessionRegistry(sessionRegistry())
                         .expiredUrl("/login?expired=true")
-                        .and()
-                        .sessionFixation().migrateSession()
                 )
                 .userDetailsService(customUserDetailsService);
         return http.build();
@@ -64,6 +61,7 @@ public class SessionSecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
+
     private void configureCsrf(CsrfConfigurer<HttpSecurity> csrf) {
         csrf.disable();
     }

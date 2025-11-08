@@ -14,6 +14,7 @@
     <meta name="locale" th:content="${#locale}">
     <meta name="language" th:content="${#locale.language}">
     <meta name="country" th:content="${#locale.country}">
+    <script type="module" th:src="@{/js/ui/layout-view.js}"></script>
 </head>
 
 <!-- Фрагмент topnav -->
@@ -25,7 +26,7 @@
         <div class="navbar-nav ms-auto">
             <div class="navbar-nav ms-auto align-items-center">
                 <span class="navbar-text me-3" th:text="'Привет, ' + ${userName}"></span>
-                <a class="btn btn-outline-light btn-sm" href="/logout">Выйти</a>
+                <button class="btn btn-outline-light btn-sm" id="logout-btn">Выйти</button>
             </div>
         </div>
 

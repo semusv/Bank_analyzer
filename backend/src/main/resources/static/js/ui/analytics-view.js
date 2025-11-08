@@ -6,7 +6,6 @@ import { setBankColorsForBtn } from "./themes.js";
 document.addEventListener('DOMContentLoaded', init);
 
 let cardsCache = [];
-let currentFilters = {};
 let cumulativeChartInstance = null;
 let categoryChartInstance = null;
 
@@ -16,7 +15,7 @@ async function init() {
         populateFilters();
         setDefaultDateRange30Days();
         setupEventListeners();
-        actualizeFilters(document.getElementById('analyticsFilterForm'));
+        clearFilters();
         await refreshCharts();
     } catch (error) {
         console.error('Failed to initialize analytics page:', error);
@@ -63,25 +62,6 @@ function populateFilters() {
     }
 }
 
-function actualizeFilters(form) {
-    const formData = new FormData(form);
-
-    const selectedCardIds = Array.from(document.querySelectorAll('#filterCardsChips .chip.active'))
-        .map(btn => Number.parseInt(btn.dataset.cardId))
-        .filter(v => !Number.isNaN(v));
-
-    const operationTypeIds = Array.from(document.querySelectorAll('#filterOperationType .btn-check'))
-        .filter(input => input.checked) // проверяем атрибут checked
-        .map(input => Number.parseInt(input.value));
-
-    currentFilters = {
-        startDate: formData.get('startDate') || null,
-        endDate: formData.get('endDate') || null,
-        cardIds: selectedCardIds,
-        operationTypeIds: operationTypeIds
-    };
-}
-
 function setDefaultDateRange30Days() {
     const end = new Date();
     const start = new Date();
@@ -100,18 +80,34 @@ function setupEventListeners() {
     if (clearBtn) clearBtn.addEventListener('click', clearFilters);
 }
 
+
+function gatherFiltersFromForm() {
+    const form = document.getElementById('analyticsFilterForm');
+    const formData = new FormData(form);
+
+    const selectedCardIds = Array.from(document.querySelectorAll('#filterCardsChips .chip.active'))
+        .map(btn => Number.parseInt(btn.dataset.cardId))
+        .filter(v => !Number.isNaN(v));
+
+    const operationTypeIds = Array.from(document.querySelectorAll('#filterOperationType .btn-check'))
+        .filter(input => input.checked) // проверяем атрибут checked
+        .map(input => Number.parseInt(input.value));
+
+    return {
+        startDate: formData.get('startDate') || null,
+        endDate: formData.get('endDate') || null,
+        cardIds: selectedCardIds,
+        operationTypeIds: operationTypeIds
+    };
+}
+
 async function handleFilterSubmit(event) {
     event.preventDefault();
-    const form = event.target;
-    actualizeFilters(form);
     await refreshCharts();
 }
 
 async function clearFilters() {
-    currentFilters = {};
-    const form = document.getElementById('analyticsFilterForm');
-    form?.reset();
-
+    document.getElementById('analyticsFilterForm').reset();
     setDefaultDateRange30Days();
     document.querySelectorAll('#filterCardsChips .chip').forEach(btn => {
         btn.classList.add('active');
@@ -122,6 +118,7 @@ async function clearFilters() {
 }
 
 async function refreshCharts() {
+    const currentFilters = gatherFiltersFromForm();
     try {
         const [timeSeries, categoryBreakdown] = await Promise.all([
             fetchAnalyticsTimeSeries(currentFilters),

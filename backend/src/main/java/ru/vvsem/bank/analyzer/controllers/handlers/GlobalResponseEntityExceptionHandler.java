@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -43,6 +44,21 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
                 HttpStatus.NOT_FOUND,
                 ex.getMessageCode(),
                 ex.getMessageArgs());
+
+    }
+
+    //401 401AuthenticationException
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Object> handleAuthenticationException(
+            AuthenticationException ex,
+            WebRequest request) {
+
+        return errorHandlingService.handleError(
+                ex,
+                request,
+                HttpStatus.UNAUTHORIZED,
+                ex.getLocalizedMessage(),
+                (Object[]) null);
 
     }
 

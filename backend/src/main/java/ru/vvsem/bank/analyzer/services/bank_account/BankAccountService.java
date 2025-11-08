@@ -22,5 +22,5 @@ public interface BankAccountService {
     @Transactional
     void deleteAccount(Long accountId, SecurityUser securityUser);
 
-    void updateAccountBalance(Long accountId, BigDecimal amount, SecurityUser securityUser );
+    void updateAccountBalance(Long accountId, BigDecimal amount, SecurityUser securityUser);
 }

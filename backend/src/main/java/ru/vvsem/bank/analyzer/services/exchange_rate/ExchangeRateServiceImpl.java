@@ -25,6 +25,7 @@ import java.util.Map;
 public class ExchangeRateServiceImpl implements ExchangeRateService {
 
     private static final String CURRENCY_CODE_RUB = "RUB";
+
     private final Map<LocalDate, Map<String, ExchangeRate>> rateCache = new HashMap<>();
 
     private final ExchangeRateRepository exchangeRateRepository;
@@ -99,7 +100,8 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     private ExchangeRate getRateForDate(String currencyCode, LocalDate date) {
         ExchangeRate rate = rateCache.getOrDefault(date, Map.of()).get(currencyCode);
         if (rate == null) {
-            rate = exchangeRateRepository.findFirstByCurrencyCodeAndCurrencyDateLessThanEqualOrderByCurrencyDateAsc(currencyCode, date)
+            rate = exchangeRateRepository
+                    .findFirstByCurrencyCodeAndCurrencyDateLessThanEqualOrderByCurrencyDateAsc(currencyCode, date)
                     .orElseThrow(() -> new EntityNotFoundException(
                             "Rate for code %s and date %s (less than equal) not found".formatted(currencyCode, date),
                             "exception.entity.not.found.exchangerate"));

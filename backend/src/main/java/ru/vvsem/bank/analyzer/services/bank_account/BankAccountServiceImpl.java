@@ -72,7 +72,8 @@ public class BankAccountServiceImpl implements BankAccountService {
                 .orElseThrow(
                         () ->
                                 new EntityNotFoundException(
-                                        "AccountId %d for UserId %d not found".formatted(accountId, securityUser.getId()),
+                                        "AccountId %d for UserId %d not found"
+                                                .formatted(accountId, securityUser.getId()),
                                         "exception.entity.not.found.bankAccount")
                 );
 

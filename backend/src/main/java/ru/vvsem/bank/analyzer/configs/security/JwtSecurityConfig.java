@@ -1,6 +1,5 @@
 package ru.vvsem.bank.analyzer.configs.security;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +10,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -24,6 +24,7 @@ import ru.vvsem.bank.analyzer.utils.security.JwtRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -32,25 +33,29 @@ public class JwtSecurityConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
 
+    private void configureAuthorization(
+            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz) {
+        authz
+                .requestMatchers(
+                        "/",
+                        "/login",
+                        "/register",
+                        "/css/**",
+                        "/js/**",
+                        "/webjars/**",
+                        "/error",
+                        "/api/auth/login",
+                        "/api/auth/register"
+                ).permitAll()
+                .anyRequest().authenticated();
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(authz -> authz
-                        .requestMatchers(
-                                "/",
-                                "/login",
-                                "/register",
-                                "/css/**",
-                                "/js/**",
-                                "/webjars/**",
-                                "/error",
-                                "/api/auth/login",
-                                "/api/auth/register"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(this::configureAuthorization)
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint())
                         .accessDeniedHandler(accessDeniedHandler())
@@ -58,7 +63,8 @@ public class JwtSecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
@@ -66,9 +72,9 @@ public class JwtSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(Arrays.asList("*"));
+        config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("*"));
+        config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -87,12 +93,12 @@ public class JwtSecurityConfig {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType("application/json");
             response.getWriter().write("""
-                {
-                  "status": 403,
-                  "error": "Forbidden",
-                  "message": "Access to this resource is denied"
-                }
-                """);
+                    {
+                      "status": 403,
+                      "error": "Forbidden",
+                      "message": "Access to this resource is denied"
+                    }
+                    """);
         };
     }
 
@@ -107,19 +113,19 @@ public class JwtSecurityConfig {
         public void commence(
                 HttpServletRequest request,
                 HttpServletResponse response,
-                AuthenticationException authException) throws IOException, ServletException {
+                AuthenticationException authException) throws IOException {
 
             // Если запрос к API — возвращаем JSON
             if (request.getRequestURI().startsWith("/api/")) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
                 response.getWriter().write("""
-                    {
-                      "status": 401,
-                      "error": "Unauthorized",
-                      "message": "Authentication is required to access this resource"
-                    }
-                    """);
+                        {
+                          "status": 401,
+                          "error": "Unauthorized",
+                          "message": "Authentication is required to access this resource"
+                        }
+                        """);
             } else {
                 // Если HTML-страница — редирект на /login
                 response.sendRedirect("/login");

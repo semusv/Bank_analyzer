@@ -12,7 +12,16 @@ export async function handleApiResponse(response) {
         if (response.status === 204) {
             return null;
         }
+
+        const contentLength = response.headers.get('content-length');
+        const contentType = response.headers.get('content-type');
+
+        if (contentLength === '0' || !contentType?.includes('application/json')) {
+            return null;
+        }
+
         return await response.json();
+
     }
 
     const errorData = await response.json();

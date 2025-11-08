@@ -20,7 +20,7 @@ public class JwtTokenUtilImpl implements JwtTokenUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration.seconds}")
+    @Value("${jwt.token.expiration.seconds}")
     private Long expiration;
 
     @Override

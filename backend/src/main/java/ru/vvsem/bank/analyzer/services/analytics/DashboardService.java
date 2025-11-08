@@ -1,6 +1,5 @@
 package ru.vvsem.bank.analyzer.services.analytics;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.DashboardStatsDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;

@@ -12,17 +12,18 @@ import java.util.List;
 
 public interface TransactionProcessingService {
     @Transactional
-    public List<TransactionDto> createTransaction(NewTransactionDto dto, SecurityUser securityUser);
+    List<TransactionDto> createTransaction(NewTransactionDto dto, SecurityUser securityUser);
 
     @Transactional
-    public void splitTransaction(Long transactionId, List<SubTransactionDto> subTransactions, SecurityUser securityUser);
+    void splitTransaction(Long transactionId, List<SubTransactionDto> subTransactions, SecurityUser securityUser);
 
     @Transactional
-    public void hideTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser);
+    void hideTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser);
 
     @Transactional
-    public void deleteTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser);
+    void deleteTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser);
 
     @Transactional
-    TransactionDto patchTransactionWithBalanceUpdate(Long transactionId, @Valid PatchTransactionData patchTransactionData, SecurityUser securityUser);
+    TransactionDto patchTransactionWithBalanceUpdate(
+            Long transactionId, @Valid PatchTransactionData patchTransactionData, SecurityUser securityUser);
 }

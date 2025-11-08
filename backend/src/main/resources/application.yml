@@ -6,11 +6,12 @@ cbr:
 
 jwt:
   secret: 518725ThisIsMy*VVSsecret-+KeyForBankAnalyzer16843
-  expiration.seconds: 3600  # 1 час
+  token.expiration.seconds: 3600  # 1 час
+  cookie.expiration.seconds: 3600
 
-spring:
-  profiles:
-    active: security1
+#spring:
+#  profiles:
+#    active: security
 
   messages:
     baseName: messages

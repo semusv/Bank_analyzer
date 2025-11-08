@@ -1,14 +1,13 @@
 package ru.vvsem.bank.analyzer.controllers.api;
 
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,17 +16,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.vvsem.bank.analyzer.dto.PageResponseDto;
 import ru.vvsem.bank.analyzer.dto.transaction.NewTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.PatchTransactionData;
 import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
+import ru.vvsem.bank.analyzer.dto.transaction.TransactionFilterDto;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.services.transaction.TransactionProcessingService;
 import ru.vvsem.bank.analyzer.services.transaction.TransactionSearchService;
 import ru.vvsem.bank.analyzer.services.transaction.TransactionService;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -44,32 +42,20 @@ public class TransactionApiController {
     @SuppressWarnings("checkstyle:ParameterNumber")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public PageResponse<TransactionDto> getListTransactions(
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate,
-            @RequestParam(required = false) Long cardId,
-            @RequestParam(required = false) Long bankId,
-            @RequestParam(required = false) Long categoryId,
-            @RequestParam(required = false) String description,
+    public PageResponseDto<TransactionDto> getListTransactions(
+            @ModelAttribute TransactionFilterDto filter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal SecurityUser securityUser) {
 
-        LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
-        LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;
 
         Page<TransactionDto> result = transactionSearchService.searchTransactions(
                 securityUser,
-                startDateTime,
-                endDateTime,
-                cardId,
-                bankId,
-                categoryId,
-                description,
+                filter,
                 page,
                 size);
 
-        return PageResponse.from(result);
+        return PageResponseDto.from(result);
     }
 
     @RequestMapping("/{id}")
@@ -102,7 +88,10 @@ public class TransactionApiController {
             @PathVariable("id") Long transactionId,
             @Valid @RequestBody PatchTransactionData patchTransactionData,
             @AuthenticationPrincipal SecurityUser securityUser) {
-        return transactionProcessingService.patchTransactionWithBalanceUpdate(transactionId, patchTransactionData, securityUser);
+        return transactionProcessingService.patchTransactionWithBalanceUpdate(
+                transactionId,
+                patchTransactionData,
+                securityUser);
     }
 
     @PostMapping("/{id}/split")
@@ -122,54 +111,5 @@ public class TransactionApiController {
         return transactionProcessingService.createTransaction(newTransactionDto, securityUser);
     }
 
-    @Setter
-    @Getter
-    public static class PageResponse<T> {
 
-        private java.util.List<T> content;
-
-        private long totalElements;
-
-        private int totalPages;
-
-        private int pageNumber;
-
-        private int pageSize;
-
-        private boolean first;
-
-        private boolean last;
-
-        public PageResponse() {
-        }
-
-        @SuppressWarnings("checkstyle:ParameterNumber")
-        public PageResponse(List<T> content,
-                            long totalElements,
-                            int totalPages,
-                            int pageNumber,
-                            int pageSize,
-                            boolean first,
-                            boolean last) {
-            this.content = content;
-            this.totalElements = totalElements;
-            this.totalPages = totalPages;
-            this.pageNumber = pageNumber;
-            this.pageSize = pageSize;
-            this.first = first;
-            this.last = last;
-        }
-
-        public static <T> PageResponse<T> from(Page<T> page) {
-            return new PageResponse<>(
-                    page.getContent(),
-                    page.getTotalElements(),
-                    page.getTotalPages(),
-                    page.getNumber(),
-                    page.getSize(),
-                    page.isFirst(),
-                    page.isLast());
-        }
-
-    }
 }

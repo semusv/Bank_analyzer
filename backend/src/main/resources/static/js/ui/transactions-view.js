@@ -31,7 +31,6 @@ import {
 
 document.addEventListener('DOMContentLoaded', init);
 
-let currentFilters = {};
 let categoriesCache = null;
 let cardsCache = null;
 let banksCache = null;
@@ -98,7 +97,7 @@ async function loadCurrencies() {
     }
 }
 
-async function loadTransactions(page = 0) {
+async function loadTransactions(page = 0, currentFilters) {
     try {
         currentPage = page;
         const filtersWithPagination = {
@@ -319,12 +318,11 @@ async function handleSplitTransaction(event) {
     }
 }
 
-async function handleFilterSubmit(event) {
-    event.preventDefault();
-    const form = event.target;
+function gatherFiltersFromForm() {
+    const form = document.getElementById('filterForm');
     const formData = new FormData(form);
 
-    currentFilters = {
+    return {
         startDate: formData.get('startDate') || null,
         endDate: formData.get('endDate') || null,
         cardId: formData.get('cardId') || null,
@@ -332,14 +330,18 @@ async function handleFilterSubmit(event) {
         categoryId: formData.get('categoryId') || null,
         description: formData.get('description') || null
     };
+}
 
-    await loadTransactions(0); // Reset to first page
+async function handleFilterSubmit(event) {
+    event.preventDefault();
+    const currentFilters = gatherFiltersFromForm();
+    await loadTransactions(0, currentFilters); // Reset to first page
 }
 
 async function clearFilters() {
-    currentFilters = {};
     document.getElementById('filterForm').reset();
-    await loadTransactions(0); // Reset to first page
+    const currentFilters = gatherFiltersFromForm();
+    await loadTransactions(0, currentFilters); // Reset to first page
 }
 
 function renderPagination() {

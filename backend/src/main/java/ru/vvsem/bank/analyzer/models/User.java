@@ -23,7 +23,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import ru.vvsem.bank.analyzer.models.enums.Role;
 
 import java.util.ArrayList;

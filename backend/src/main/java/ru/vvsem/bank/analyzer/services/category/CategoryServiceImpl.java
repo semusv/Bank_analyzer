@@ -41,14 +41,15 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto getCategoryDtoById(Long categoryId, SecurityUser securityUser) {
-        return categoryMapper.toCategoryDto(entityAccessProviderImpl.requireOwnedCategory(categoryId, securityUser.getId()));
+        return categoryMapper.toCategoryDto(entityAccessProviderImpl.requireOwnedCategory(
+                categoryId, securityUser.getId()));
     }
 
     @Override
     public CategoryDto createCategory(CategoryDto categoryDto, SecurityUser securityUser) {
 
         Category category = categoryMapper.toEntity(categoryDto);
-        category.setUser( userService.getUserById(securityUser.getId()) );
+        category.setUser(userService.getUserById(securityUser.getId()));
 
         return categoryMapper.toCategoryDto(categoryRepository.save(category));
     }
