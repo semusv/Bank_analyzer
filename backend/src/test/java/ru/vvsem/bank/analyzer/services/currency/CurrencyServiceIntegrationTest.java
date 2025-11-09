@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Testcontainers
-@TestPropertySource("classpath:application-test.yml")
+@TestPropertySource("classpath:application.yml")
 @Import({
         CurrencyServiceImpl.class,
         CurrencyMapperImpl.class
@@ -40,13 +40,13 @@ class CurrencyServiceIntegrationTest extends BaseRepositoryTest {
     @BeforeEach
     void setUp() {
         // Создаём валюты
-//        currencyRub = new Currency("RUB", "₽", "Russian Ruble");
-//        currencyUsd = new Currency("USD", "$", "US Dollar");
-//        currencyEur = new Currency("EUR", "€", "Euro");
-//
-//        entityManager.persistAndFlush(currencyRub);
-//        entityManager.persistAndFlush(currencyUsd);
-//        entityManager.persistAndFlush(currencyEur);
+        currencyRub = new Currency("RUB", "₽", "Russian Ruble");
+        currencyUsd = new Currency("USD", "$", "US Dollar");
+        currencyEur = new Currency("EUR", "€", "Euro");
+
+        entityManager.persistAndFlush(currencyRub);
+        entityManager.persistAndFlush(currencyUsd);
+        entityManager.persistAndFlush(currencyEur);
     }
 
     @Test

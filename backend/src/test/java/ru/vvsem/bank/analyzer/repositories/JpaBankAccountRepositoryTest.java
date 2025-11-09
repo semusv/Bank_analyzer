@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Testcontainers
-@TestPropertySource("classpath:application-test.yml")
+@TestPropertySource("classpath:application.yml")
 class JpaBankAccountRepositoryTest extends BaseRepositoryTest {
 
     @Autowired

@@ -2,7 +2,6 @@ package ru.vvsem.bank.analyzer.repositories;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
@@ -12,6 +11,7 @@ public class BaseRepositoryTest {
 
     static {
 
+        //noinspection resource
         postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:16"))
                 .withDatabaseName("bank_analyzer_test")
                 .withUsername("test")
@@ -19,9 +19,6 @@ public class BaseRepositoryTest {
                 .withNetworkMode("bank_analyzer-network")
                 .withNetworkAliases("testcontainers-db")
                 .withReuse(true);
-
-        postgres.withCreateContainerCmdModifier(cmd ->
-                cmd.withNetworkMode("bank_analyzer-network"));
 
         postgres.start();
 

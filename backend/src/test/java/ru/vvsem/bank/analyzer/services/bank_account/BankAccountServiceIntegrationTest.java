@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 
 @DataJpaTest
 @Testcontainers
-@TestPropertySource("classpath:application-test.yml")
+@TestPropertySource("classpath:application.yml")
 @Import({
         BankAccountServiceImpl.class,
         BankAccountMapperImpl.class,

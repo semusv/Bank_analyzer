@@ -19,9 +19,7 @@ import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.TransactionMapperImpl;
 import ru.vvsem.bank.analyzer.models.*;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
-import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
-import ru.vvsem.bank.analyzer.repositories.UserRepository;
 import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
 import ru.vvsem.bank.analyzer.services.exchange_rate.ExchangeRateService;
 import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
@@ -31,13 +29,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 @DataJpaTest
 @Testcontainers
-@TestPropertySource("classpath:application-test.yml")
+@TestPropertySource("classpath:application.yml")
 @Import({
         DashboardServiceImpl.class,
         TransactionMapperImpl.class,
@@ -187,12 +184,6 @@ class DashboardServiceIntegrationTest extends BaseRepositoryTest {
         assertThat(result.getTotalBalances()).hasSize(2);
     }
 
-    private boolean containsCurrencyAmount(List<CurrencyAmountDto> list, String currencyCode, BigDecimal amount) {
-        return list.stream()
-                .anyMatch(dto -> dto.getCurrencyCode().equals(currencyCode) &&
-                                 dto.getAmount().compareTo(amount) == 0);
-    }
-
     @Test
     @DisplayName("Должен вернуть нулевую статистику при отсутствии транзакций")
     void shouldReturnZeroStatsWhenNoTransactions() {
@@ -217,8 +208,8 @@ class DashboardServiceIntegrationTest extends BaseRepositoryTest {
         assertThat(result.getMonthlyIncomeRub()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(result.getMonthlyExpenseRub()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(result.getTotalBalanceRub()).isEqualByComparingTo(BigDecimal.valueOf(6000));
-        assertThat(result.getTotalTransactions()).isEqualTo(0L);
-        assertThat(result.getUncategorizedTransactions()).isEqualTo(0L);
+        assertThat(result.getTotalTransactions()).isZero();
+        assertThat(result.getUncategorizedTransactions()).isZero();
     }
 
     @Test

@@ -17,6 +17,7 @@ import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
 import ru.vvsem.bank.analyzer.repositories.ExchangeRateRepository;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -25,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
 @Testcontainers
-@TestPropertySource("classpath:application-test.yml")
+@TestPropertySource("classpath:application.yml")
 @Import(ExchangeRateServiceImpl.class)
 class ExchangeRateServiceIntegrationTest extends BaseRepositoryTest {
 
@@ -100,7 +101,7 @@ class ExchangeRateServiceIntegrationTest extends BaseRepositoryTest {
 
         // Then
         BigDecimal expected = amount.multiply(usdRateToday.getValue())
-                .divide(BigDecimal.valueOf(usdRateToday.getNominal()), 2, BigDecimal.ROUND_HALF_UP);
+                .divide(BigDecimal.valueOf(usdRateToday.getNominal()), 2, RoundingMode.HALF_UP);
         assertThat(result).isEqualByComparingTo(expected);
     }
 
@@ -115,7 +116,7 @@ class ExchangeRateServiceIntegrationTest extends BaseRepositoryTest {
 
         // Then
         BigDecimal expected = amount.multiply(eurRateToday.getValue())
-                .divide(BigDecimal.valueOf(eurRateToday.getNominal()), 2, BigDecimal.ROUND_HALF_UP);
+                .divide(BigDecimal.valueOf(eurRateToday.getNominal()), 2, RoundingMode.HALF_UP);
         assertThat(result).isEqualByComparingTo(expected);
     }
 
@@ -138,7 +139,7 @@ class ExchangeRateServiceIntegrationTest extends BaseRepositoryTest {
 
         // Then
         BigDecimal expected = amount.multiply(rateWithNominal.getValue())
-                .divide(BigDecimal.valueOf(rateWithNominal.getNominal()), 2, BigDecimal.ROUND_HALF_UP);
+                .divide(BigDecimal.valueOf(rateWithNominal.getNominal()), 2, RoundingMode.HALF_UP);
         assertThat(result).isEqualByComparingTo(expected);
     }
 
@@ -171,9 +172,9 @@ class ExchangeRateServiceIntegrationTest extends BaseRepositoryTest {
         // Then
         BigDecimal rubAmount = BigDecimal.valueOf(1000);
         BigDecimal usdAmount = BigDecimal.valueOf(100).multiply(usdRateToday.getValue())
-                .divide(BigDecimal.valueOf(usdRateToday.getNominal()), 2, BigDecimal.ROUND_HALF_UP);
+                .divide(BigDecimal.valueOf(usdRateToday.getNominal()), 2, RoundingMode.HALF_UP);
         BigDecimal eurAmount = BigDecimal.valueOf(50).multiply(eurRateToday.getValue())
-                .divide(BigDecimal.valueOf(eurRateToday.getNominal()), 2, BigDecimal.ROUND_HALF_UP);
+                .divide(BigDecimal.valueOf(eurRateToday.getNominal()), 2, RoundingMode.HALF_UP);
         BigDecimal expected = rubAmount.add(usdAmount).add(eurAmount);
 
         assertThat(result).isEqualByComparingTo(expected);
@@ -232,7 +233,7 @@ class ExchangeRateServiceIntegrationTest extends BaseRepositoryTest {
 
         // Then
         BigDecimal expected = amount.multiply(usdRateToday.getValue())
-                .divide(BigDecimal.valueOf(usdRateToday.getNominal()), 2, BigDecimal.ROUND_HALF_UP);
+                .divide(BigDecimal.valueOf(usdRateToday.getNominal()), 2, RoundingMode.HALF_UP);
         assertThat(result).isEqualByComparingTo(expected);
     }
 
@@ -248,7 +249,7 @@ class ExchangeRateServiceIntegrationTest extends BaseRepositoryTest {
 
         // Then
         BigDecimal expected = amount.multiply(usdRateYesterday.getValue())
-                .divide(BigDecimal.valueOf(usdRateYesterday.getNominal()), 2, BigDecimal.ROUND_HALF_UP);
+                .divide(BigDecimal.valueOf(usdRateYesterday.getNominal()), 2, RoundingMode.HALF_UP);
         assertThat(result).isEqualByComparingTo(expected);
     }
 
@@ -297,8 +298,7 @@ class ExchangeRateServiceIntegrationTest extends BaseRepositoryTest {
 
         // Then
         // Ожидаем округление до 2 знаков после запятой
-        BigDecimal expected = amount.multiply(preciseRate.getValue())
-                .divide(BigDecimal.valueOf(preciseRate.getNominal()), 2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal expected = amount.multiply(preciseRate.getValue()).divide(BigDecimal.valueOf(preciseRate.getNominal()), 2, RoundingMode.HALF_UP);
         assertThat(result).isEqualByComparingTo(expected);
         assertThat(result.scale()).isEqualTo(2);
     }

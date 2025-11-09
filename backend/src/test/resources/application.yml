@@ -3,17 +3,16 @@ jwt:
   token.expiration.seconds: 3600  # 1 час
   cookie.expiration.seconds: 3600
 
-
 spring:
   output:
     ansi:
       enabled: ALWAYS
 
   datasource:
-    url: jdbc:tc:postgresql:16://localhost/bank_analyzer_test
+    url: jdbc:postgresql://localhost:5432/bank_analyzer_test
     username: test
     password: test
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    driver-class-name: org.postgresql.Driver
     hikari:
       max-lifetime: 10000
 
