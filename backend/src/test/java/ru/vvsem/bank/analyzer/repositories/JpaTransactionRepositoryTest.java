@@ -282,13 +282,13 @@ class JpaTransactionRepositoryTest extends BaseRepositoryTest {
                 OperationType.INCOMING);
     }
 
-    private Transaction createAndPersistTransaction(
+    private void createAndPersistTransaction(
             User user,
             BigDecimal amount,
             Currency currency,
             LocalDateTime operationTime,
             Category category) {
-        return createAndPersistTransaction(
+        createAndPersistTransaction(
                 user,
                 amount,
                 currency,
@@ -299,13 +299,13 @@ class JpaTransactionRepositoryTest extends BaseRepositoryTest {
 
 
 
-    private Transaction createAndPersistTransaction(
+    private void createAndPersistTransaction(
             User user,
             BigDecimal amount,
             Currency currency,
             LocalDateTime operationTime,
             OperationType operationType) {
-        return createAndPersistTransaction(
+        createAndPersistTransaction(
                 user,
                 amount,
                 currency,
