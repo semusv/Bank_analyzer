@@ -22,8 +22,6 @@ public class DashboardStatsDto {
 
     private List<CurrencyAmountDto> monthlyExpenses;
 
-    private Long activeBudgets;
-
     private Long totalTransactions;
 
     private Long uncategorizedTransactions;

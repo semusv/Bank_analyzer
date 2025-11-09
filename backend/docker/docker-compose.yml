@@ -4,15 +4,23 @@ services:
     container_name: pg-db-bank
     restart: unless-stopped
     networks:
-      - bank_analyzer-network               # ← дай сети имя
+      - bank_analyzer-network
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "admin", "-d", "bank_analyze"]
       interval: 10s
       timeout: 5s
       start_period: 10s
       retries: 5
+    env_file: ../env/.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: /var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -21,9 +29,9 @@ services:
     depends_on:
       - pg-db
     networks:
-      - bank_analyzer-network                # ← тоже ссылка на сеть!
+      - bank_analyzer-network
     ports:
-      - "5050:80"                  # по умолчанию, можно переопределить в dev/prod
+      - "5050:80"
     volumes:
       - ./docker/pgadmin_data:/var/lib/pgadmin
       - ./docker/pgadmin_data/servers.json:/pgadmin4/servers.json
@@ -33,10 +41,16 @@ services:
       timeout: 5s
       start_period: 10s
       retries: 5
+    env_file: ../env/.env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
 
 networks:
   bank_analyzer-network:
     driver: bridge
+    attachable: true
+    external: true
 
 volumes:
   pgdata:

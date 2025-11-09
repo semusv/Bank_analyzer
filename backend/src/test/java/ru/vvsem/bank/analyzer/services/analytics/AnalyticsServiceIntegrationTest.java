@@ -16,7 +16,6 @@ import ru.vvsem.bank.analyzer.dto.analytics.TimeSeriesDto;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CategoryMapperImpl;
-import ru.vvsem.bank.analyzer.mappers.OperationTypeMapper;
 import ru.vvsem.bank.analyzer.mappers.OperationTypeMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.TransactionMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.UserMapperImpl;
@@ -177,7 +176,7 @@ class AnalyticsServiceIntegrationTest extends BaseRepositoryTest {
         // Мокаем exchange rate
         when(exchangeRateService.convertToRub(BigDecimal.valueOf(100), "CU1")).thenReturn(BigDecimal.valueOf(100));
         when(exchangeRateService.convertToRub(BigDecimal.valueOf(1000), "CU1")).thenReturn(BigDecimal.valueOf(1000));
-        when(exchangeRateService.convertToRub(BigDecimal.valueOf(200), "CU2")).thenReturn(BigDecimal.valueOf(15000)); // 200 USD ≈ 15000 RUB
+        when(exchangeRateService.convertToRub(BigDecimal.valueOf(200), "CU2")).thenReturn(BigDecimal.valueOf(2000)); // 200 USD ≈ 15000 RUB
         when(exchangeRateService.convertToRub(BigDecimal.valueOf(50), "CU1")).thenReturn(BigDecimal.valueOf(50));
     }
 
@@ -226,7 +225,7 @@ class AnalyticsServiceIntegrationTest extends BaseRepositoryTest {
         assertThat(result.get(1)).hasFieldOrPropertyWithValue("amount", BigDecimal.ZERO);
 
         assertThat(result.get(2)).hasFieldOrPropertyWithValue("date", LocalDate.of(2024, 10, 3));
-        assertThat(result.get(2)).hasFieldOrPropertyWithValue("amount", BigDecimal.valueOf(15000));
+        assertThat(result.get(2)).hasFieldOrPropertyWithValue("amount", BigDecimal.valueOf(2000));
 
         assertThat(result.get(3)).hasFieldOrPropertyWithValue("date", LocalDate.of(2024, 10, 4));
         assertThat(result.get(3)).hasFieldOrPropertyWithValue("amount", BigDecimal.ZERO);
@@ -290,8 +289,7 @@ class AnalyticsServiceIntegrationTest extends BaseRepositoryTest {
         List<TimeSeriesDto> result = analyticsService.getTimeSeries(filter, securityUser);
 
         // Then
-        assertThat(result).hasSize(10);
-        assertThat(result)
+        assertThat(result).hasSize(10)
                 .allMatch(dto -> BigDecimal.ZERO.compareTo(dto.getAmount()) == 0);
     }
 
@@ -363,8 +361,64 @@ class AnalyticsServiceIntegrationTest extends BaseRepositoryTest {
         outgoing.setOperationType(OperationType.OUTGOING);
         outgoing.setHide(false);
 
+
         entityManager.persistAndFlush(incoming);
         entityManager.persistAndFlush(outgoing);
+
+        SeriesFilterDto filter = new SeriesFilterDto();
+        filter.setStartDate(LocalDate.of(2024, 10, 1));
+        filter.setEndDate(LocalDate.of(2024, 10, 1));
+        filter.setOperationTypeIdList(List.of(1)); // 1 = INCOMING
+
+        // When
+        List<TimeSeriesDto> result = analyticsService.getTimeSeries(filter, securityUser);
+
+        // Then
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getAmount()).isEqualByComparingTo(BigDecimal.valueOf(1000));
+    }
+
+    @Test
+    @DisplayName("Должен учитывать фильтр по типу операции и учетом HIDE")
+    void shouldFilterByOperationTypeAndHide() {
+        // Given
+        Transaction incoming = new Transaction();
+        incoming.setDescription("Incoming");
+        incoming.setAmount(BigDecimal.valueOf(1000));
+        incoming.setCurrency(currencyRub);
+        incoming.setOperationTime(LocalDateTime.of(2024, 10, 1, 10, 0));
+        incoming.setCard(card1);
+        incoming.setCategory(category2);
+        incoming.setUser(user);
+        incoming.setOperationType(OperationType.INCOMING);
+        incoming.setHide(false);
+
+        Transaction incoming2 = new Transaction();
+        incoming2.setDescription("Incoming");
+        incoming2.setAmount(BigDecimal.valueOf(1000));
+        incoming2.setCurrency(currencyRub);
+        incoming2.setOperationTime(LocalDateTime.of(2024, 10, 1, 10, 0));
+        incoming2.setCard(card1);
+        incoming2.setCategory(category2);
+        incoming2.setUser(user);
+        incoming2.setOperationType(OperationType.INCOMING);
+        incoming2.setHide(true);
+
+        Transaction outgoing = new Transaction();
+        outgoing.setDescription("Outgoing");
+        outgoing.setAmount(BigDecimal.valueOf(200));
+        outgoing.setCurrency(currencyRub);
+        outgoing.setOperationTime(LocalDateTime.of(2024, 10, 1, 11, 0));
+        outgoing.setCard(card1);
+        outgoing.setCategory(category1);
+        outgoing.setUser(user);
+        outgoing.setOperationType(OperationType.OUTGOING);
+        outgoing.setHide(false);
+
+
+        entityManager.persistAndFlush(incoming);
+        entityManager.persistAndFlush(outgoing);
+        entityManager.persistAndFlush(incoming2);
 
         SeriesFilterDto filter = new SeriesFilterDto();
         filter.setStartDate(LocalDate.of(2024, 10, 1));

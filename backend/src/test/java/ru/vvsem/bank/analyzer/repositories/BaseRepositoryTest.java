@@ -2,6 +2,7 @@ package ru.vvsem.bank.analyzer.repositories;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
@@ -10,12 +11,32 @@ public class BaseRepositoryTest {
     private static final PostgreSQLContainer<?> postgres;
 
     static {
+
         postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:16"))
                 .withDatabaseName("bank_analyzer_test")
                 .withUsername("test")
                 .withPassword("test")
+                .withNetworkMode("bank_analyzer-network")
+                .withNetworkAliases("testcontainers-db")
                 .withReuse(true);
+
+        postgres.withCreateContainerCmdModifier(cmd ->
+                cmd.withNetworkMode("bank_analyzer-network"));
+
         postgres.start();
+
+        printConnectionInfo();
+    }
+
+    public static void printConnectionInfo() {
+        System.out.println("=== PGAdmin Connection Info ===");
+        System.out.println("Host: " + postgres.getHost());
+        System.out.println("Port: " + postgres.getMappedPort(5432));
+        System.out.println("Database: " + postgres.getDatabaseName());
+        System.out.println("Username: " + postgres.getUsername());
+        System.out.println("Password: " + postgres.getPassword());
+        System.out.println("JDBC URL: " + postgres.getJdbcUrl());
+        System.out.println("===============================");
     }
 
     @DynamicPropertySource

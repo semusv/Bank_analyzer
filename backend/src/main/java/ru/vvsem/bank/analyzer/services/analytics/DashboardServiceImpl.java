@@ -38,7 +38,6 @@ public class DashboardServiceImpl implements DashboardService {
     public DashboardStatsDto getDashboardStats(SecurityUser securityUser) {
         User user = userService.getUserById(securityUser.getId());
         log.info("Getting dashboard stats for user: {}", user.getId());
-
         LocalDateTime startOfMonth = getStartOfMonth();
         LocalDateTime endOfMonth = getEndOfMonth();
 

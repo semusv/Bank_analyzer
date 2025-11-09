@@ -57,8 +57,12 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
             transactionDtoList.add(transactionService.createTransaction(revTransaction));
         }
         transactionDtoList.add(transactionService.createTransaction(transaction));
+        transactionDtoList
+                .forEach(transactionDto ->
+                        bankAccountService.addAccountBalance(
+                                transactionDto.getCard().getId(),
+                                transactionDto.getAmount(), securityUser));
         return transactionDtoList;
-
     }
 
     private Transaction prepareNewTransaction(

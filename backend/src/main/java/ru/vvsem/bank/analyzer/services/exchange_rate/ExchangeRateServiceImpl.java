@@ -101,7 +101,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         ExchangeRate rate = rateCache.getOrDefault(date, Map.of()).get(currencyCode);
         if (rate == null) {
             rate = exchangeRateRepository
-                    .findFirstByCurrencyCodeAndCurrencyDateLessThanEqualOrderByCurrencyDateAsc(currencyCode, date)
+                    .findFirstByCurrencyCodeAndCurrencyDateLessThanEqualOrderByCurrencyDateDesc(currencyCode, date)
                     .orElseThrow(() -> new EntityNotFoundException(
                             "Rate for code %s and date %s (less than equal) not found".formatted(currencyCode, date),
                             "exception.entity.not.found.exchangerate"));
