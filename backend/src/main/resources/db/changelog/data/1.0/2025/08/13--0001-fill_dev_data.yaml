@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 2025-08-13--0001-currencies-data
-      author: vvsemenov
+      author: Semenov V
       context: dev
       runOnChange: true
       changes:
@@ -23,7 +23,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 2025-08-13--0002-banks-data
-      author: vvsemenov
+      author: Semenov V
       context: dev
       runOnChange: true
       changes:
@@ -47,7 +47,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 2025-08-13--0003-users-data
-      author: vvsemenov
+      author: Semenov V
       context: dev
       runOnChange: true
       changes:
@@ -75,7 +75,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 2025-08-13--0004-accounts-data
-      author: vvsemenov
+      author: Semenov V
       context: dev
       runOnChange: true
       changes:
@@ -101,7 +101,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 2025-08-13--0005-cards-data
-      author: vvsemenov
+      author: Semenov V
       context: dev
       runOnChange: true
       changes:
@@ -125,7 +125,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 2025-08-13--0006-categories-data
-      author: vvsemenov
+      author: Semenov V
       context: dev
       runOnChange: true
       changes:
@@ -147,7 +147,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 2025-08-13--0008-transactions-data
-      author: vvsemenov
+      author: Semenov V
       context: dev
       runOnChange: true
       changes:

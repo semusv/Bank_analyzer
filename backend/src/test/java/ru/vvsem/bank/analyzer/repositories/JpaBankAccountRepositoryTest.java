@@ -1,141 +1,206 @@
 package ru.vvsem.bank.analyzer.repositories;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.TestPropertySource;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.vvsem.bank.analyzer.dto.currency.CurrencyAmountDto;
 import ru.vvsem.bank.analyzer.models.Bank;
 import ru.vvsem.bank.analyzer.models.BankAccount;
 import ru.vvsem.bank.analyzer.models.Currency;
 import ru.vvsem.bank.analyzer.models.User;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@DisplayName("Репозиторий счетов банка")
-class JpaBankAccountRepositoryTest {
+@Testcontainers
+@TestPropertySource("classpath:application-test.yml")
+class JpaBankAccountRepositoryTest extends BaseRepositoryTest {
 
     @Autowired
-    private BankAccountRepository accountRepository;
+    private BankAccountRepository bankAccountRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private TestEntityManager entityManager;
 
-    @Autowired
-    CurrencyRepository currencyRepository;
-
-    @Autowired
-    private TestEntityManager em;
-
-    private BankAccount testAccount;
-
-    private User user;
-    private Bank bank;
-    private Currency currency;
+    private final List<User> userList  = new ArrayList<>();
+    private Currency rub;
+    private Currency usd;
+    private Bank sber;
 
     @BeforeEach
     void setUp() {
+        rub = new Currency("CU1", "₽", "Russian Ruble");
+        usd = new Currency("CU2", "$", "US Dollar");
+        entityManager.persistAndFlush(rub);
+        entityManager.persistAndFlush(usd);
+
+        sber = new Bank();
+        sber.setName("Sberbank");
+        sber.setBankCode("sber");
+        sber.setBic("11111111");
+        entityManager.persistAndFlush(sber);
+
+        User user = new User();
+        user.setLogin("testLogin");
+        user.setEmail("test@example.com");
+        user.setPassword("password");
+        user.setSurname("TestSurname");
+        user.setName("TestName");
+        entityManager.persistAndFlush(user);
+        userList.add(user);
+
         user = new User();
-        user.setLogin("john.doe");
-        user.setName("John");
-        user.setSurname("Doe");
-        user.setEmail("john@example.com");
-        user.setPassword("qwerty");
-        user.setTelegramChatId("12345");
-        em.persist(user);
-
-        bank = new Bank();
-        bank.setName("Bank");
-        bank.setBic("123456789");
-        em.persist(bank);
-
-        currency = new Currency();
-        currency.setCode("VAL");
-        currency.setSymbol("V");
-        currency.setName("Валюта");
-        em.persist(currency);
-
-        testAccount = new BankAccount();
-        testAccount.setName("Основной счет");
-        testAccount.setAccountNumber("40817810099910004321");
-        testAccount.setBank(bank);
-        testAccount.setCurrency(currency);
-        testAccount.setUser(user);
-        em.persist(testAccount);
-        em.flush();
+        user.setLogin("testLogin2");
+        user.setEmail("test2@example.com");
+        user.setPassword("password2");
+        user.setSurname("TestSurname2");
+        user.setName("TestName2");
+        entityManager.persistAndFlush(user);
+        userList.add(user);
     }
 
     @Test
-    @DisplayName("Find account by account number")
-    void shouldFindByAccountNumber() {
-        //given
-        //when
-        Optional<BankAccount> found = accountRepository.findByAccountNumber(testAccount.getAccountNumber());
-        //then
-        assertThat(found).isPresent().get().satisfies(account -> {
-            assertThat(account.getName()).isEqualTo(testAccount.getName());
-            assertThat(account.getAccountNumber()).isEqualTo(testAccount.getAccountNumber());
-        });
+    @DisplayName("Должен обновить баланс счёта по ID")
+    void shouldUpdateBalance_WhenValidId() {
+        // Given
+        BankAccount account = createAndPersistBankAccount(
+                userList.get(0), "40817810099910000001", usd, BigDecimal.valueOf(1000));
+        BigDecimal newBalance = BigDecimal.valueOf(1500);
+        entityManager.detach(account);
+
+        // When
+        int updatedRows = bankAccountRepository.updateBalance(newBalance, account.getId());
+
+        // Then
+        assertThat(updatedRows).isEqualTo(1);
+        BankAccount updatedAccount = entityManager.find(BankAccount.class, account.getId());
+        assertThat(updatedAccount.getBalance()).isEqualByComparingTo(newBalance);
     }
 
     @Test
-    @DisplayName("Find accounts by user")
-    void shouldFindByUser() {
-        //given
-        //when
-        List<BankAccount> accounts = accountRepository.findByUserId(user.getId());
-        //then
-        assertThat(accounts).hasSize(1);
-        assertThat(accounts.get(0).getAccountNumber()).isEqualTo(testAccount.getAccountNumber());
-    }
-    @Test
-    @DisplayName("Find accounts by ID")
-    void shouldFindById() {
-        //given
-        //when
-        Optional<BankAccount> account = accountRepository.findById(testAccount.getId());
-        //then
-        assertThat(account).isPresent().get().satisfies(acc -> {
-            assertThat(acc.getName()).isEqualTo(testAccount.getName());
-            assertThat(acc.getAccountNumber()).isEqualTo(testAccount.getAccountNumber());
-        });
+    @DisplayName("Должен найти счёт по ID и userId")
+    void shouldFindByIdAndUserId_WhenAccountExists() {
+        // Given
+        BankAccount account = createAndPersistBankAccount(
+                userList.get(0), "40817810099910000001", usd, BigDecimal.valueOf(1000));
+
+        // When
+        Optional<BankAccount> result = bankAccountRepository.findByIdAndUserId(
+                account.getId(), userList.get(0).getId());
+
+        // Then
+        assertThat(result).isPresent();
+        assertThat(result.get().getAccountNumber()).isEqualTo("40817810099910000001");
     }
 
     @Test
-    @DisplayName("Insert account")
-    void shouldCreateBankAccount() {
-        //given
-        BankAccount newAccount ;
-        newAccount = new BankAccount();
-        newAccount.setName("Основной счет_2");
-        newAccount.setAccountNumber("40817810099910009999");
-        newAccount.setBank(bank);
-        newAccount.setCurrency(currency);
-        newAccount.setUser(user);
-        //when
-        accountRepository.save(newAccount);
-        em.flush();
-        em.clear();
+    @DisplayName("Должен вернуть пустой Optional, если счёт не принадлежит пользователю")
+    void shouldNotFindByIdAndUserId_WhenWrongUser() {
+        // Given
+        BankAccount account = createAndPersistBankAccount(
+                userList.get(0), "40817810099910000001", usd, BigDecimal.valueOf(1000));
+        Long otherUserId = 999L;
 
-        //then
-        BankAccount foundAccount = em.find(BankAccount.class, newAccount.getId());
-        assertThat(foundAccount).satisfies(account -> {
-            assertThat(account.getName()).isEqualTo(newAccount.getName());
-            assertThat(account.getAccountNumber()).isEqualTo(newAccount.getAccountNumber());
-            assertThat(account.getId()).isEqualTo(newAccount.getId());
-            assertThat(account.getUser().getLogin()).isEqualTo(newAccount.getUser().getLogin());
-            assertThat(account.getUser().getId()).isEqualTo(newAccount.getUser().getId());
-            assertThat(account.getBank().getId()).isEqualTo(newAccount.getBank().getId());
-            assertThat(account.getCurrency().getId()).isEqualTo(newAccount.getCurrency().getId());
-        });
+        // When
+        Optional<BankAccount> result = bankAccountRepository.findByIdAndUserId(account.getId(), otherUserId);
 
+        // Then
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Должен найти все счета пользователя")
+    void shouldFindByUserId_ReturnAllAccountsForUser() {
+        // Given
+        createAndPersistBankAccount(
+                userList.get(0), "40817810099910000001", usd, BigDecimal.valueOf(1000));
+        createAndPersistBankAccount(
+                userList.get(0), "40817810099910000002", rub, BigDecimal.valueOf(2000));
+        createAndPersistBankAccount(
+                userList.get(1), "40817810099910000003", rub, BigDecimal.valueOf(5000));
+        // When
+        List<BankAccount> result = bankAccountRepository.findByUserId(userList.get(0).getId());
+
+        // Then
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting("accountNumber")
+                .containsExactlyInAnyOrder("40817810099910000001", "40817810099910000002");
     }
 
 
+    @Test
+    @DisplayName("Должен рассчитать общий баланс по валютам для пользователя")
+    void shouldCalculateTotalBalanceByUserId_ReturnSumGroupedByCurrency() {
+        // Given
+        createAndPersistBankAccount(
+                userList.get(0), "40817810099910000001", rub, BigDecimal.valueOf(1000));
+        createAndPersistBankAccount(
+                userList.get(0), "40817810099910000002", rub, BigDecimal.valueOf(2000));
+        createAndPersistBankAccount(
+                userList.get(0), "40817810099910000003", usd, BigDecimal.valueOf(500));
+
+        // When
+        List<CurrencyAmountDto> balances = bankAccountRepository.calculateTotalBalanceByUserId(userList.get(0).getId());
+
+        // Then
+        assertThat(balances).hasSize(2);
+        assertThat(balances)
+                .filteredOn(dto -> "CU1".equals(dto.getCurrencyCode()))
+                .first()
+                .satisfies(dto -> assertThat(dto.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(3000)));
+        assertThat(balances)
+                .filteredOn(dto -> "CU2".equals(dto.getCurrencyCode()))
+                .first()
+                .satisfies(dto -> assertThat(dto.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(500)));
+    }
+
+    @Test
+    @DisplayName("Должен найти все счета с подгрузкой связанных сущностей (cards, user, currency, bank)")
+    void shouldFindWithCardsAndUserAndCurrencyByUserId_ReturnAccountsWithEagerFetch() {
+        // Given
+        createAndPersistBankAccount(
+                userList.get(0), "40817810099910000001", rub, BigDecimal.valueOf(1000));
+        createAndPersistBankAccount(
+                userList.get(0), "40817810099910000002", usd, BigDecimal.valueOf(2000));
+
+        // When
+        List<BankAccount> result = bankAccountRepository.findWithCardsAndUserAndCurrencyByUserId(
+                userList.get(0).getId());
+
+        // Then
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting("accountNumber")
+                .containsExactlyInAnyOrder("40817810099910000001", "40817810099910000002");
+
+        // Проверяем, что связанные сущности загружены
+        assertThat(result.get(0).getUser()).isNotNull();
+        assertThat(result.get(0).getCurrency()).isNotNull();
+        assertThat(result.get(0).getBank()).isNotNull();
+        assertThat(result.get(0).getCards()).isNotNull();
+    }
+
+    // Хелпер
+    private BankAccount createAndPersistBankAccount(User user, String accountNumber, Currency currency, BigDecimal balance) {
+        BankAccount account = new BankAccount();
+        account.setName("Test Account");
+        account.setUser(user);
+        account.setAccountNumber(accountNumber);
+        account.setCurrency(currency);
+        account.setBalance(balance);
+        account.setBank(sber);
+        return entityManager.persistAndFlush(account);
+    }
 }

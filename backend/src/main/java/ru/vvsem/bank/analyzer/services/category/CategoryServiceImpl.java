@@ -40,6 +40,14 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<Category> getCategoryEntitiesForUser(SecurityUser securityUser) {
+        return categoryRepository.findByUserId(securityUser.getId())
+                .stream()
+                .sorted(Comparator.comparing(Category::getName))
+                .toList();
+    }
+
+    @Override
     public CategoryDto getCategoryDtoById(Long categoryId, SecurityUser securityUser) {
         return categoryMapper.toCategoryDto(entityAccessProviderImpl.requireOwnedCategory(
                 categoryId, securityUser.getId()));

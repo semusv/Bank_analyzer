@@ -34,7 +34,6 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Transactional(readOnly = true)
     @Override
     public List<BankAccountDto> getUserBankAccount(Long userId) {
-        log.info("Getting accounts for user: {}", userId);
         List<BankAccount> accounts = bankAccountRepository.findByUserId(userId);
         return accounts.stream()
                 .map(bankAccountMapper::toBankAccountDto).toList();
@@ -43,8 +42,6 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Transactional
     @Override
     public BankAccountSimpleDto createAccount(NewBankAccountDto newBankAccountDto, SecurityUser securityUser) {
-        log.info("Creating new account for user: {}", securityUser.getId());
-
         var bankAccount = bankAccountMapper.toEntity(newBankAccountDto);
         bankAccount.setBank(entityAccessProvider.requireBank(bankAccount.getBank().getId()));
         bankAccount.setCurrency(entityAccessProvider.requireCurrency(bankAccount.getCurrency().getId()));
@@ -56,7 +53,6 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Transactional
     @Override
     public List<BankAccountSimpleDto> getUserAccountsWithCards(SecurityUser securityUser) {
-        log.info("Getting accounts with cards for user: {}", securityUser.getId());
         List<BankAccount> accounts = bankAccountRepository.findWithCardsAndUserAndCurrencyByUserId(securityUser.getId());
         return accounts.stream()
                 .map(bankAccountMapper::toBankAccountSimpleDto).toList();
@@ -66,34 +62,17 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Transactional
     @Override
     public void deleteAccount(Long accountId, SecurityUser securityUser) {
-        log.info("Deleting account: {} for user: {}", accountId, securityUser.getId());
-
-        BankAccount account = bankAccountRepository.findByIdAndUserId(accountId, securityUser.getId())
-                .orElseThrow(
-                        () ->
-                                new EntityNotFoundException(
-                                        "AccountId %d for UserId %d not found"
-                                                .formatted(accountId, securityUser.getId()),
-                                        "exception.entity.not.found.bankAccount")
-                );
-
-        bankAccountRepository.delete(account);
+        var bankAccount = entityAccessProvider.requireOwnedBankAccount(accountId, securityUser.getId());
+        bankAccountRepository.delete(bankAccount);
     }
 
     @Override
-    public void updateAccountBalance(Long accountId, BigDecimal amount, SecurityUser securityUser) {
+    public void addAccountBalance(Long accountId, BigDecimal amount, SecurityUser securityUser) {
         var bankAccount = entityAccessProvider.requireOwnedBankAccount(accountId, securityUser.getId());
-        var updatedBankAccount = bankAccountRepository.updateBalance(
+        bankAccountRepository.updateBalance(
                 bankAccount.getBalance().add(amount),
                 accountId
         );
-        if (updatedBankAccount == 0) {
-            throw new EntityNotFoundException(
-                    "BankAccount with id %d not found".formatted(bankAccount.getId()),
-                    "exception.entity.not.found.bankAccount"
-            );
-        }
-
     }
 
 }

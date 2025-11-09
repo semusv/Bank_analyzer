@@ -18,7 +18,7 @@ public interface TransactionProcessingService {
     void splitTransaction(Long transactionId, List<SubTransactionDto> subTransactions, SecurityUser securityUser);
 
     @Transactional
-    void hideTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser);
+    TransactionDto hideTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser);
 
     @Transactional
     void deleteTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser);

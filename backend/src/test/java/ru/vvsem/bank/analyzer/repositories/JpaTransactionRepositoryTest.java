@@ -1,163 +1,335 @@
 package ru.vvsem.bank.analyzer.repositories;
 
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.TestPropertySource;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.vvsem.bank.analyzer.dto.currency.CurrencyAmountDto;
+import ru.vvsem.bank.analyzer.models.Category;
 import ru.vvsem.bank.analyzer.models.Currency;
 import ru.vvsem.bank.analyzer.models.Transaction;
 import ru.vvsem.bank.analyzer.models.User;
+import ru.vvsem.bank.analyzer.models.enums.OperationType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-//@DataJpaTest
-@DisplayName("Репозиторий транзакций")
-class JpaTransactionRepositoryTest {
-//    @Autowired
-//    private TransactionRepository transactionRepository;
-//
-//    @Autowired
-//    private TestEntityManager em;
-//
-//    private User user1;
-//    private User user2;
-//    private Currency rub;
-//    private Currency usd;
-//    private Currency eur;
-//
-//
-//    @BeforeEach
-//    void setUp() {
-//        user1 = user("user001");
-//        user2 = user("user002");
-//
-//        rub = currency("Va1", "Z", "Валюта 1");
-//        usd = currency("Va2", "X", "Валюта 2");
-//        eur = currency("Va3", "V", "Валюта 3");
-//
-//        transaction(user1, rub, "Покупка", BigDecimal.valueOf(100), LocalDateTime.now().minusDays(3));
-//        transaction(user1, usd, "Возврат", BigDecimal.valueOf(-50), LocalDateTime.now().minusDays(2));
-//        transaction(user1, rub, "Капитализация", BigDecimal.valueOf(200), LocalDateTime.now().minusHours(5));
-//
-//        transaction(user2, eur, "Покупка", BigDecimal.valueOf(500), LocalDateTime.now().minusDays(1));
-//        transaction(user2, rub, "Отчисление", BigDecimal.valueOf(-300), LocalDateTime.now().minusHours(1));
-//
-//        em.flush();
-//    }
-//
-//
-//    private User user(String login) {
-//        User u = new User();
-//        u.setLogin(login);
-//        u.setName("Name");
-//        u.setSurname("Surname");
-//        u.setEmail(login + "@example.com");
-//        u.setPassword("pass");
-//        em.persist(u);
-//        return u;
-//    }
-//
-//    private Currency currency(String code, String sym, String name) {
-//        Currency c = new Currency();
-//        c.setCode(code);
-//        c.setSymbol(sym);
-//        c.setName(name);
-//        em.persist(c);
-//        return c;
-//    }
-//
-//    private void transaction(User u, Currency c, String desc,
-//                                    BigDecimal amount, LocalDateTime time) {
-//        Transaction tr = new Transaction();
-//        tr.setUser(u);
-//        tr.setCurrency(c);
-//        tr.setDescription(desc);
-//        tr.setAmount(amount);
-//        tr.setOperationTime(time);
-//        em.persist(tr);
-//    }
-//
-//    @Test
-//    @DisplayName("Найти все транзакции по пользователю")
-//    void shouldFindAllByUser() {
-//        List<Transaction> list = transactionRepository.findByUserId(user1.getId());
-//        assertThat(list).hasSize(3)
-//                .extracting(Transaction::getDescription)
-//                .containsOnly("Покупка", "Возврат", "Капитализация");
-//    }
-//
-//
-//    @Test
-//    @DisplayName("Найти транзакции по подстроке в описании")
-//    void shouldFindByDescriptionContainingIgnoreCase() {
-//        List<Transaction> list = transactionRepository
-//                .findByDescriptionContainingIgnoreCase("покупка");
-//        assertThat(list).hasSize(2) // t1 (Покупка) + t4 (Покупка)
-//                .extracting(Transaction::getUser)
-//                .extracting(User::getLogin)
-//                .containsExactlyInAnyOrder("user001", "user002");
-//    }
-//
-//    @Test
-//    @DisplayName("Найти все положительные транзакции > 0")
-//    void shouldFindByAmountGreaterThanZero() {
-//        List<Transaction> pos = transactionRepository.findByAmountGreaterThan(new BigDecimal("0"));
-//        assertThat(pos).hasSize(3)
-//                .extracting(Transaction::getAmount)
-//                .doesNotContain(BigDecimal.valueOf(-50), BigDecimal.valueOf(-300));
-//    }
-//
-//    @Test
-//    @DisplayName("Найти все транзакции по валюте")
-//    void shouldFindByCurrency() {
-//        List<Transaction> rubList = transactionRepository.findByCurrencyCode(rub.getCode());
-//        assertThat(rubList).hasSize(3)                   // t1, t3, t5
-//                .extracting(Transaction::getUser)
-//                .extracting(User::getLogin)
-//                .containsExactlyInAnyOrder("user001", "user002","user001" );
-//    }
-//
-//
-//
-//    @Test
-//    @DisplayName("Найти транзакции между датами и пользователем одновременно")
-//    void shouldFindByUserAndDateRange() {
-//        LocalDateTime start = LocalDateTime.now().minusDays(2);
-//        LocalDateTime end = LocalDateTime.now();
-//        List<Transaction> list = transactionRepository
-//                .findByUserIdAndOperationTimeBetween(user2.getId(), start, end);
-//
-//        assertThat(list).hasSize(2)                     // t4, t5
-//                .extracting(Transaction::getDescription)
-//                .containsExactlyInAnyOrder("Покупка", "Отчисление");
-//    }
-//
-//    @Test
-//    @DisplayName("Найти транзакции между датами и пользователем одновременно")
-//    void shouldFindByUserAndDateRange2() {
-//        LocalDateTime start = LocalDateTime.now().minusDays(2);
-//        LocalDateTime end = LocalDateTime.now().minusHours(2);
-//        List<Transaction> list = transactionRepository
-//                .findByUserIdAndOperationTimeBetween(user2.getId(), start, end);
-//
-//        assertThat(list).hasSize(1)                     // t4, t5
-//                .extracting(Transaction::getDescription)
-//                .containsExactlyInAnyOrder("Покупка");
-//    }
-//
-//    @Test
-//    @DisplayName("Ни одной транзакции не должно быть для пользователя с id = 999")
-//    void shouldReturnEmptyWhenNoTransactionForUser() {
-//        User ghost = new User();
-//        ghost.setId(999L);
-//        List<Transaction> list = transactionRepository.findByUserId(ghost.getId());
-//        assertThat(list).isEmpty();
-//    }
+@DataJpaTest
+@Testcontainers
+@TestPropertySource("classpath:application-test.yml")
+class JpaTransactionRepositoryTest extends BaseRepositoryTest {
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    @Autowired
+    private TestEntityManager entityManager;
+
+    private final List<User> userList  = new ArrayList<>();
+    private Currency usd;
+    private Currency eur;
+    private Currency rub;
+    private final List<Category> categoryList = new ArrayList<>();
+
+    @BeforeEach
+    void setUp() {
+        User user = new User();
+        user.setLogin("testLogin");
+        user.setEmail("test@example.com");
+        user.setPassword("password");
+        user.setSurname("TestSurname");
+        user.setName("TestName");
+        entityManager.persistAndFlush(user);
+        userList.add(user);
+
+        user = new User();
+        user.setLogin("testLogin2");
+        user.setEmail("test2@example.com");
+        user.setPassword("password2");
+        user.setSurname("TestSurname2");
+        user.setName("TestName2");
+        entityManager.persistAndFlush(user);
+        userList.add(user);
+
+
+
+        usd = new Currency("CU1", "$", "Currency 1");
+        eur = new Currency("CU2", "€", "Currency 2");
+        rub = new Currency("CU3", "₽", "Currency 3");
+        entityManager.persistAndFlush(usd);
+        entityManager.persistAndFlush(eur);
+        entityManager.persistAndFlush(rub);
+
+        Category category = new Category();
+        category.setName("Test Category 1");
+        category.setUser(user);
+        entityManager.persistAndFlush(category);
+        categoryList.add(category);
+
+        category = new Category();
+        category.setName("Test Category 2");
+        category.setUser(user);
+        entityManager.persistAndFlush(category);
+        categoryList.add(category);
+    }
+
+    @DisplayName("Должен найти транзакцию по id и userId")
+    @Test
+    void shouldFindByIdAndUserId_WhenTransactionExists() {
+        // given
+        Transaction transaction = createAndPersistTransaction(
+                userList.get(0), BigDecimal.valueOf(1000), rub, LocalDateTime.now());
+
+        entityManager.persistAndFlush(transaction);
+
+        // When
+        Optional<Transaction> result = transactionRepository
+                .findByIdAndUserId(transaction.getId(), userList.get(0).getId());
+
+        // Then
+        assertThat(result).isPresent();
+        assertThat(result.get().getAmount()).isEqualByComparingTo(BigDecimal.valueOf(1000));
+    }
+
+    @Test
+    @DisplayName("Должен вернуть пустой Optional, если транзакция не найдена по id и userId")
+    void shouldNotFindByIdAndUserId_WhenWrongUser() {
+        // Given
+        Transaction transaction = createAndPersistTransaction(
+                userList.get(0), BigDecimal.valueOf(1000), rub, LocalDateTime.now());
+        Long otherUserId = 999L;
+
+        // When
+        Optional<Transaction> result = transactionRepository.findByIdAndUserId(transaction.getId(), otherUserId);
+
+        // Then
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Должен рассчитать доходы за месяц по валютам")
+    void shouldCalculateMonthlyIncome_ReturnSumOfPositiveTransactionsGroupedByCurrency() {
+        // Given
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = now.withDayOfMonth(1).withHour(0).withMinute(0);
+        LocalDateTime end = now.withDayOfMonth(28).withHour(23).withMinute(59);
+        // Доходы
+        createAndPersistTransaction(
+                userList.get(0), BigDecimal.valueOf(100), rub, start.plusDays(1), OperationType.INCOMING);
+        createAndPersistTransaction(
+                userList.get(0), BigDecimal.valueOf(200), rub, start.plusDays(5), OperationType.INCOMING);
+        createAndPersistTransaction(
+                userList.get(0), BigDecimal.valueOf(300), usd, start.plusDays(1), OperationType.INCOMING);
+        createAndPersistTransaction(
+                userList.get(0), BigDecimal.valueOf(400), usd, start.plusDays(5), OperationType.INCOMING);
+        // Расходы
+        createAndPersistTransaction(
+                userList.get(0), BigDecimal.valueOf(-22), rub, start.plusDays(5), OperationType.OUTGOING);
+
+        // When
+        List<CurrencyAmountDto> income = transactionRepository.calculateMonthlyIncome(userList.get(0).getId(), start, end);
+
+        // Then
+        assertThat(income).hasSize(2);
+        assertThat(income)
+                .filteredOn(amountDto ->
+                        "CU1".equals(amountDto.getCurrencyCode()))
+                .first()
+                .satisfies(amountDto ->
+                        assertThat(amountDto.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(700)));
+        assertThat(income)
+                .filteredOn(amountDto ->
+                        "CU3".equals(amountDto.getCurrencyCode()))
+                .first()
+                .satisfies(amountDto ->
+                        assertThat(amountDto.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(300)));
+    }
+
+    @Test
+    @DisplayName("Должен найти все транзакции по userId")
+    void shouldFindByUserId_ReturnAllTransactionsForUser() {
+        // Given
+        createAndPersistTransaction(userList.get(0), BigDecimal.valueOf(100), rub, LocalDateTime.now().minusDays(1));
+        createAndPersistTransaction(userList.get(0), BigDecimal.valueOf(200), usd, LocalDateTime.now());
+
+        // When
+        List<Transaction> result = transactionRepository.findByUserId(userList.get(0).getId());
+
+        // Then
+        assertThat(result).hasSize(2);
+        assertThat(result).extracting("amount").containsExactlyInAnyOrder(
+                BigDecimal.valueOf(100),
+                BigDecimal.valueOf(200)
+        );
+    }
+
+    @Test
+    @DisplayName("Должен подсчитать количество транзакций по userId")
+    void shouldCountByUserId_ReturnCorrectCount() {
+        // Given
+        createAndPersistTransaction(
+                userList.get(0), BigDecimal.valueOf(100), rub, LocalDateTime.now().minusDays(1));
+        createAndPersistTransaction(
+                userList.get(0), BigDecimal.valueOf(200), usd, LocalDateTime.now());
+        createAndPersistTransaction(
+                userList.get(1), BigDecimal.valueOf(200), eur, LocalDateTime.now());
+
+        // When
+        Long count = transactionRepository.countByUserId(userList.get(0).getId());
+
+        // Then
+        assertThat(count).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("Должен подсчитать количество транзакций без категории по userId")
+    void shouldCountUncategorizedByUserId_ReturnOnlyNullCategoryTransactions() {
+        // Given
+        createAndPersistTransaction(userList.get(0), BigDecimal.valueOf(100), rub, LocalDateTime.now()); // без категории
+        createAndPersistTransaction(userList.get(0), BigDecimal.valueOf(150), rub, LocalDateTime.now()); // без категории
+        createAndPersistTransaction(userList.get(0), BigDecimal.valueOf(200), usd, LocalDateTime.now(), categoryList.get(0)); // с категорией
+        createAndPersistTransaction(userList.get(1), BigDecimal.valueOf(100), rub, LocalDateTime.now()); // без категории
+
+        // When
+        Long count = transactionRepository.countUncategorizedByUserId(userList.get(0).getId());
+
+        // Then
+        assertThat(count).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("Должен рассчитать доходы за месяц по валюте")
+    void shouldCalculateMonthlyExpense_ReturnSumOfNegativeTransactionsGroupedByCurrency() {
+        // Given
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = now.withDayOfMonth(1).withHour(0).withMinute(0);
+        LocalDateTime end = now.withDayOfMonth(28).withHour(23).withMinute(59);
+        // Доходы
+        createAndPersistTransaction(
+                userList.get(0), BigDecimal.valueOf(-100), rub, start.plusDays(1), OperationType.OUTGOING);
+        createAndPersistTransaction(
+                userList.get(0), BigDecimal.valueOf(-200), rub, start.plusDays(5), OperationType.OUTGOING);
+        createAndPersistTransaction(
+                userList.get(0), BigDecimal.valueOf(-300), usd, start.plusDays(1), OperationType.OUTGOING);
+        createAndPersistTransaction(
+                userList.get(0), BigDecimal.valueOf(-400), usd, start.plusDays(5), OperationType.OUTGOING);
+        // Расходы
+        createAndPersistTransaction(
+                userList.get(0), BigDecimal.valueOf(22), rub, start.plusDays(5), OperationType.INCOMING);
+
+        // When
+        List<CurrencyAmountDto> outgoing = transactionRepository.calculateMonthlyExpense(userList.get(0).getId(), start, end);
+
+        // Then
+        assertThat(outgoing).hasSize(2);
+        assertThat(outgoing)
+                .filteredOn(amountDto ->
+                        "CU1".equals(amountDto.getCurrencyCode()))
+                .first()
+                .satisfies(amountDto ->
+                        assertThat(amountDto.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(-700)));
+        assertThat(outgoing)
+                .filteredOn(amountDto ->
+                        "CU3".equals(amountDto.getCurrencyCode()))
+                .first()
+                .satisfies(amountDto ->
+                        assertThat(amountDto.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(-300)));
+    }
+
+    @Test
+    @DisplayName("Должен найти N последних транзакций по userId, отсортированных по дате операции")
+    void shouldFindTopNByUserIdOrderByOperationTimeDesc_ReturnLatestTransactions() {
+        // Given
+        LocalDateTime time1 = LocalDateTime.now().minusDays(5);
+        LocalDateTime time2 = LocalDateTime.now().minusDays(3);
+        LocalDateTime time3 = LocalDateTime.now().minusDays(1);
+
+        createAndPersistTransaction(userList.get(0), BigDecimal.valueOf(100), rub, time1);
+        Transaction t2 = createAndPersistTransaction(userList.get(0), BigDecimal.valueOf(200), usd, time2);
+        Transaction t3 = createAndPersistTransaction(userList.get(0), BigDecimal.valueOf(300), rub, time3);
+
+        // When
+        List<Transaction> result = transactionRepository.findTopNByUserIdOrderByOperationTimeDesc(userList.get(0).getId(), 2);
+
+        // Then
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getId()).isEqualTo(t3.getId()); // самый свежий
+        assertThat(result.get(1).getId()).isEqualTo(t2.getId()); // второй по свежести
+    }
+
+
+
+    private Transaction createAndPersistTransaction(
+            User user,
+            BigDecimal amount,
+            Currency currency,
+            LocalDateTime operationTime) {
+        return createAndPersistTransaction(
+                user,
+                amount,
+                currency,
+                operationTime,
+                null,
+                OperationType.INCOMING);
+    }
+
+    private Transaction createAndPersistTransaction(
+            User user,
+            BigDecimal amount,
+            Currency currency,
+            LocalDateTime operationTime,
+            Category category) {
+        return createAndPersistTransaction(
+                user,
+                amount,
+                currency,
+                operationTime,
+                category,
+                OperationType.INCOMING);
+    }
+
+
+
+    private Transaction createAndPersistTransaction(
+            User user,
+            BigDecimal amount,
+            Currency currency,
+            LocalDateTime operationTime,
+            OperationType operationType) {
+        return createAndPersistTransaction(
+                user,
+                amount,
+                currency,
+                operationTime,
+                null,
+                operationType);
+    }
+
+    private Transaction createAndPersistTransaction(
+            User user,
+            BigDecimal amount,
+            Currency currency,
+            LocalDateTime operationTime,
+            Category category,
+            OperationType operationType
+    ) {
+        Transaction t = new Transaction();
+        t.setDescription("Test Transaction");
+        t.setUser(user);
+        t.setAmount(amount);
+        t.setCurrency(currency);
+        t.setOperationTime(operationTime);
+        t.setCategory(category);
+        t.setOperationType(operationType);
+        return entityManager.persistAndFlush(t);
+    }
 }

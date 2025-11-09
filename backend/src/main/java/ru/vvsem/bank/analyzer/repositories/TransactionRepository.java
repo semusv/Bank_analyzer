@@ -30,7 +30,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     @Query("SELECT NEW ru.vvsem.bank.analyzer.dto.currency.CurrencyAmountDto(t.currency.code, SUM(t.amount)) " +
            "FROM Transaction t " +
            "WHERE t.user.id = :userId AND t.amount > 0 AND t.operationTime BETWEEN :start AND :end " +
-           "GROUP BY t.currency.code")
+           "GROUP BY t.currency.code " +
+           "ORDER BY t.currency.code ASC")
     List<CurrencyAmountDto> calculateMonthlyIncome(@Param("userId") Long userId,
                                                    @Param("start") LocalDateTime start,
                                                    @Param("end") LocalDateTime end);

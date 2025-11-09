@@ -9,9 +9,8 @@ jwt:
   token.expiration.seconds: 3600  # 1 час
   cookie.expiration.seconds: 3600
 
-#spring:
-#  profiles:
-#    active: security
+spring:
+
 
   messages:
     baseName: messages

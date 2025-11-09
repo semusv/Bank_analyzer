@@ -31,6 +31,7 @@ public class Bank extends AbstractBaseEntity {
     private String bic; // БИК банка
 
     @Column(name = "bank_code", length = 50)
+    @NotNull
     private String bankCode;
 
     @Column(name = "logo_url")

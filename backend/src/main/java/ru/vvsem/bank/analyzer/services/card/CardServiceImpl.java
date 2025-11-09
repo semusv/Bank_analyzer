@@ -45,7 +45,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public CardDto getCard(Long cardId, SecurityUser securityUser) {
+    public CardDto getCardById(Long cardId, SecurityUser securityUser) {
         return cardMapper.toCardDto(
                 entityAccessProvider.requireOwnedCard(cardId, securityUser.getId()));
     }

@@ -26,6 +26,7 @@ import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.services.transaction.TransactionProcessingService;
 import ru.vvsem.bank.analyzer.services.transaction.TransactionSearchService;
 import ru.vvsem.bank.analyzer.services.transaction.TransactionService;
+
 import java.util.List;
 
 @RestController
@@ -68,10 +69,10 @@ public class TransactionApiController {
 
     @RequestMapping("/{id}/hide")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void hideTransaction(
+    public TransactionDto hideTransaction(
             @PathVariable("id") Long transactionId,
             @AuthenticationPrincipal SecurityUser securityUser) {
-        transactionProcessingService.hideTransactionWithBalanceUpdate(transactionId, securityUser);
+        return transactionProcessingService.hideTransactionWithBalanceUpdate(transactionId, securityUser);
     }
 
     @DeleteMapping("/{id}")

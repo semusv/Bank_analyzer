@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 1753099601854-1
-      author: semva (generated)
+      author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - modifyDataType:
@@ -10,7 +10,7 @@ databaseChangeLog:
             tableName: bank_accounts
   - changeSet:
       id: 1753099601854-2
-      author: semva (generated)
+      author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - modifyDataType:
@@ -19,7 +19,7 @@ databaseChangeLog:
             tableName: categories
   - changeSet:
       id: 1753099601854-3
-      author: semva (generated)
+      author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - dropNotNullConstraint:
@@ -28,7 +28,7 @@ databaseChangeLog:
             tableName: bank_accounts
   - changeSet:
       id: 1753099601854-4
-      author: semva (generated)
+      author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - dropNotNullConstraint:
@@ -37,7 +37,7 @@ databaseChangeLog:
             tableName: banks
   - changeSet:
       id: 1753099601854-5
-      author: semva (generated)
+      author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - dropNotNullConstraint:
@@ -46,7 +46,7 @@ databaseChangeLog:
             tableName: budgets
   - changeSet:
       id: 1753099601854-6
-      author: semva (generated)
+      author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - dropNotNullConstraint:
@@ -55,7 +55,7 @@ databaseChangeLog:
             tableName: cards
   - changeSet:
       id: 1753099601854-7
-      author: semva (generated)
+      author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - dropNotNullConstraint:
@@ -64,7 +64,7 @@ databaseChangeLog:
             tableName: categories
   - changeSet:
       id: 1753099601854-8
-      author: semva (generated)
+      author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - dropNotNullConstraint:
@@ -73,7 +73,7 @@ databaseChangeLog:
             tableName: currencies
   - changeSet:
       id: 1753099601854-9
-      author: semva (generated)
+      author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - dropNotNullConstraint:
@@ -82,7 +82,7 @@ databaseChangeLog:
             tableName: transactions
   - changeSet:
       id: 1753099601854-10
-      author: semva (generated)
+      author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - dropNotNullConstraint:
@@ -91,7 +91,7 @@ databaseChangeLog:
             tableName: users
   - changeSet:
       id: 1753099601854-11
-      author: semva (generated)
+      author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - modifyDataType:
@@ -100,7 +100,7 @@ databaseChangeLog:
             tableName: currencies
   - changeSet:
       id: 1753099601854-12
-      author: semva (generated)
+      author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - modifyDataType:
@@ -109,7 +109,7 @@ databaseChangeLog:
             tableName: currencies
   - changeSet:
       id: 1753099601854-13
-      author: semva (generated)
+      author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - modifyDataType:

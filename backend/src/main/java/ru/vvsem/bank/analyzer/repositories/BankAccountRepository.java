@@ -21,16 +21,17 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, Long> 
     @Query("update BankAccount b set b.balance = ?1 where b.id = ?2")
     int updateBalance(BigDecimal balance, Long bankAccountId);
 
+    @EntityGraph(attributePaths = {"cards", "user", "currency", "bank"})
     Optional<BankAccount> findByIdAndUserId(Long id, Long userId);
 
+    @EntityGraph(attributePaths = {"cards", "user", "currency", "bank"})
     List<BankAccount> findByUserId(Long userId);
-
-    Optional<BankAccount> findByAccountNumber(String accountNumber);
 
     @Query("SELECT NEW ru.vvsem.bank.analyzer.dto.currency.CurrencyAmountDto(b.currency.code, SUM(b.balance)) " +
            "FROM BankAccount b " +
            "WHERE b.user.id = :userId " +
-           "GROUP BY b.currency.code")
+           "GROUP BY b.currency.code " +
+           "ORDER BY b.currency.code")
     List<CurrencyAmountDto> calculateTotalBalanceByUserId(@Param("userId") Long userId);
 
     @EntityGraph(attributePaths = {"cards", "user", "currency", "bank"})

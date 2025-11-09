@@ -7,10 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.vvsem.bank.analyzer.dto.analytics.SeriesFilterDto;
-import ru.vvsem.bank.analyzer.dto.category.CategoryDto;
 import ru.vvsem.bank.analyzer.dto.analytics.CategoryBreakdownDto;
 import ru.vvsem.bank.analyzer.dto.analytics.TimeSeriesDto;
+import ru.vvsem.bank.analyzer.mappers.CategoryMapper;
 import ru.vvsem.bank.analyzer.mappers.OperationTypeMapper;
+import ru.vvsem.bank.analyzer.models.Category;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.Transaction;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
@@ -47,6 +48,8 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final CustomUserDetailsService userService;
 
     private final OperationTypeMapper operationTypeMapper;
+
+    private final CategoryMapper categoryMapper;
 
     @Override
     public List<TimeSeriesDto> getTimeSeries(
@@ -104,7 +107,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     public List<CategoryBreakdownDto> getCategoryBreakdown(SeriesFilterDto filter,
                                                            SecurityUser securityUser) {
         // Получаем категории пользователя
-        Map<Long, CategoryDto> categoryMap = getCategoriesMap(securityUser);
+        Map<Long, Category> categoryMap = getCategoriesMap(securityUser);
 
         // Получаем транзакции по фильтру
         List<Transaction> transactions = getFilteredTransactions(filter, securityUser);
@@ -116,9 +119,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         return convertToCategoryBreakdownDto(categoryAmounts, categoryMap);
     }
 
-    private Map<Long, CategoryDto> getCategoriesMap(SecurityUser securityUser) {
-        return categoryService.getCategoriesForUser(securityUser).stream()
-                .collect(Collectors.toMap(CategoryDto::getId, Function.identity()));
+    private Map<Long, Category> getCategoriesMap(SecurityUser securityUser) {
+        return categoryService.getCategoryEntitiesForUser(securityUser).stream()
+                .collect(Collectors.toMap(Category::getId, Function.identity()));
     }
 
     private List<Transaction> getFilteredTransactions(SeriesFilterDto filter, SecurityUser securityUser) {
@@ -143,7 +146,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     private List<CategoryBreakdownDto> convertToCategoryBreakdownDto(
             Map<Long, BigDecimal> categoryAmounts,
-            Map<Long, CategoryDto> categoryMap) {
+            Map<Long, Category> categoryMap) {
 
         return categoryAmounts.entrySet().stream()
                 .map(entry -> createCategoryBreakdownDto(entry, categoryMap))
@@ -153,12 +156,12 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     private CategoryBreakdownDto createCategoryBreakdownDto(
             Map.Entry<Long, BigDecimal> entry,
-            Map<Long, CategoryDto> categoryMap) {
+            Map<Long, Category> categoryMap) {
 
-        CategoryDto category = categoryMap.get(entry.getKey());
+        Category category = categoryMap.get(entry.getKey());
         BigDecimal amount = entry.getValue().abs(); // Используем абсолютное значение
 
-        return new CategoryBreakdownDto(category, amount);
+        return new CategoryBreakdownDto(categoryMapper.toCategoryDto(category), amount);
     }
 
     private Specification<Transaction> buildSpecification(Long userId, SeriesFilterDto filter) {

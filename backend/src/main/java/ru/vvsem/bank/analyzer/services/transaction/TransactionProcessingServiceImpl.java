@@ -111,37 +111,38 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
     }
 
     @Override
-    public void hideTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser) {
+    public TransactionDto hideTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser) {
         entityAccessProviderImpl.requireOwnedTransaction(transactionId, securityUser.getId());
 
         var transactionDto = transactionService.hideTransaction(transactionId, securityUser.getId());
-        var cardDto = cardService.getCard(transactionDto.getCard().getId(), securityUser);
-        bankAccountService.updateAccountBalance(cardDto.getAccountId(),
+        var card = entityAccessProviderImpl.requireOwnedCard(transactionDto.getCard().getId(), securityUser.getId());
+        bankAccountService.addAccountBalance(card.getAccount().getId(),
                 !transactionDto.isHide()
                         ? transactionDto.getAmount()
                         : transactionDto.getAmount().negate(), securityUser);
+        return transactionDto;
     }
 
     @Override
     public void deleteTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser) {
         var transaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, securityUser.getId());
-        var cardDto = cardService.getCard(transaction.getCard().getId(), securityUser);
+        var card = entityAccessProviderImpl.requireOwnedCard(transaction.getCard().getId(), securityUser.getId());
         transactionService.deleteTransaction(transactionId, securityUser);
-        bankAccountService.updateAccountBalance(cardDto.getAccountId(), transaction.getAmount().negate(), securityUser);
+        bankAccountService.addAccountBalance(card.getAccount().getId(), transaction.getAmount().negate(), securityUser);
     }
 
     @Override
     public TransactionDto patchTransactionWithBalanceUpdate(
             Long transactionId, PatchTransactionData patchTransactionData, SecurityUser securityUser) {
         var transaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, securityUser.getId());
-        var cardDto = cardService.getCard(transaction.getCard().getId(), securityUser);
+        var card = entityAccessProviderImpl.requireOwnedCard(transaction.getCard().getId(), securityUser.getId());
         var diffAmount = transaction.getAmount().subtract(patchTransactionData.getAmount());
         transaction.setCategory(entityAccessProviderImpl
                 .requireOwnedCategory(patchTransactionData.getCategoryId(), securityUser.getId()));
         transaction.setAmount(patchTransactionData.getAmount());
         transaction.setOperationTime(patchTransactionData.getOperationTime());
         if (!diffAmount.equals(BigDecimal.ZERO)) {
-            bankAccountService.updateAccountBalance(cardDto.getAccountId(), diffAmount.negate(), securityUser);
+            bankAccountService.addAccountBalance(card.getAccount().getId(), diffAmount.negate(), securityUser);
         }
         return transactionService.updateTransaction(transaction, securityUser.getId());
     }
