@@ -46,9 +46,9 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
             log.info("Exchange rates for date {} already exist", date);
             return;
         }
-
         exchangeRateRepository.saveAll(rates);
         log.info("Saved {} exchange rates", rates.size());
+        rateCache.clear();
     }
 
     @Override

@@ -89,8 +89,8 @@ class DashboardServiceIntegrationTest extends BaseRepositoryTest {
         when(customUserDetailsService.getUserById(user.getId())).thenReturn(user);
 
         // Создаём валюты
-        currencyRub = new Currency("CU1", "₽", "Russian Ruble");
-        currencyUsd = new Currency("CU2", "$", "US Dollar");
+        currencyRub = new Currency("RUB", "₽", "Russian Ruble");
+        currencyUsd = new Currency("USD", "$", "US Dollar");
         entityManager.persistAndFlush(currencyRub);
         entityManager.persistAndFlush(currencyUsd);
 

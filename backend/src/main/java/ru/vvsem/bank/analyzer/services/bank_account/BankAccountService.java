@@ -16,11 +16,12 @@ public interface BankAccountService {
     @Transactional
     BankAccountSimpleDto createAccount(NewBankAccountDto newBankAccountDto, SecurityUser securityUser);
 
-    @Transactional
+    @Transactional(readOnly = true)
     List<BankAccountSimpleDto> getUserAccountsWithCards(SecurityUser securityUser);
 
     @Transactional
     void deleteAccount(Long accountId, SecurityUser securityUser);
 
+    @Transactional
     void addAccountBalance(Long accountId, BigDecimal amount, SecurityUser securityUser);
 }

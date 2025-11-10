@@ -13,12 +13,15 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.vvsem.bank.analyzer.dto.currency.CurrencyAmountDto;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.models.ExchangeRate;
+import ru.vvsem.bank.analyzer.models.xml.ValCurs;
+import ru.vvsem.bank.analyzer.models.xml.Valute;
 import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
 import ru.vvsem.bank.analyzer.repositories.ExchangeRateRepository;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -301,5 +304,44 @@ class ExchangeRateServiceIntegrationTest extends BaseRepositoryTest {
         BigDecimal expected = amount.multiply(preciseRate.getValue()).divide(BigDecimal.valueOf(preciseRate.getNominal()), 2, RoundingMode.HALF_UP);
         assertThat(result).isEqualByComparingTo(expected);
         assertThat(result.scale()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("Должен очистить кэш после сохранения новых курсов")
+    void shouldClearCacheAfterProcessingNewRates() {
+        // Given: Используем сегодняшнюю дату + 1 и USD
+        LocalDate date = LocalDate.now().plusDays(1);
+        BigDecimal amount = BigDecimal.valueOf(100);
+        String currencyCode = "USD";
+
+        // Первый вызов — данные попадут в кэш
+        BigDecimal firstResult = exchangeRateService.convertToRub(amount, currencyCode, date);
+        assertThat(firstResult).isNotZero();
+
+        // Создаём новый ValCurs с новым курсом
+        ValCurs valCurs = new ValCurs();
+        valCurs.setDate(date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+
+        Valute valute = new Valute();
+        valute.setCharCode(currencyCode);
+        valute.setNominal(1);
+        valute.setValue(String.valueOf(new BigDecimal("99.99"))); // Новый курс
+        valute.setVunitRate(String.valueOf(new BigDecimal("99.99")));
+        valute.setName("US Dollar");
+
+        valCurs.setValutes(List.of(valute));
+
+        // When: Обрабатываем новые курсы — это должно очистить кэш
+        exchangeRateService.processExchangeRates(valCurs);
+
+        // Then: Повторный запрос должен использовать новый курс
+        BigDecimal secondResult = exchangeRateService.convertToRub(amount, currencyCode, date);
+        entityManager.flush();
+        // Должен быть равен новому значению (99.99 * 100 / 1 = 9999)
+        BigDecimal expectedNewResult = BigDecimal.valueOf(99.99)
+                .multiply(amount)
+                .setScale(2, RoundingMode.HALF_UP);
+        assertThat(secondResult).isEqualByComparingTo(expectedNewResult)
+                .isNotEqualByComparingTo(firstResult);
     }
 }

@@ -1,5 +1,6 @@
 package ru.vvsem.bank.analyzer.configs.integration;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -33,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 @ConfigurationProperties(prefix = "cbr.integration")
 public class CbrIntegrationConfig {
 
+    @Setter
     private String cbrUrl;
 
     @Bean

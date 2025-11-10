@@ -44,15 +44,9 @@ public class CardServiceImpl implements CardService {
         cardRepository.delete(card);
     }
 
-    @Override
-    public CardDto getCardById(Long cardId, SecurityUser securityUser) {
-        return cardMapper.toCardDto(
-                entityAccessProvider.requireOwnedCard(cardId, securityUser.getId()));
-    }
 
     @Override
     public List<CardDto> getCardList(SecurityUser securityUser) {
-
         return cardRepository.findByAccountUserId(securityUser.getId())
                 .stream()
                 .map(cardMapper::toCardDto)

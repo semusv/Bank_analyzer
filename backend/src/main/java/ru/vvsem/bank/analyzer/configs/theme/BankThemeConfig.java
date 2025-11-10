@@ -16,8 +16,6 @@ import java.util.Map;
 public class BankThemeConfig {
     private Map<String, BankTheme> themes = new HashMap<>();
 
-
-
     public BankTheme getThemeForBank(String bankCode) {
         return themes.getOrDefault(bankCode, getDefaultTheme());
     }

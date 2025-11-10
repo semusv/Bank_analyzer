@@ -35,6 +35,10 @@ public class EntityAccessProviderImpl implements EntityAccessProvider {
 
     @Override
     public Category requireOwnedCategory(Long categoryId, Long userId) {
+        if (categoryId == null || userId == null) {
+            throw new IllegalArgumentException(
+                    "Category id and user id must not be null");
+        }
         return categoryRepository.findByIdAndUserId(categoryId, userId)
                 .orElseThrow(() ->
                         entityNotFound(EntityName.CATEGORY, categoryId, userId));
@@ -42,6 +46,10 @@ public class EntityAccessProviderImpl implements EntityAccessProvider {
 
     @Override
     public Card requireOwnedCard(Long cardId, Long userId) {
+        if (cardId == null || userId == null) {
+            throw new IllegalArgumentException(
+                    "Card id and user id must not be null");
+        }
         return cardRepository.findByIdAndAccountUserId(cardId, userId)
                 .orElseThrow(() ->
                         entityNotFound(EntityName.CARD, cardId, userId));
@@ -49,6 +57,10 @@ public class EntityAccessProviderImpl implements EntityAccessProvider {
 
     @Override
     public Transaction requireOwnedTransaction(Long transactionId, Long userId) {
+        if (transactionId == null || userId == null) {
+            throw new IllegalArgumentException(
+                    "Transaction id and user id must not be null");
+        }
         return transactionRepository.findByIdAndUserId(transactionId, userId)
                 .orElseThrow(() ->
                         entityNotFound(EntityName.TRANSACTION, transactionId, userId));
@@ -56,6 +68,10 @@ public class EntityAccessProviderImpl implements EntityAccessProvider {
 
     @Override
     public Currency requireCurrency(Long currencyId) {
+        if (currencyId == null) {
+            throw new IllegalArgumentException(
+                    "Currency id must not be null");
+        }
         return currencyRepository.findById(currencyId)
                 .orElseThrow(() ->
                         entityNotFound(EntityName.CURRENCY, currencyId));
@@ -63,14 +79,21 @@ public class EntityAccessProviderImpl implements EntityAccessProvider {
 
     @Override
     public Currency requireCurrencyByCardId(Long cardId) {
+        if (cardId == null) {
+            throw new IllegalArgumentException(
+                    "Card id must not be null");
+        }
         return currencyRepository.getCurrencyByCardId(cardId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Currency for card with id %d not found".formatted(cardId),
-                        "exception.entity.not.found.currency"));
+                .orElseThrow(() ->
+                        entityNotFound(EntityName.CURRENCY, cardId));
     }
 
     @Override
     public Bank requireBank(Long bankId) {
+        if (bankId == null) {
+            throw new IllegalArgumentException(
+                    "Bank id must not be null");
+        }
         return bankRepository.findById(bankId)
                 .orElseThrow(() ->
                         entityNotFound(EntityName.BANK, bankId));
@@ -78,6 +101,10 @@ public class EntityAccessProviderImpl implements EntityAccessProvider {
 
     @Override
     public BankAccount requireOwnedBankAccount(Long bankAccountId, Long userId) {
+        if (bankAccountId == null || userId == null) {
+            throw new IllegalArgumentException(
+                    "Bank account id and user id must not be null");
+        }
         return bankAccountRepository.findByIdAndUserId(bankAccountId, userId)
                 .orElseThrow(() ->
                         entityNotFound(EntityName.CATEGORY, bankAccountId, userId));

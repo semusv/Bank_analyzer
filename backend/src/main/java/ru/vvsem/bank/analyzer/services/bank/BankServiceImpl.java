@@ -3,7 +3,6 @@ package ru.vvsem.bank.analyzer.services.bank;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.bank.BankDto;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.mappers.BankMapper;
@@ -20,7 +19,6 @@ public class BankServiceImpl implements BankService {
 
     private final BankMapper bankMapper;
 
-    @Transactional(readOnly = true)
     @Override
     public List<BankDto> getBanks() {
         log.info("Getting banks");
@@ -30,14 +28,4 @@ public class BankServiceImpl implements BankService {
                 .map(bankMapper::toBankDto).toList();
     }
 
-    @Override
-    public Bank getBankById(Long id) {
-        return bankRepository.findById(id)
-                .orElseThrow(
-                        () ->
-                                new EntityNotFoundException(
-                                        "Bank with id %d not found".formatted(id),
-                                        "exception.entity.not.found.bank")
-                );
-    }
 }

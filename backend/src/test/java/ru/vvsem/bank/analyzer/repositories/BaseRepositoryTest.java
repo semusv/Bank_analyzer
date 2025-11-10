@@ -16,7 +16,7 @@ public class BaseRepositoryTest {
                 .withDatabaseName("bank_analyzer_test")
                 .withUsername("test")
                 .withPassword("test")
-                .withNetworkMode("bank_analyzer-network")
+                .withNetworkMode("bank_bbb_bank_analyzer-network")
                 .withNetworkAliases("testcontainers-db")
                 .withReuse(true);
 

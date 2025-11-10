@@ -1,7 +1,7 @@
 cbr:
   integration:
     enabled: true
-    url: https://www.cbr.ru/scripts/XML_daily.asp
+    cbrUrl: https://www.cbr.ru/scripts/XML_daily.asp
     poll-interval: 3600000
 
 jwt:

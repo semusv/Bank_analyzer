@@ -15,6 +15,7 @@ public interface AnalyticsService {
             SeriesFilterDto filter,
             SecurityUser securityUser);
 
+    @Transactional(readOnly = true)
     List<CategoryBreakdownDto> getCategoryBreakdown(
             SeriesFilterDto filter,
             SecurityUser securityUser);
