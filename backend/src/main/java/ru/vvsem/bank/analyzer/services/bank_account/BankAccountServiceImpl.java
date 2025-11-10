@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.account.BankAccountDto;
 import ru.vvsem.bank.analyzer.dto.account.NewBankAccountDto;
-import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.mappers.BankAccountMapper;
 import ru.vvsem.bank.analyzer.models.BankAccount;
 import ru.vvsem.bank.analyzer.dto.account.BankAccountSimpleDto;

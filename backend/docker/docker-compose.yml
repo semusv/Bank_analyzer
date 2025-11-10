@@ -1,4 +1,30 @@
+name: bank_bbb
+
 services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      pg-db:
+        condition: service_healthy
+    networks:
+      - bank_analyzer-network
+    env_file: .env
+    command: >
+      sh -c "
+      echo 'Waiting for PostgreSQL to be ready...' &&
+      sleep 35 &&
+      ./app"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
   pg-db:
     image: postgres:16
     container_name: pg-db-bank
@@ -10,24 +36,23 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "admin", "-d", "bank_analyze"]
+      test: [ "CMD", "pg_isready", "-U", "admin", "-d", "bank_analyze" ]
       interval: 10s
       timeout: 5s
-      start_period: 10s
-      retries: 5
-    env_file: ../env/.env
+      start_period: 30s
+      retries: 10
+    env_file: .env
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
       PGDATA: /var/lib/postgresql/data
+
 
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pg-admin-bank
     restart: unless-stopped
     depends_on:
-      - pg-db
+      pg-db:
+        condition: service_healthy
     networks:
       - bank_analyzer-network
     ports:
@@ -36,23 +61,19 @@ services:
       - ./docker/pgadmin_data:/var/lib/pgadmin
       - ./docker/pgadmin_data/servers.json:/pgadmin4/servers.json
     healthcheck:
-      test: curl -f http://localhost:80/misc/ping
+      test: ["CMD", "curl", "-f", "http://localhost:80/misc/ping"]
       interval: 10s
       timeout: 5s
-      start_period: 10s
+      start_period: 20s
       retries: 5
-    env_file: ../env/.env
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    env_file: .env
 
 networks:
   bank_analyzer-network:
     driver: bridge
     attachable: true
-    external: true
+    external: false  # Лучше сделать false, если сеть создается здесь
 
 volumes:
   pgdata:
   pgadmin_data:
-

@@ -44,6 +44,9 @@ spring:
   liquibase:
     enabled: true
     contexts: dev
+    url: ${SPRING_LIQUIBASE_URL}
+    user: ${SPRING_LIQUIBASE_USERNAME}
+    password: ${SPRING_LIQUIBASE_PASSWORD}
 
   jpa:
     generate-ddl: false
@@ -62,7 +65,9 @@ app:
 logging:
   level:
     org.springframework.integration: DEBUG
-
+    liquibase: DEBUG
+    org.springframework.jdbc.datasource: DEBUG
+    org.springframework.liquibase: DEBUG
 
 colors:
   bank:
