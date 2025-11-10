@@ -49,7 +49,6 @@ public class BaseRepositoryTest {
         registry.add("spring.datasource.hikari.minimum-idle", () -> "1");
         registry.add("spring.datasource.hikari.maximum-pool-size", () -> "5");
 
-        // Важно: отключить проверку соединения при валидации, т.к. контейнер может "перезагрузиться"
         registry.add("spring.datasource.hikari.validation-timeout", () -> "3000");
         registry.add("spring.datasource.hikari.initialization-fail-timeout", () -> "3000");
     }

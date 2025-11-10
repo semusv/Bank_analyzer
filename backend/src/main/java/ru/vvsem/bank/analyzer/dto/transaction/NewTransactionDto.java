@@ -3,6 +3,7 @@ package ru.vvsem.bank.analyzer.dto.transaction;
 import jakarta.validation.constraints.NotBlank;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import ru.vvsem.bank.analyzer.models.Transaction;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
+@Builder
 public class NewTransactionDto {
     @NotNull
     @NotBlank(message = "{validation.Transaction.description.notBlank}")

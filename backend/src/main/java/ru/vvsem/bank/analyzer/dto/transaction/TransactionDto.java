@@ -7,6 +7,7 @@ import ru.vvsem.bank.analyzer.dto.category.CategoryDto;
 import ru.vvsem.bank.analyzer.dto.currency.CurrencyDto;
 import ru.vvsem.bank.analyzer.dto.bank.BankDto;
 import ru.vvsem.bank.analyzer.dto.card.CardDto;
+import ru.vvsem.bank.analyzer.models.enums.OperationType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -42,4 +43,6 @@ public class TransactionDto {
     private BankDto bank;
 
     private Long userId;
+
+    private OperationType operationType;
 }

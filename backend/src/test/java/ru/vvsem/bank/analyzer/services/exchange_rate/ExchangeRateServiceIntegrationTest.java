@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.servlet.RequestToViewNameTranslator;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.vvsem.bank.analyzer.dto.currency.CurrencyAmountDto;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
@@ -43,7 +44,7 @@ class ExchangeRateServiceIntegrationTest extends BaseRepositoryTest {
     private TestEntityManager entityManager;
 
     @MockitoBean
-    private org.springframework.web.servlet.RequestToViewNameTranslator requestToViewNameTranslator;
+    private RequestToViewNameTranslator requestToViewNameTranslator;
 
     private ExchangeRate usdRateToday;
     private ExchangeRate usdRateYesterday;

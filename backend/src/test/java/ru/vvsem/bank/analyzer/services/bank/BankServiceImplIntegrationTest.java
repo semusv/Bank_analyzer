@@ -12,6 +12,7 @@ import ru.vvsem.bank.analyzer.dto.bank.BankDto;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.models.Bank;
 import ru.vvsem.bank.analyzer.repositories.BankRepository;
+import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         BankServiceImpl.class,
         BankMapperImpl.class
 })
-class BankServiceImplIntegrationTest {
+class BankServiceImplIntegrationTest extends BaseRepositoryTest {
 
     @Autowired
     private BankService bankService;

@@ -1,6 +1,7 @@
 package ru.vvsem.bank.analyzer.dto.transaction;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 public class PatchTransactionData {
     @NotNull(message = "{validation.Transaction.amount.NotNull}")
     private BigDecimal amount;

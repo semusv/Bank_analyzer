@@ -15,6 +15,7 @@ import ru.vvsem.bank.analyzer.mappers.UserMapperImpl;
 import ru.vvsem.bank.analyzer.models.*;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
+import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
 import ru.vvsem.bank.analyzer.repositories.CardRepository;
 import java.util.List;
 
@@ -28,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         UserMapperImpl.class,
         EntityAccessProviderImpl.class
 })
-class CardServiceImplIntegrationTest {
+class CardServiceImplIntegrationTest  extends BaseRepositoryTest {
 
     @Autowired
     private CardService cardService;

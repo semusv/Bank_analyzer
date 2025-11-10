@@ -60,7 +60,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
         transactionDtoList
                 .forEach(transactionDto ->
                         bankAccountService.addAccountBalance(
-                                transactionDto.getCard().getId(),
+                                transactionDto.getCard().getAccountId(),
                                 transactionDto.getAmount(), securityUser));
         return transactionDtoList;
     }

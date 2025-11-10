@@ -39,7 +39,6 @@ import static org.mockito.Mockito.when;
         DashboardServiceImpl.class,
         TransactionMapperImpl.class,
         BankMapperImpl.class,
-        TransactionMapperImpl.class,
         BankAccountMapperImpl.class,
         CardMapperImpl.class
 })
