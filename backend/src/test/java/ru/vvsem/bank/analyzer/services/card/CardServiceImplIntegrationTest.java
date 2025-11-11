@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import ru.vvsem.bank.analyzer.dto.card.CardDto;
 import ru.vvsem.bank.analyzer.dto.card.NewCardDto;
+import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.UserMapperImpl;
 import ru.vvsem.bank.analyzer.models.*;
@@ -17,6 +18,9 @@ import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
 import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
 import ru.vvsem.bank.analyzer.repositories.CardRepository;
+import ru.vvsem.bank.analyzer.services.bank.BankService;
+import ru.vvsem.bank.analyzer.services.bank.BankServiceImpl;
+
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +31,9 @@ import static org.assertj.core.api.Assertions.assertThat;
         CardServiceImpl.class,
         CardMapperImpl.class,
         UserMapperImpl.class,
-        EntityAccessProviderImpl.class
+        EntityAccessProviderImpl.class,
+        BankServiceImpl.class,
+        BankMapperImpl.class
 })
 class CardServiceImplIntegrationTest  extends BaseRepositoryTest {
 
@@ -42,6 +48,9 @@ class CardServiceImplIntegrationTest  extends BaseRepositoryTest {
 
     @Autowired
     private EntityAccessProvider entityAccessProvider;
+
+    @Autowired
+    private BankService bankService;
 
     private SecurityUser securityUser;
     private User user;

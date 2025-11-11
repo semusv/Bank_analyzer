@@ -26,8 +26,10 @@ import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
 import ru.vvsem.bank.analyzer.repositories.UserRepository;
 import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
+import ru.vvsem.bank.analyzer.services.bank.BankService;
 import ru.vvsem.bank.analyzer.services.card.CardService;
 import ru.vvsem.bank.analyzer.services.category.CategoryService;
+import ru.vvsem.bank.analyzer.services.currency.CurrencyService;
 import ru.vvsem.bank.analyzer.services.exchange_rate.ExchangeRateService;
 import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 
@@ -79,6 +81,12 @@ class AnalyticsServiceIntegrationTest extends BaseRepositoryTest {
 
     @MockitoBean
     private EntityAccessProvider entityAccessProvider;
+
+    @MockitoBean
+    private CurrencyService currencyService;
+
+    @MockitoBean
+    private BankService bankService;
 
     private SecurityUser securityUser;
     private User user;
@@ -166,9 +174,9 @@ class AnalyticsServiceIntegrationTest extends BaseRepositoryTest {
 
         //
         when(customUserDetailsService.getUserById(user.getId())).thenReturn(user);
-        when(entityAccessProvider.requireBank(bank.getId())).thenReturn(bank);
-        when(entityAccessProvider.requireCurrency(currencyRub.getId())).thenReturn(currencyRub);
-        when(entityAccessProvider.requireCurrency(currencyUsd.getId())).thenReturn(currencyUsd);
+        when(bankService.findById(bank.getId())).thenReturn(bank);
+        when(currencyService.findById(currencyRub.getId())).thenReturn(currencyRub);
+        when(currencyService.findById(currencyUsd.getId())).thenReturn(currencyUsd);
         when(entityAccessProvider.requireOwnedCard(card1.getId(),user.getId())).thenReturn(card1);
         when(entityAccessProvider.requireOwnedCard(card2.getId(),user.getId())).thenReturn(card2);
 

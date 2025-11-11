@@ -1,11 +1,12 @@
 package ru.vvsem.bank.analyzer.providers;
 
-import ru.vvsem.bank.analyzer.models.Bank;
+import org.springframework.security.access.AccessDeniedException;
+import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.models.BankAccount;
 import ru.vvsem.bank.analyzer.models.Card;
 import ru.vvsem.bank.analyzer.models.Category;
-import ru.vvsem.bank.analyzer.models.Currency;
 import ru.vvsem.bank.analyzer.models.Transaction;
+import ru.vvsem.bank.analyzer.models.enums.EntityName;
 
 public interface EntityAccessProvider {
     Category requireOwnedCategory(Long categoryId, Long userId);
@@ -14,11 +15,11 @@ public interface EntityAccessProvider {
 
     Transaction requireOwnedTransaction(Long transactionId, Long userId);
 
-    Currency requireCurrency(Long currencyId);
-
-    Currency requireCurrencyByCardId(Long cardId);
-
-    Bank requireBank(Long bankId);
-
     BankAccount requireOwnedBankAccount(Long bankAccountId, Long userId);
+
+    AccessDeniedException entityAccessDenied(EntityName entityName, Long categoryId, Long userId);
+
+    EntityNotFoundException entityNotFound(EntityName entityName, Long id, Long userId);
+
+    EntityNotFoundException entityNotFound(EntityName entityName, Long id);
 }

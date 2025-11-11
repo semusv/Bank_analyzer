@@ -12,6 +12,7 @@ import ru.vvsem.bank.analyzer.models.Card;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
 import ru.vvsem.bank.analyzer.repositories.CardRepository;
+import ru.vvsem.bank.analyzer.services.bank.BankService;
 
 import java.util.List;
 
@@ -27,13 +28,15 @@ public class CardServiceImpl implements CardService {
 
     private final EntityAccessProvider entityAccessProvider;
 
+    private final BankService bankService;
+
     @Override
     @Transactional
     public CardDto createCard(NewCardDto newCardDto, SecurityUser securityUser) {
         var card = cardMapper.toEntity(newCardDto);
         card.setAccount(entityAccessProvider.requireOwnedBankAccount(
                 card.getAccount().getId(), securityUser.getId()));
-        card.setIssuerBank(entityAccessProvider.requireBank(card.getAccount().getBank().getId()));
+        card.setIssuerBank(bankService.findById(card.getAccount().getBank().getId()));
         var newCard = cardRepository.save(card);
         return cardMapper.toCardDto(newCard);
     }

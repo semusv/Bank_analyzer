@@ -12,6 +12,8 @@ import ru.vvsem.bank.analyzer.dto.account.BankAccountSimpleDto;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
 import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
+import ru.vvsem.bank.analyzer.services.bank.BankService;
+import ru.vvsem.bank.analyzer.services.currency.CurrencyService;
 import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 
 import java.math.BigDecimal;
@@ -30,6 +32,10 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     private final CustomUserDetailsService userService;
 
+    private final CurrencyService currencyService;
+
+    private final BankService bankService;
+
     @Transactional(readOnly = true)
     @Override
     public List<BankAccountDto> getUserBankAccount(Long userId) {
@@ -42,8 +48,8 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Override
     public BankAccountSimpleDto createAccount(NewBankAccountDto newBankAccountDto, SecurityUser securityUser) {
         var bankAccount = bankAccountMapper.toEntity(newBankAccountDto);
-        bankAccount.setBank(entityAccessProvider.requireBank(bankAccount.getBank().getId()));
-        bankAccount.setCurrency(entityAccessProvider.requireCurrency(bankAccount.getCurrency().getId()));
+        bankAccount.setBank(bankService.findById(bankAccount.getBank().getId()));
+        bankAccount.setCurrency(currencyService.findById(bankAccount.getCurrency().getId()));
         bankAccount.setUser(userService.getUserById(securityUser.getId()));
 
         return bankAccountMapper.toBankAccountSimpleDto(bankAccountRepository.save(bankAccount));

@@ -11,6 +11,7 @@ import org.springframework.test.context.TestPropertySource;
 import ru.vvsem.bank.analyzer.dto.bank.BankDto;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.models.Bank;
+import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
 import ru.vvsem.bank.analyzer.repositories.BankRepository;
 import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
 
@@ -22,7 +23,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource("classpath:application.yml")
 @Import({
         BankServiceImpl.class,
-        BankMapperImpl.class
+        BankMapperImpl.class,
+        EntityAccessProviderImpl.class
 })
 class BankServiceImplIntegrationTest extends BaseRepositoryTest {
 
@@ -34,6 +36,9 @@ class BankServiceImplIntegrationTest extends BaseRepositoryTest {
 
     @Autowired
     private TestEntityManager entityManager;
+
+    @Autowired
+    private EntityAccessProviderImpl entityAccessProvider;
 
     private Bank bank1;
     private Bank bank2;

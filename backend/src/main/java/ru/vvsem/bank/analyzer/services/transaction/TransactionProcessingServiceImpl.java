@@ -15,6 +15,7 @@ import ru.vvsem.bank.analyzer.models.enums.OperationType;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
 import ru.vvsem.bank.analyzer.services.bank_account.BankAccountService;
 import ru.vvsem.bank.analyzer.services.card.CardService;
+import ru.vvsem.bank.analyzer.services.currency.CurrencyService;
 import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 
 import java.math.BigDecimal;
@@ -38,6 +39,8 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
     private final TransactionService transactionService;
 
     private final CardService cardService;
+
+    private final CurrencyService currencyService;
 
     @Override
     public List<TransactionDto> createTransaction(NewTransactionDto dto, SecurityUser securityUser) {
@@ -77,7 +80,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
                 newTransactionDto.getCategoryId(),
                 user.getId()));
         transaction.setCard(entityAccessProviderImpl.requireOwnedCard(cardId, user.getId()));
-        transaction.setCurrency(entityAccessProviderImpl.requireCurrencyByCardId(transaction.getCard().getId()));
+        transaction.setCurrency(currencyService.requireCurrencyByCardId(transaction.getCard().getId()));
         transaction.setOperationType(newTransactionDto.getOperationType());
         if (transaction.getOperationType() == OperationType.OUTGOING) {
             transaction.setAmount(transaction.getAmount().negate());

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
@@ -234,7 +235,7 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
         Long anotherUserId = anotherUser.getId();
         // When & Then
         assertThrows(
-                EntityNotFoundException.class,
+                AccessDeniedException.class,
                 () -> transactionService.getUserTransaction(transaction1.getId(), anotherUserId)
         );
     }
@@ -367,7 +368,7 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
         Long anotherUserId = anotherUser.getId();
         // When & Then
         assertThrows(
-                EntityNotFoundException.class,
+                AccessDeniedException.class,
                 () -> transactionService.updateTransaction(transaction1, anotherUserId)
         );
     }

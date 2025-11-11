@@ -12,6 +12,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.vvsem.bank.analyzer.dto.currency.CurrencyDto;
 import ru.vvsem.bank.analyzer.mappers.CurrencyMapperImpl;
 import ru.vvsem.bank.analyzer.models.Currency;
+import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
+import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
 import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
 
 import java.util.List;
@@ -23,7 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource("classpath:application.yml")
 @Import({
         CurrencyServiceImpl.class,
-        CurrencyMapperImpl.class
+        CurrencyMapperImpl.class,
+        EntityAccessProviderImpl.class
 })
 class CurrencyServiceIntegrationTest extends BaseRepositoryTest {
 
@@ -32,6 +35,9 @@ class CurrencyServiceIntegrationTest extends BaseRepositoryTest {
 
     @Autowired
     private TestEntityManager entityManager;
+
+    @Autowired
+    private EntityAccessProvider entityAccessProvider;
 
     private Currency currencyRub;
     private Currency currencyUsd;
@@ -53,7 +59,7 @@ class CurrencyServiceIntegrationTest extends BaseRepositoryTest {
     @DisplayName("Должен вернуть все валюты")
     void shouldReturnAllCurrencies() {
         // When
-        List<CurrencyDto> result = currencyService.getAllCurrencies();
+        List<CurrencyDto> result = currencyService.getAllCurrencyDto();
 
         // Then
         assertThat(result).hasSize(3);
@@ -71,7 +77,7 @@ class CurrencyServiceIntegrationTest extends BaseRepositoryTest {
         entityManager.getEntityManager().createQuery("DELETE FROM Currency").executeUpdate();
 
         // When
-        List<CurrencyDto> result = currencyService.getAllCurrencies();
+        List<CurrencyDto> result = currencyService.getAllCurrencyDto();
 
         // Then
         assertThat(result).isEmpty();
@@ -81,7 +87,7 @@ class CurrencyServiceIntegrationTest extends BaseRepositoryTest {
     @DisplayName("Должен корректно маппить сущности в DTO")
     void shouldCorrectlyMapEntitiesToDto() {
         // When
-        List<CurrencyDto> result = currencyService.getAllCurrencies();
+        List<CurrencyDto> result = currencyService.getAllCurrencyDto();
 
         // Then
         CurrencyDto rubDto = result.stream()

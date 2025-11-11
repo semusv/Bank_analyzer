@@ -24,6 +24,8 @@ import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
 import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
 import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
 import ru.vvsem.bank.analyzer.repositories.UserRepository;
+import ru.vvsem.bank.analyzer.services.bank.BankService;
+import ru.vvsem.bank.analyzer.services.currency.CurrencyService;
 import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 import ru.vvsem.bank.analyzer.dto.account.NewBankAccountDto;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
@@ -64,6 +66,12 @@ class BankAccountServiceIntegrationTest extends BaseRepositoryTest {
     @Autowired
     private TestEntityManager entityManager;
 
+    @MockitoBean
+    private CurrencyService currencyService;
+
+    @MockitoBean
+    BankService bankService;
+
     private SecurityUser securityUser;
     private User user;
     private Bank bank;
@@ -95,8 +103,8 @@ class BankAccountServiceIntegrationTest extends BaseRepositoryTest {
                 user.getId(), user.getLogin(), user.getPassword(), user.getAuthorities(),
                 true, true, true, true);
         when(customUserDetailsService.getUserById(user.getId())).thenReturn(user);
-        when(entityAccessProvider.requireBank(bank.getId())).thenReturn(bank);
-        when(entityAccessProvider.requireCurrency(currency.getId())).thenReturn(currency);
+        when(bankService.findById(bank.getId())).thenReturn(bank);
+        when(currencyService.findById(currency.getId())).thenReturn(currency);
         when(entityAccessProvider.requireOwnedBankAccount(1L, user.getId())).thenAnswer(invocation -> {
             var account = bankAccountRepository.findById(1L).orElse(null);
             if (account == null || !account.getUser().getId().equals(user.getId())) {

@@ -15,6 +15,7 @@ import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.mappers.BankAccountMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
+import ru.vvsem.bank.analyzer.mappers.CurrencyMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.TransactionMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.UserMapperImpl;
 import ru.vvsem.bank.analyzer.models.*;
@@ -22,8 +23,11 @@ import ru.vvsem.bank.analyzer.models.enums.OperationType;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
 import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
+import ru.vvsem.bank.analyzer.services.bank.BankServiceImpl;
 import ru.vvsem.bank.analyzer.services.bank_account.BankAccountServiceImpl;
 import ru.vvsem.bank.analyzer.services.card.CardServiceImpl;
+import ru.vvsem.bank.analyzer.services.currency.CurrencyService;
+import ru.vvsem.bank.analyzer.services.currency.CurrencyServiceImpl;
 import ru.vvsem.bank.analyzer.services.exchange_rate.ExchangeRateService;
 import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 
@@ -48,7 +52,10 @@ import static org.mockito.Mockito.when;
         BankMapperImpl.class,
         BankAccountMapperImpl.class,
         CardMapperImpl.class,
-        UserMapperImpl.class
+        UserMapperImpl.class,
+        CurrencyServiceImpl.class,
+        BankServiceImpl.class,
+        CurrencyMapperImpl.class
 })
 class TransactionProcessingServiceImplIntegrationTest extends BaseRepositoryTest {
 
@@ -69,6 +76,9 @@ class TransactionProcessingServiceImplIntegrationTest extends BaseRepositoryTest
 
     @Autowired
     private DataSource dataSource;
+
+    @Autowired
+    private CurrencyService currencyService;
 
     private SecurityUser securityUser;
     private User user;

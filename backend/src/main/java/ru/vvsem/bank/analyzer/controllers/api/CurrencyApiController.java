@@ -24,6 +24,6 @@ public class CurrencyApiController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<CurrencyDto> getAll(Pageable pageable) {
-        return currencyService.getAllCurrencies();
+        return currencyService.getAllCurrencyDto();
     }
 }
