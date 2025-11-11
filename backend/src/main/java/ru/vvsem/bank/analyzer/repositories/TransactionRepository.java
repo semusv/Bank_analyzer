@@ -49,6 +49,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
 
     @Query("SELECT t " +
            "FROM Transaction t " +
-           "WHERE t.user.id = :userId ORDER BY t.operationTime DESC LIMIT :limit")
+           "WHERE t.user.id = :userId and t.hide = false  ORDER BY t.operationTime DESC LIMIT :limit")
     List<Transaction> findTopNByUserIdOrderByOperationTimeDesc(@Param("userId") Long userId, @Param("limit") int limit);
 }

@@ -43,6 +43,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
 
     private final CurrencyService currencyService;
 
+    @SuppressWarnings("CheckStyle")
     @Override
     public List<TransactionDto> createTransaction(NewTransactionDto dto, SecurityUser securityUser) {
         List<TransactionDto> transactionDtoList = new ArrayList<>();

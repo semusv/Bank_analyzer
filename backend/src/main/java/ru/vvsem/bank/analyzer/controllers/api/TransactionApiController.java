@@ -21,6 +21,7 @@ import ru.vvsem.bank.analyzer.dto.transaction.NewTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.PatchTransactionData;
 import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
+import ru.vvsem.bank.analyzer.dto.transaction.TransactionDtoWithSiblings;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionFilterDto;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.services.transaction.TransactionProcessingService;
@@ -42,14 +43,14 @@ public class TransactionApiController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public PageResponseDto<TransactionDto> getListTransactions(
+    public PageResponseDto<TransactionDtoWithSiblings> getListTransactions(
             @ModelAttribute TransactionFilterDto filter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal SecurityUser securityUser) {
 
 
-        Page<TransactionDto> result = transactionSearchService.searchTransactions(
+        Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(
                 securityUser,
                 filter,
                 page,

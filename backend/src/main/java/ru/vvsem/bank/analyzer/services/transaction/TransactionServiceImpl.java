@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
+import ru.vvsem.bank.analyzer.dto.transaction.TransactionDtoWithSiblings;
 import ru.vvsem.bank.analyzer.mappers.TransactionMapper;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.Transaction;
@@ -49,9 +50,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Page<TransactionDto> searchTransactions(Specification<Transaction> criteria, Pageable pageable) {
+    public Page<TransactionDtoWithSiblings> searchTransactions(Specification<Transaction> criteria, Pageable pageable) {
         Page<Transaction> transactions = transactionRepository.findAll(criteria, pageable);
-        return transactions.map(transactionMapper::toTransactionDto);
+        return transactions.map(transactionMapper::toTransactionDtoWithSiblings);
     }
 
     @Override

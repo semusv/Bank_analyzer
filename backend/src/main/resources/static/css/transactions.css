@@ -168,3 +168,25 @@
 .buttons-grid button:last-child:nth-child(odd) {
     grid-column: 1 / -1;
 }
+
+.sub-transaction {
+    border-left: 2px solid #3d6288;
+    transition: background-color 0.2s ease;
+}
+
+.main-transaction {
+    transition: background-color 0.2s ease;
+}
+
+.sub-transaction:hover {
+    background-color: #e9ecef;
+}
+
+.transaction-card {
+    transition: all 0.2s ease;
+    padding: 0.75rem 0;
+}
+
+.transaction-card:hover {
+    background-color: #f8f9fa;
+}

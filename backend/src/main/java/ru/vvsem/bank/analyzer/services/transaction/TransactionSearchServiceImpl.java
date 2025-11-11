@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
+import ru.vvsem.bank.analyzer.dto.transaction.TransactionDtoWithSiblings;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionFilterDto;
 import ru.vvsem.bank.analyzer.mappers.TransactionMapper;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
@@ -31,7 +31,7 @@ public class TransactionSearchServiceImpl implements TransactionSearchService {
     private final TransactionServiceImpl transactionService;
 
     @Override
-    public Page<TransactionDto> searchTransactions(
+    public Page<TransactionDtoWithSiblings> searchTransactions(
             SecurityUser securityUser,
             TransactionFilterDto filter,
             int page,
@@ -54,6 +54,7 @@ public class TransactionSearchServiceImpl implements TransactionSearchService {
             addCategoryIdPredicate(predicates, root, criteriaBuilder, filter);
             addBankIdPredicate(predicates, root, criteriaBuilder, filter);
             addDescriptionPredicate(predicates, root, criteriaBuilder, filter);
+            addParentTransactionPredicate(predicates, root, criteriaBuilder);
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
@@ -107,6 +108,11 @@ public class TransactionSearchServiceImpl implements TransactionSearchService {
                     "%" + filter.getDescription().toLowerCase() + "%"
             ));
         }
+    }
+
+    private void addParentTransactionPredicate(List<Predicate> predicates, Root<Transaction> root,
+                                               CriteriaBuilder cb) {
+        predicates.add(cb.isNull(root.get("parentTransaction")));
     }
 
 

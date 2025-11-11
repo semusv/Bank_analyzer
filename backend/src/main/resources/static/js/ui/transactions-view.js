@@ -126,71 +126,199 @@ async function renderTransactions(transactions) {
     }
 
     const fragment = document.createDocumentFragment();
-
     const tempContainer = document.createElement('div');
 
-    tempContainer.innerHTML = transactions.map(thx => {
-        const category = getCategoryById(thx.categoryId);
-        const card = getCardById(thx.cardId);
+    // Функция для рендеринга одной транзакции (рекурсивно)
+    function renderTransaction(transaction, level = 0) {
+        const isSubTransaction = level > 0;
+        const indentClass = isSubTransaction ? 'sub-transaction' : 'main-transaction';
+        const indentStyle = `margin-left: ${level * 20}px;`;
+
+        const category = getCategoryById(transaction.categoryId);
+        const card = getCardById(transaction.cardId);
 
         return `
-                <div class="transaction-card row align-items-center border-bottom ${thx.hide ? 'opacity-50' : ''}"
-                                data-transaction-id="${thx.id}"
-                                data-bank-theme="${thx.bankCode}"
-                                onclick="viewTransactionDetails(${thx.id})">
-                    <div class="col-7 col-md-6 col-lg-6 mb-1">
-                        <div class="transaction-info">
-                            <h6 class="mb-1">
-                                    ${thx.description}
-                                ${thx.hide ? '<span class="badge bg-secondary ms-2">Скрыто</span>' : ''}
-                            </h6>
-                            ${category ? `
-                                <div class="category-badge d-inline-block">
-                                    <span class="badge" style="background-color: ${category.color || '#6c757d'}; color: ${category.textColor || '#000000ff'};">
-                                        ${category.name}
-                                    </span>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-
-                    <div class="col-5 col-md-6 col-lg-2 text-end">
-                        <div class="amount ${thx.amount >= 0 ? 'text-success' : 'text-danger'}">
-                            <strong>
-                            ${formatCurrency(thx.amount, thx.currencyCode)}
-                            </strong>
-                        </div>
-                        <small class="text-muted">
-                            ${formatDateTime(thx.operationTime)}
-                        </small>
-                    </div>
-
-                    <div class="col-12 col-md-9 col-lg-3"  >
-                        <div class="card-info mb-2 card-header" data-bank-theme="${thx.bankCode}">
-                            <i class="fas fa-credit-card"></i>
-                            <span>**** ${card.lastFourDigits}</span>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-md-3 col-lg-1 ">
-                        <div class="d-flex gap-2 flex-wrap flex-row-reverse">
-                            <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteTransactionById(${thx.id})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
+            <div class="transaction-card row align-items-center border-bottom ${transaction.hide ? 'opacity-50' : ''} ${indentClass}"
+                data-transaction-id="${transaction.id}"
+                data-bank-theme="${transaction.bankCode}"
+                onclick="viewTransactionDetails(${transaction.id})"
+                style="${indentStyle}">
+                <div class="col-7 col-md-6 col-lg-6 mb-1">
+                    <div class="transaction-info">
+                        <h6 class="mb-1">
+                            ${transaction.description}
+                            ${transaction.hide ? '<span class="badge bg-secondary ms-2">Скрыто</span>' : ''}
+                            ${isSubTransaction ? '<span class="badge bg-light text-dark ms-2">Подтранзакция</span>' : ''}
+                        </h6>
+                        ${category ? `
+                            <div class="category-badge d-inline-block">
+                                <span class="badge" style="background-color: ${category.color || '#6c757d'}; color: ${category.textColor || '#000000ff'};">
+                                    ${category.name}
+                                </span>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
+
+                <div class="col-5 col-md-6 col-lg-2 text-end">
+                    <div class="amount ${transaction.amount >= 0 ? 'text-success' : 'text-danger'}">
+                        <strong>
+                        ${formatCurrency(transaction.amount, transaction.currencyCode)}
+                        </strong>
+                    </div>
+                    <small class="text-muted">
+                        ${formatDateTime(transaction.operationTime)}
+                    </small>
+                </div>
+
+                <div class="col-12 col-md-9 col-lg-3">
+                    <div class="card-info mb-2 card-header" data-bank-theme="${transaction.bankCode}">
+                        <i class="fas fa-credit-card"></i>
+                        <span>**** ${card.lastFourDigits}</span>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-3 col-lg-1">
+                    <div class="d-flex gap-2 flex-wrap flex-row-reverse">
+                        <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteTransactionById(${transaction.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Рендерим подтранзакции рекурсивно -->
+            ${transaction.subTransactions && transaction.subTransactions.length > 0 ?
+                transaction.subTransactions.map(subTx => renderTransaction(subTx, level + 1)).join('') : ''}
         `;
-    }).join('');
+    }
+
+    // Рендерим все транзакции (включая подтранзакции)
+    tempContainer.innerHTML = transactions.map(tx => renderTransaction(tx)).join('');
 
     while (tempContainer.firstChild) {
         fragment.appendChild(tempContainer.firstChild);
     }
+
     await applyBankThemesToTransactions(transactions, fragment);
 
     container.innerHTML = '';
     container.appendChild(fragment);
 }
+
+async function applyBankThemesToTransactions(transactions, containerElement) {
+    if (!transactions || transactions.length === 0) return;
+
+    // Функция для рекурсивного сбора всех транзакций (включая подтранзакции)
+    function collectAllTransactions(txns) {
+        const allTransactions = [];
+        
+        function collectRecursive(transaction) {
+            allTransactions.push(transaction);
+            // Рекурсивно добавляем подтранзакции
+            if (transaction.subTransactions && transaction.subTransactions.length > 0) {
+                transaction.subTransactions.forEach(subTx => collectRecursive(subTx));
+            }
+        }
+        
+        txns.forEach(tx => collectRecursive(tx));
+        return allTransactions;
+    }
+
+    // Собираем все транзакции (основные и подтранзакции)
+    const allTransactions = collectAllTransactions(transactions);
+
+    const themePromises = allTransactions.map(async (txn) => {
+        const { bankCode, id } = txn;
+        const cardElement = containerElement.querySelector(
+            `.transaction-card[data-transaction-id="${id}"] .card-info`
+        );
+        if (cardElement) {
+            await setBankColorsForElem(bankCode, cardElement);
+        }
+    });
+
+    try {
+        await Promise.all(themePromises);
+    } catch (error) {
+        console.error('Failed to apply bank themes:', error);
+    }
+}
+
+// async function renderTransactions(transactions) {
+//     const container = document.getElementById('transactionsContainer');
+
+//     if (!transactions || transactions.length === 0) {
+//         renderEmptyState();
+//         return;
+//     }
+
+//     const fragment = document.createDocumentFragment();
+
+//     const tempContainer = document.createElement('div');
+
+//     tempContainer.innerHTML = transactions.map(thx => {
+//         const category = getCategoryById(thx.categoryId);
+//         const card = getCardById(thx.cardId);
+
+//         return `
+//                 <div class="transaction-card row align-items-center border-bottom ${thx.hide ? 'opacity-50' : ''}"
+//                                 data-transaction-id="${thx.id}"
+//                                 data-bank-theme="${thx.bankCode}"
+//                                 onclick="viewTransactionDetails(${thx.id})">
+//                     <div class="col-7 col-md-6 col-lg-6 mb-1">
+//                         <div class="transaction-info">
+//                             <h6 class="mb-1">
+//                                     ${thx.description}
+//                                 ${thx.hide ? '<span class="badge bg-secondary ms-2">Скрыто</span>' : ''}
+//                             </h6>
+//                             ${category ? `
+//                                 <div class="category-badge d-inline-block">
+//                                     <span class="badge" style="background-color: ${category.color || '#6c757d'}; color: ${category.textColor || '#000000ff'};">
+//                                         ${category.name}
+//                                     </span>
+//                                 </div>
+//                             ` : ''}
+//                         </div>
+//                     </div>
+
+//                     <div class="col-5 col-md-6 col-lg-2 text-end">
+//                         <div class="amount ${thx.amount >= 0 ? 'text-success' : 'text-danger'}">
+//                             <strong>
+//                             ${formatCurrency(thx.amount, thx.currencyCode)}
+//                             </strong>
+//                         </div>
+//                         <small class="text-muted">
+//                             ${formatDateTime(thx.operationTime)}
+//                         </small>
+//                     </div>
+
+//                     <div class="col-12 col-md-9 col-lg-3"  >
+//                         <div class="card-info mb-2 card-header" data-bank-theme="${thx.bankCode}">
+//                             <i class="fas fa-credit-card"></i>
+//                             <span>**** ${card.lastFourDigits}</span>
+//                         </div>
+//                     </div>
+
+//                     <div class="col-12 col-md-3 col-lg-1 ">
+//                         <div class="d-flex gap-2 flex-wrap flex-row-reverse">
+//                             <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteTransactionById(${thx.id})">
+//                                 <i class="fas fa-trash"></i>
+//                             </button>
+//                         </div>
+//                     </div>
+//                 </div>
+//         `;
+//     }).join('');
+
+//     while (tempContainer.firstChild) {
+//         fragment.appendChild(tempContainer.firstChild);
+//     }
+//     await applyBankThemesToTransactions(transactions, fragment);
+
+//     container.innerHTML = '';
+//     container.appendChild(fragment);
+// }
 
 function getCategoryById(categoryId) {
     if (categoryId) {
@@ -208,25 +336,7 @@ function getCardById(cardId) {
     }
 }
 
-async function applyBankThemesToTransactions(transactions, containerElement) {
-    if (!transactions || transactions.length === 0) return;
 
-    const themePromises = transactions.map(async (txn) => {
-        const { bankCode, id } = txn;
-        const cardElement = containerElement.querySelector(
-            `.transaction-card[data-transaction-id="${id}"] .card-info`
-        );
-        if (cardElement) {
-            await setBankColorsForElem(bankCode, cardElement);
-        }
-    });
-
-    try {
-        await Promise.all(themePromises);
-    } catch (error) {
-        console.error('Failed to apply bank themes:', error);
-    }
-}
 
 function renderEmptyState() {
     const container = document.getElementById('transactionsContainer');

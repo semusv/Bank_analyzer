@@ -8,14 +8,15 @@ import ru.vvsem.bank.analyzer.models.enums.OperationType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DTO for {@link ru.vvsem.bank.analyzer.models.Transaction}
  */
 @Getter
 @Setter
-public class TransactionDto {
+public class TransactionDtoWithSiblings {
     private Long id;
 
     @NotNull
@@ -57,4 +58,6 @@ public class TransactionDto {
     private String currencyCode;
 
     private Long parentTransactionId;
+
+    private List<TransactionDtoWithSiblings> subTransactions = new ArrayList<>();
 }

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
+import ru.vvsem.bank.analyzer.dto.transaction.TransactionDtoWithSiblings;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.Transaction;
 
@@ -23,7 +24,7 @@ public interface TransactionService {
     void deleteTransaction(Long transactionId, SecurityUser securityUser);
 
     @Transactional
-    Page<TransactionDto> searchTransactions(Specification<Transaction> criteria, Pageable pageable);
+    Page<TransactionDtoWithSiblings> searchTransactions(Specification<Transaction> criteria, Pageable pageable);
 
     @Transactional
     TransactionDto hideTransaction(Long transactionId, Long userId);
