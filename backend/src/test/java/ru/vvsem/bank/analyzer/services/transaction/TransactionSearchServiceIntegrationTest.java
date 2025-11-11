@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
+import ru.vvsem.bank.analyzer.dto.transaction.TransactionDtoWithSiblings;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionFilterDto;
 import ru.vvsem.bank.analyzer.mappers.BankAccountMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
@@ -241,7 +241,7 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
         TransactionFilterDto filter = TransactionFilterDto.builder().build();
 
         // When
-        Page<TransactionDto> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
+        Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
         assertThat(result.getContent()).hasSize(4);
@@ -258,12 +258,12 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
                 .build();
 
         // When
-        Page<TransactionDto> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
+        Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent())
-                .extracting(TransactionDto::getDescription)
+                .extracting(TransactionDtoWithSiblings::getDescription)
                 .containsExactlyInAnyOrder("Grocery shopping at supermarket", "Restaurant dinner");
     }
 
@@ -276,12 +276,12 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
                 .build();
 
         // When
-        Page<TransactionDto> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
+        Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent())
-                .extracting(TransactionDto::getDescription)
+                .extracting(TransactionDtoWithSiblings::getDescription)
                 .containsExactlyInAnyOrder("Grocery shopping at supermarket", "Monthly salary");
     }
 
@@ -294,12 +294,12 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
                 .build();
 
         // When
-        Page<TransactionDto> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
+        Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent())
-                .extracting(TransactionDto::getDescription)
+                .extracting(TransactionDtoWithSiblings::getDescription)
                 .containsExactlyInAnyOrder("Restaurant dinner", "Online shopping");
     }
 
@@ -312,12 +312,12 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
                 .build();
 
         // When
-        Page<TransactionDto> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
+        Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent())
-                .extracting(TransactionDto::getDescription)
+                .extracting(TransactionDtoWithSiblings::getDescription)
                 .containsExactlyInAnyOrder("Grocery shopping at supermarket", "Online shopping");
     }
 
@@ -334,12 +334,12 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
                 .build();
 
         // When
-        Page<TransactionDto> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
+        Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent())
-                .extracting(TransactionDto::getDescription)
+                .extracting(TransactionDtoWithSiblings::getDescription)
                 .containsExactlyInAnyOrder("Monthly salary", "Restaurant dinner");
     }
 
@@ -353,7 +353,7 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
                 .build();
 
         // When
-        Page<TransactionDto> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
+        Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
         assertThat(result.getContent()).hasSize(1);
@@ -367,7 +367,7 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
         TransactionFilterDto filter = TransactionFilterDto.builder().build();
 
         // When - первая страница с 2 элементами
-        Page<TransactionDto> page1 = transactionSearchService.searchTransactions(securityUser, filter, 0, 2);
+        Page<TransactionDtoWithSiblings> page1 = transactionSearchService.searchTransactions(securityUser, filter, 0, 2);
 
         // Then
         assertThat(page1.getContent()).hasSize(2);
@@ -377,7 +377,7 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
         assertThat(page1.getSize()).isEqualTo(2);
 
         // When - вторая страница с 2 элементами
-        Page<TransactionDto> page2 = transactionSearchService.searchTransactions(securityUser, filter, 1, 2);
+        Page<TransactionDtoWithSiblings> page2 = transactionSearchService.searchTransactions(securityUser, filter, 1, 2);
 
         // Then
         assertThat(page2.getContent()).hasSize(2);
@@ -393,7 +393,7 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
                 .build();
 
         // When
-        Page<TransactionDto> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
+        Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
         assertThat(result.getContent()).isEmpty();
@@ -409,7 +409,7 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
                 .build();
 
         // When
-        Page<TransactionDto> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
+        Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
         assertThat(result.getContent()).hasSize(4);
@@ -429,7 +429,7 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
                 .build();
 
         // When
-        Page<TransactionDto> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
+        Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
         assertThat(result.getContent()).hasSize(4);
@@ -442,10 +442,10 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
         TransactionFilterDto filter = TransactionFilterDto.builder().build();
 
         // When
-        Page<TransactionDto> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
+        Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
-        List<TransactionDto> content = result.getContent();
+        List<TransactionDtoWithSiblings> content = result.getContent();
         assertThat(content).isSortedAccordingTo((t1, t2) ->
                 t2.getOperationTime().compareTo(t1.getOperationTime())
         );
@@ -460,7 +460,7 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
                 .build();
 
         // When
-        Page<TransactionDto> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
+        Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
         assertThat(result.getContent()).hasSize(1);

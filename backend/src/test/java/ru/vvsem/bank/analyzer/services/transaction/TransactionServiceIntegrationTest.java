@@ -15,6 +15,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
+import ru.vvsem.bank.analyzer.dto.transaction.TransactionDtoWithSiblings;
 import ru.vvsem.bank.analyzer.mappers.BankAccountMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
@@ -332,7 +333,7 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
         Pageable pageable = PageRequest.of(0, 1);
 
         // When
-        Page<TransactionDto> result = transactionService.searchTransactions(spec, pageable);
+        Page<TransactionDtoWithSiblings> result = transactionService.searchTransactions(spec, pageable);
 
         // Then
         assertThat(result).isNotNull();
@@ -354,7 +355,7 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // When
-        Page<TransactionDto> result = transactionService.searchTransactions(spec, pageable);
+        Page<TransactionDtoWithSiblings> result = transactionService.searchTransactions(spec, pageable);
 
         // Then
         assertThat(result).isNotNull();
