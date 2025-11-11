@@ -360,7 +360,7 @@ class TransactionProcessingServiceImplIntegrationTest extends BaseRepositoryTest
         assertThat(parent.isMaster()).isTrue();
 
         // Проверяем создание подтранзакций
-        List<Transaction> subTransactionsList = transactionRepository.findByParentTransactionId(parent);
+        List<Transaction> subTransactionsList = transactionRepository.findByParentTransactionId(parent.getId());
         assertThat(subTransactionsList).hasSize(3);
 
         assertThat(subTransactionsList)
@@ -508,7 +508,7 @@ class TransactionProcessingServiceImplIntegrationTest extends BaseRepositoryTest
         // Then
         // Проверяем, что созданы только подтранзакции с ненулевой суммой
         Transaction parent = entityManager.find(Transaction.class, existingTransaction.getId());
-        List<Transaction> subTransactionsList = transactionRepository.findByParentTransactionId(parent);
+        List<Transaction> subTransactionsList = transactionRepository.findByParentTransactionId(parent.getId());
 
         assertThat(subTransactionsList).hasSize(2); // Только 2 подтранзакции (нулевая игнорируется)
         assertThat(subTransactionsList)
