@@ -30,7 +30,6 @@ public class TransactionSearchServiceImpl implements TransactionSearchService {
 
     private final TransactionServiceImpl transactionService;
 
-    @SuppressWarnings("checkstyle:ParameterNumber")
     @Override
     public Page<TransactionDto> searchTransactions(
             SecurityUser securityUser,

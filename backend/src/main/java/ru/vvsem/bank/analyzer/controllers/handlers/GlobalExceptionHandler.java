@@ -1,5 +1,7 @@
 package ru.vvsem.bank.analyzer.controllers.handlers;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -7,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -17,7 +20,9 @@ import ru.vvsem.bank.analyzer.exceptions.BusinessException;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.providers.ErrorHandlingProvider;
 
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 
 @RestControllerAdvice
@@ -159,9 +164,44 @@ public class GlobalExceptionHandler {
         return errorHandlingProvider.handleError(
                 ex,
                 request,
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.CONFLICT,
                 ex.getMessageCode(),
                 ex.getMessageArgs());
 
     }
+
+    @ExceptionHandler(TransactionSystemException.class)
+    public ResponseEntity<Object> handleTransactionSystemException(
+            TransactionSystemException ex,
+            WebRequest request) {
+
+        Throwable cause = ex.getRootCause();
+        if (cause instanceof ConstraintViolationException constraintEx) {
+            return handleConstraintViolation(constraintEx, request);
+        }
+
+        return errorHandlingProvider.handleError(
+                ex,
+                request,
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "error.transaction.failed",
+                ex.getMostSpecificCause().getMessage());
+    }
+
+    private ResponseEntity<Object> handleConstraintViolation(
+            ConstraintViolationException ex,
+            WebRequest request) {
+
+        String firstError = ex.getConstraintViolations().stream()
+                .findFirst()
+                .map(ConstraintViolation::getMessage)
+                .orElse("Validation failed");
+
+        return errorHandlingProvider.handleError(
+                ex,
+                request,
+                HttpStatus.BAD_REQUEST,
+                firstError);
+    }
+
 }

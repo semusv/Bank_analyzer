@@ -28,7 +28,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final CustomUserDetailsService userService;
 
     @Override
-    public List<TransactionDto> getUserTransactions(Long userId) {
+    public List<TransactionDto> getUserTransactionDtoList(Long userId) {
         return transactionRepository.findByUserId(userId)
                 .stream()
                 .map(transactionMapper::toTransactionDto)
@@ -36,7 +36,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public TransactionDto getUserTransaction(Long transactionId, Long userId) {
+    public TransactionDto getTransactionDtoByIdAndUserId(Long transactionId, Long userId) {
         return transactionMapper.toTransactionDto(
                 entityAccessProviderImpl.getOwnedTransaction(transactionId, userId));
     }
@@ -70,5 +70,13 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionDto createTransaction(Transaction transaction) {
         return transactionMapper.toTransactionDto(transactionRepository.save(transaction));
+    }
+
+    @Override
+    public List<TransactionDto> getByParentTransactionId(Long parentTransactionId) {
+        return transactionRepository.findByParentTransactionId(parentTransactionId)
+                .stream()
+                .map(transactionMapper::toTransactionDto)
+                .toList();
     }
 }

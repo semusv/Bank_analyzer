@@ -7,7 +7,7 @@ import ru.vvsem.bank.analyzer.dto.transaction.TransactionFilterDto;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 
 public interface TransactionSearchService {
-    @SuppressWarnings("checkstyle:ParameterNumber")
+
     @Transactional(readOnly = true)
     Page<TransactionDto> searchTransactions(
             SecurityUser securityUser,

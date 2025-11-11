@@ -14,25 +14,26 @@ import java.util.List;
 public interface TransactionService {
 
     @Transactional(readOnly = true)
-    List<TransactionDto> getUserTransactions(Long userId);
+    List<TransactionDto> getUserTransactionDtoList(Long userId);
 
     @Transactional(readOnly = true)
-    TransactionDto getUserTransaction(Long transactionId, Long userId);
+    TransactionDto getTransactionDtoByIdAndUserId(Long transactionId, Long userId);
 
     @Transactional
     void deleteTransaction(Long transactionId, SecurityUser securityUser);
 
     @Transactional
-    public Page<TransactionDto> searchTransactions(Specification<Transaction> criteria, Pageable pageable);
+    Page<TransactionDto> searchTransactions(Specification<Transaction> criteria, Pageable pageable);
 
     @Transactional
-    public TransactionDto hideTransaction(Long transactionId, Long userId);
+    TransactionDto hideTransaction(Long transactionId, Long userId);
 
     @Transactional
-    public TransactionDto updateTransaction(Transaction transaction, Long userId);
+    TransactionDto updateTransaction(Transaction transaction, Long userId);
 
     @Transactional
-    public TransactionDto createTransaction(Transaction transaction);
+    TransactionDto createTransaction(Transaction transaction);
 
-
+    @Transactional(readOnly = true)
+    List<TransactionDto> getByParentTransactionId(Long parentTransactionId);
 }

@@ -39,6 +39,13 @@ public class ErrorHandlingProviderImpl implements ErrorHandlingProvider {
         return buildApiErrorResponse(ex, errorText, status, getRequestPath(request));
     }
 
+    @Override
+    public ResponseEntity<Object> handleError(
+            Exception ex, WebRequest request, HttpStatus status, String message) {
+        logErrorDetails(ex, request, message);
+        return buildApiErrorResponse(ex, message, status, getRequestPath(request));
+    }
+
     private String getLocalizedErrorMessage(String messageCode, Object... args) {
         return messageSource.getMessage(
                 messageCode,

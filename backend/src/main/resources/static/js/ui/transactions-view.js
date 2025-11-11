@@ -475,13 +475,17 @@ globalThis.toggleHideTransactionById = async function (transactionId, hide) {
     try {
         await toggleHideTransaction(transactionId, hide);
         showSuccessMessage(hide ? 'Транзакция скрыта из статистики' : 'Транзакция показана в статистике');
+        await loadTransactions();
 
-        // Refresh the modal with updated data
-        const transaction = await fetchTransactionById(transactionId);
-        populateTransactionDetailsModal(transaction);
+        if (typeof bootstrap !== 'undefined') {
+            const modalElement = document.getElementById('transactionDetailsModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            }
+        }
 
-        // Reload the transactions list to reflect the change
-        await loadTransactions(currentPage);
+
     } catch (error) {
         console.error('Failed to toggle hide transaction:', error);
         showApiErrors(error);

@@ -40,7 +40,6 @@ public class TransactionApiController {
 
     private final TransactionProcessingService transactionProcessingService;
 
-    @SuppressWarnings("checkstyle:ParameterNumber")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PageResponseDto<TransactionDto> getListTransactions(
@@ -64,7 +63,7 @@ public class TransactionApiController {
     public TransactionDto getTransaction(
             @PathVariable("id") Long transactionId,
             @AuthenticationPrincipal SecurityUser securityUser) {
-        return transactionService.getUserTransaction(transactionId, securityUser.getId());
+        return transactionService.getTransactionDtoByIdAndUserId(transactionId, securityUser.getId());
     }
 
     @RequestMapping("/{id}/hide")

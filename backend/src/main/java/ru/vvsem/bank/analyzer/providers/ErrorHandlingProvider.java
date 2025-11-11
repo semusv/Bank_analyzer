@@ -13,4 +13,9 @@ public interface ErrorHandlingProvider {
             String messageCode,
             Object... args);
 
+    ResponseEntity<Object> handleError(
+            Exception ex,
+            WebRequest request,
+            HttpStatus status,
+            String message);
 }

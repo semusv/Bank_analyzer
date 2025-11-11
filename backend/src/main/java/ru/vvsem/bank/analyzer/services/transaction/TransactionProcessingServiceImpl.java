@@ -94,17 +94,29 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
         return transaction;
     }
 
+    @SuppressWarnings("CheckStyle")
     @Override
     public void splitTransaction(
             Long transactionId, List<SubTransactionDto> subTransactions, SecurityUser securityUser) {
         Transaction parentTransaction = entityAccessProviderImpl
                 .getOwnedTransaction(transactionId, securityUser.getId());
-
         BigDecimal totalSubAmount = subTransactions.stream()
                 .map(SubTransactionDto::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .setScale(2, RoundingMode.HALF_UP);
 
+        if (!transactionService.getByParentTransactionId(parentTransaction.getId()).isEmpty()) {
+            throw new BusinessException(
+                    "Can't split already splitted transaction",
+                    "business.transaction.already.splitted"
+            );
+        }
+        if (parentTransaction.getParentTransaction() != null) {
+            throw new BusinessException(
+                    "Can't split sub transaction",
+                    "business.transaction.cant.split.sub"
+            );
+        }
         if (!totalSubAmount.equals(parentTransaction.getAmount())) {
             throw new IllegalArgumentException("Сумма дочерних транзакций не равна сумме родительской");
         }
@@ -123,7 +135,14 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
 
     @Override
     public TransactionDto hideTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser) {
-        entityAccessProviderImpl.getOwnedTransaction(transactionId, securityUser.getId());
+        Transaction transaction = entityAccessProviderImpl.getOwnedTransaction(transactionId, securityUser.getId());
+
+        if (!transactionService.getByParentTransactionId(transaction.getId()).isEmpty()) {
+            throw new BusinessException(
+                    "Can't unHide already splitted transaction",
+                    "business.transaction.unHide.already.splitted"
+            );
+        }
 
         var transactionDto = transactionService.hideTransaction(transactionId, securityUser.getId());
         var card = entityAccessProviderImpl.getOwnedCard(transactionDto.getCardAccountId(), securityUser.getId());
@@ -138,6 +157,13 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
     public void deleteTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser) {
         var transaction = entityAccessProviderImpl.getOwnedTransaction(transactionId, securityUser.getId());
         var card = entityAccessProviderImpl.getOwnedCard(transaction.getCard().getId(), securityUser.getId());
+
+        if (!transactionService.getByParentTransactionId(transaction.getId()).isEmpty()) {
+            throw new BusinessException(
+                    "Can't delete already splitted transaction",
+                    "business.transaction.delete.already.splitted"
+            );
+        }
         transactionService.deleteTransaction(transactionId, securityUser);
         bankAccountService.addAccountBalance(card.getAccount().getId(), transaction.getAmount().negate(), securityUser);
     }

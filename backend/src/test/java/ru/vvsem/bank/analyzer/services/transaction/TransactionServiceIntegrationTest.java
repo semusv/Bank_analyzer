@@ -187,7 +187,7 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
     @DisplayName("Должен вернуть все транзакции пользователя")
     void shouldReturnAllUserTransactions() {
         // When
-        List<TransactionDto> result = transactionService.getUserTransactions(user.getId());
+        List<TransactionDto> result = transactionService.getUserTransactionDtoList(user.getId());
 
         // Then
         assertThat(result).hasSize(2);
@@ -209,7 +209,7 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
         newUser = entityManager.persistAndFlush(newUser);
 
         // When
-        List<TransactionDto> result = transactionService.getUserTransactions(newUser.getId());
+        List<TransactionDto> result = transactionService.getUserTransactionDtoList(newUser.getId());
 
         // Then
         assertThat(result).isEmpty();
@@ -219,7 +219,7 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
     @DisplayName("Должен вернуть конкретную транзакцию пользователя")
     void shouldReturnSpecificUserTransaction() {
         // When
-        TransactionDto result = transactionService.getUserTransaction(transaction1.getId(), user.getId());
+        TransactionDto result = transactionService.getTransactionDtoByIdAndUserId(transaction1.getId(), user.getId());
 
         // Then
         assertThat(result).isNotNull();
@@ -236,7 +236,7 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
         // When & Then
         assertThrows(
                 AccessDeniedException.class,
-                () -> transactionService.getUserTransaction(transactionId, anotherUserId)
+                () -> transactionService.getTransactionDtoByIdAndUserId(transactionId, anotherUserId)
         );
     }
 
@@ -377,7 +377,7 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
     @DisplayName("Должен корректно обрабатывать транзакцию без категории")
     void shouldHandleTransactionWithoutCategory() {
         // When
-        TransactionDto result = transactionService.getUserTransaction(transaction2.getId(), user.getId());
+        TransactionDto result = transactionService.getTransactionDtoByIdAndUserId(transaction2.getId(), user.getId());
 
         // Then
         assertThat(result).isNotNull();
