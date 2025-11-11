@@ -22,7 +22,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.vvsem.bank.analyzer.dto.validator.ValidationErrorResponse;
-import ru.vvsem.bank.analyzer.services.handlers.ErrorHandlingService;
+import ru.vvsem.bank.analyzer.providers.ErrorHandlingProvider;
 
 
 @Slf4j
@@ -33,7 +33,7 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     private final ValidationExceptionHandler validationExceptionHandler;
 
-    private final ErrorHandlingService errorHandlingService;
+    private final ErrorHandlingProvider errorHandlingProvider;
 
     // 400 - Invalid JSON format
     @Override
@@ -43,7 +43,7 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
             @Nullable HttpStatusCode status,
             @Nullable WebRequest request) {
 
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.BAD_REQUEST,
@@ -58,7 +58,7 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
             HttpStatusCode status,
             WebRequest request) {
 
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.valueOf(status.value()),
@@ -73,7 +73,7 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
             @Nullable HttpStatusCode status,
             @Nullable WebRequest request) {
 
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.NOT_FOUND,
@@ -89,7 +89,7 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
             @Nullable HttpStatusCode status,
             @Nullable WebRequest request) {
 
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.METHOD_NOT_ALLOWED,
@@ -103,7 +103,7 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
             DataIntegrityViolationException ex,
             WebRequest request) {
 
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.CONFLICT,
@@ -119,7 +119,7 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
             @Nullable HttpStatusCode status,
             @Nullable WebRequest request) {
 
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.UNSUPPORTED_MEDIA_TYPE,
@@ -139,7 +139,7 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
         assert status != null;
         assert ex != null;
 
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.valueOf(status.value()),
@@ -177,7 +177,7 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
             HttpStatusCode statusCode,
             @Nullable WebRequest request) {
 
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.valueOf(statusCode.value()),

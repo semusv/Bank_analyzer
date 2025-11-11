@@ -9,8 +9,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import ru.vvsem.bank.analyzer.dto.bank.BankDto;
+import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.models.Bank;
+import ru.vvsem.bank.analyzer.models.Currency;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
 import ru.vvsem.bank.analyzer.repositories.BankRepository;
 import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
@@ -18,6 +20,7 @@ import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @TestPropertySource("classpath:application.yml")
@@ -26,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         BankMapperImpl.class,
         EntityAccessProviderImpl.class
 })
-class BankServiceImplIntegrationTest extends BaseRepositoryTest {
+class BankServiceIntegrationTest extends BaseRepositoryTest {
 
     @Autowired
     private BankService bankService;
@@ -134,5 +137,37 @@ class BankServiceImplIntegrationTest extends BaseRepositoryTest {
         // Проверяем порядок (должен соответствовать порядку вставки в @BeforeEach)
         assertThat(result.get(0).getName()).isEqualTo("Сбербанк");
         assertThat(result.get(1).getName()).isEqualTo("Тинькофф");
+    }
+
+
+
+    @Test
+    @DisplayName("Должен вернуть валюту по ID")
+    void shouldReturnCurrencyByID() {
+        // Given
+        entityManager.clear();
+
+        // When
+        Bank result = bankService.findById(bank1.getId());
+
+        // Then
+        assertThat(result.getId()).isEqualTo(bank1.getId());
+        assertThat(result.getBankCode()).isEqualTo(bank1.getBankCode());
+    }
+
+    @Test
+    @DisplayName("Должен вернуть исключение, если валюта не найдена по ID")
+    void shouldReturnExceptionWhenCurrencyNotFound() {
+        // Given
+        entityManager.clear();
+
+        // Given
+        Long nonExistentId = 999L;
+
+        // When
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> bankService.findById(nonExistentId));
+
+        assertThat(exception.getMessageCode()).isEqualTo("exception.entity.not.found.entity");
     }
 }

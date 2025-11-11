@@ -80,7 +80,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
                 newTransactionDto.getCategoryId(),
                 user.getId()));
         transaction.setCard(entityAccessProviderImpl.requireOwnedCard(cardId, user.getId()));
-        transaction.setCurrency(currencyService.requireCurrencyByCardId(transaction.getCard().getId()));
+        transaction.setCurrency(currencyService.findByCardId(transaction.getCard().getId()));
         transaction.setOperationType(newTransactionDto.getOperationType());
         if (transaction.getOperationType() == OperationType.OUTGOING) {
             transaction.setAmount(transaction.getAmount().negate());

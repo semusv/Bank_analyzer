@@ -14,7 +14,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
-import ru.vvsem.bank.analyzer.services.handlers.ErrorHandlingService;
+import ru.vvsem.bank.analyzer.providers.ErrorHandlingProvider;
 
 import java.util.concurrent.TimeoutException;
 
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeoutException;
 @AllArgsConstructor
 public class GlobalExceptionHandler {
 
-    private final ErrorHandlingService errorHandlingService;
+    private final ErrorHandlingProvider errorHandlingProvider;
 
     // 400 - Method argument type mismatch
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
             WebRequest request) {
         var requiredType = ex.getRequiredType();
         String requiredTypeText = requiredType != null ? requiredType.getSimpleName() : "unknown";
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.BAD_REQUEST,
@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
             AuthenticationException ex,
             WebRequest request) {
 
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.UNAUTHORIZED,
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
             AccessDeniedException ex,
             WebRequest request) {
 
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.FORBIDDEN,
@@ -73,7 +73,7 @@ public class GlobalExceptionHandler {
             EntityNotFoundException ex,
             WebRequest request) {
 
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.NOT_FOUND,
@@ -87,7 +87,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleNoResourceFoundException(
             NoResourceFoundException ex,
             WebRequest request) {
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.NOT_FOUND,
@@ -101,7 +101,7 @@ public class GlobalExceptionHandler {
             EmptyResultDataAccessException ex,
             WebRequest request) {
 
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.NOT_FOUND,
@@ -114,7 +114,7 @@ public class GlobalExceptionHandler {
             Exception ex,
             WebRequest request
     ) {
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.INTERNAL_SERVER_ERROR,
@@ -127,7 +127,7 @@ public class GlobalExceptionHandler {
             DataAccessException ex,
             WebRequest request) {
 
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.SERVICE_UNAVAILABLE,
@@ -141,7 +141,7 @@ public class GlobalExceptionHandler {
             TimeoutException ex,
             WebRequest request) {
 
-        return errorHandlingService.handleError(
+        return errorHandlingProvider.handleError(
                 ex,
                 request,
                 HttpStatus.REQUEST_TIMEOUT,

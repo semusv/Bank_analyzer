@@ -48,14 +48,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("User with email " + user.getEmail() + " already exists");
         }
-
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
             user.setRoles(java.util.Set.of(ru.vvsem.bank.analyzer.models.enums.Role.USER));
         }
-
         user.setPassword(passwordService.encodePassword(user.getPassword()));
-
-        user.setRoles(Set.of(Role.USER));
         userRepository.save(user);
     }
 

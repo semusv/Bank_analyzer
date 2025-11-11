@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 })
 @Import(BankThemeServiceImpl.class)
-class BankThemeServiceImplIntegrationTest extends BaseRepositoryTest {
+class BankThemeServiceIntegrationTest extends BaseRepositoryTest {
 
     @Autowired
     private BankThemeService bankThemeService;

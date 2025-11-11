@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.services.handlers;
+package ru.vvsem.bank.analyzer.providers;
 
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ErrorHandlingServiceImpl implements ErrorHandlingService {
+public class ErrorHandlingProviderImpl implements ErrorHandlingProvider {
 
     private final ErrorMessageFormatter errorMessageFormatter;
 
@@ -38,8 +38,6 @@ public class ErrorHandlingServiceImpl implements ErrorHandlingService {
         logErrorDetails(ex, request, errorText);
         return buildApiErrorResponse(ex, errorText, status, getRequestPath(request));
     }
-
-
 
     private String getLocalizedErrorMessage(String messageCode, Object... args) {
         return messageSource.getMessage(

@@ -30,7 +30,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     }
 
     @Override
-    public Currency requireCurrencyByCardId(Long cardId) {
+    public Currency findByCardId(Long cardId) {
         if (cardId == null) {
             throw new IllegalArgumentException(
                     "Card id must not be null");

@@ -11,7 +11,7 @@ public interface CurrencyService {
     List<CurrencyDto> getAllCurrencyDto();
 
     @Transactional(readOnly = true)
-    Currency requireCurrencyByCardId(Long cardId);
+    Currency findByCardId(Long cardId);
 
     @Transactional(readOnly = true)
     Currency findById(Long currencyId);
