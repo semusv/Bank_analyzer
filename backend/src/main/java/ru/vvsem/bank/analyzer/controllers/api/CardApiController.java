@@ -35,6 +35,14 @@ public class CardApiController {
         return cardService.createCard(newCardDto, securityUser);
     }
 
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public CardDto getCard(
+            @PathVariable("id") Long id,
+            @AuthenticationPrincipal SecurityUser securityUser) {
+        return cardService.getCardDtoById(id, securityUser);
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCard(
@@ -49,7 +57,7 @@ public class CardApiController {
     public List<CardDto> getCardList(
             @AuthenticationPrincipal SecurityUser securityUser
     ) {
-        return cardService.getCardList(securityUser);
+        return cardService.getCardListDto(securityUser);
     }
 }
 

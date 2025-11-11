@@ -37,7 +37,7 @@ public class CurrencyServiceImpl implements CurrencyService {
         }
         return currencyRepository.getCurrencyByCardId(cardId)
                 .orElseThrow(() ->
-                        entityAccessProvider.entityNotFound(EntityName.CURRENCY, cardId));
+                        entityAccessProvider.throwEntityNotFound(EntityName.CURRENCY, cardId));
     }
 
     @Override
@@ -48,7 +48,7 @@ public class CurrencyServiceImpl implements CurrencyService {
         }
         return currencyRepository.findById(currencyId)
                 .orElseThrow(() ->
-                        entityAccessProvider.entityNotFound(EntityName.CURRENCY, currencyId));
+                        entityAccessProvider.throwEntityNotFound(EntityName.CURRENCY, currencyId));
     }
 
 }

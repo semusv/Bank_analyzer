@@ -3,6 +3,7 @@ package ru.vvsem.bank.analyzer.controllers.handlers;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -49,6 +50,21 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
                 HttpStatus.BAD_REQUEST,
                 "error.invalid.json.format",
                 ex != null ? ex.getMostSpecificCause().getMessage() : "Invalid JSON");
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleTypeMismatch(
+            TypeMismatchException ex,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request) {
+
+        return errorHandlingProvider.handleError(
+                ex,
+                request,
+                HttpStatus.BAD_REQUEST,
+                "error.argument.type.mismatch",
+                ex.getPropertyName(), ex.getValue(), ex.getRequiredType());
     }
 
     @Override

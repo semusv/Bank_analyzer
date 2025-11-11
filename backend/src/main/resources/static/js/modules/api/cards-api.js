@@ -10,6 +10,17 @@ export async function fetchCards() {
     return await handleApiResponse(response);
 }
 
+export async function fetchCardById(cardId) {
+    const response = await fetch(`/api/card/${cardId}`, {
+        headers: {
+            'Accept': 'application/json'
+        }
+    });
+
+    return await handleApiResponse(response);
+}
+
+
 export async function deleteCard(cardId) {
     const response = await fetch(`/api/card/${cardId}`, {
         method: 'DELETE',

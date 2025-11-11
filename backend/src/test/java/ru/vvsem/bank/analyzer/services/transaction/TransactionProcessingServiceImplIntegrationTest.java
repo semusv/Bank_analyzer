@@ -458,7 +458,7 @@ class TransactionProcessingServiceImplIntegrationTest extends BaseRepositoryTest
         entityManager.clear();
 
         assertThat(result.getAmount()).isEqualByComparingTo("-1500.00");
-        assertThat(result.getCategory().getId()).isEqualTo(categorySalary.getId());
+        assertThat(result.getCategoryId()).isEqualTo(categorySalary.getId());
 
         // Проверяем корректировку баланса (разница -500.00, поэтому баланс должен уменьшиться на 500)
         BankAccount updatedAccount = entityManager.find(BankAccount.class, account1.getId());
@@ -483,7 +483,7 @@ class TransactionProcessingServiceImplIntegrationTest extends BaseRepositoryTest
                 existingTransaction.getId(), patchData, securityUser);
 
         // Then
-        assertThat(result.getCategory().getId()).isEqualTo(categorySalary.getId());
+        assertThat(result.getCategoryId()).isEqualTo(categorySalary.getId());
 
         // Баланс не должен измениться
         BankAccount updatedAccount = entityManager.find(BankAccount.class, account1.getId());

@@ -16,5 +16,8 @@ public interface CardService {
     void deleteCard(Long cardId, SecurityUser securityUser);
 
     @Transactional(readOnly = true)
-    List<CardDto> getCardList(SecurityUser securityUser);
+    List<CardDto> getCardListDto(SecurityUser securityUser);
+
+    @Transactional(readOnly = true)
+    CardDto getCardDtoById(Long cardId, SecurityUser securityUser);
 }

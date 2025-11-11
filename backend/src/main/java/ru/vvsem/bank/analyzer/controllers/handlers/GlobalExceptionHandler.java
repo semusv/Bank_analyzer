@@ -13,6 +13,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import ru.vvsem.bank.analyzer.exceptions.BusinessException;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.providers.ErrorHandlingProvider;
 
@@ -149,5 +150,18 @@ public class GlobalExceptionHandler {
                 (Object[]) null);
     }
 
+    //BusinessException
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Object> handleBusinessException(
+            BusinessException ex,
+            WebRequest request) {
 
+        return errorHandlingProvider.handleError(
+                ex,
+                request,
+                HttpStatus.BAD_REQUEST,
+                ex.getMessageCode(),
+                ex.getMessageArgs());
+
+    }
 }

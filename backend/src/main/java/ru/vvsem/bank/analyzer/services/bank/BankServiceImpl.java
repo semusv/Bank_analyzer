@@ -23,7 +23,7 @@ public class BankServiceImpl implements BankService {
     private final EntityAccessProvider entityAccessProvider;
 
     @Override
-    public List<BankDto> getBanks() {
+    public List<BankDto> getBankDtos() {
         log.info("Getting banks");
         List<Bank> accounts = bankRepository.findAll();
 
@@ -33,13 +33,22 @@ public class BankServiceImpl implements BankService {
 
     @Override
     public Bank findById(Long bankId) {
+        return findByIdEntity(bankId);
+    }
+
+    @Override
+    public BankDto findByIdDto(Long bankId) {
+        return bankMapper.toBankDto(findByIdEntity(bankId));
+    }
+
+    private Bank findByIdEntity(Long bankId) {
         if (bankId == null) {
             throw new IllegalArgumentException(
                     "Bank id must not be null");
         }
         return bankRepository.findById(bankId)
                 .orElseThrow(() ->
-                        entityAccessProvider.entityNotFound(EntityName.BANK, bankId));
+                        entityAccessProvider.throwEntityNotFound(EntityName.BANK, bankId));
     }
 
 }

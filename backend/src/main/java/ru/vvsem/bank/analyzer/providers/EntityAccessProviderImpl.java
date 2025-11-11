@@ -33,75 +33,75 @@ public class EntityAccessProviderImpl implements EntityAccessProvider {
     private final CurrencyRepository currencyRepository;
 
     @Override
-    public Category requireOwnedCategory(Long categoryId, Long userId) {
+    public Category getOwnedCategory(Long categoryId, Long userId) {
         if (categoryId == null || userId == null) {
             throw new IllegalArgumentException(
                     "Category id and user id must not be null");
         }
         var entity = categoryRepository.findById(categoryId)
                 .orElseThrow(() ->
-                        entityNotFound(EntityName.CATEGORY, categoryId, userId));
+                        throwEntityNotFound(EntityName.CATEGORY, categoryId, userId));
         if (!entity.getUser().getId().equals(userId)) {
-            throw entityAccessDenied(EntityName.CATEGORY, entity.getId(), userId);
+            throw throwEntityAccessDenied(EntityName.CATEGORY, entity.getId(), userId);
         }
         return entity;
     }
 
 
     @Override
-    public Card requireOwnedCard(Long cardId, Long userId) {
+    public Card getOwnedCard(Long cardId, Long userId) {
         if (cardId == null || userId == null) {
             throw new IllegalArgumentException(
                     "Card id and user id must not be null");
         }
         var entity = cardRepository.findById(cardId)
                 .orElseThrow(() ->
-                        entityNotFound(EntityName.CARD, cardId, userId));
+                        throwEntityNotFound(EntityName.CARD, cardId, userId));
         if (!entity.getAccount().getUser().getId().equals(userId)) {
-            throw entityAccessDenied(EntityName.CARD, entity.getId(), userId);
+            throw throwEntityAccessDenied(EntityName.CARD, entity.getId(), userId);
         }
         return entity;
     }
 
     @Override
-    public Transaction requireOwnedTransaction(Long transactionId, Long userId) {
+    public Transaction getOwnedTransaction(Long transactionId, Long userId) {
         if (transactionId == null || userId == null) {
             throw new IllegalArgumentException(
                     "Transaction id and user id must not be null");
         }
         var entity = transactionRepository.findById(transactionId)
                 .orElseThrow(() ->
-                        entityNotFound(EntityName.TRANSACTION, transactionId, userId));
+                        throwEntityNotFound(EntityName.TRANSACTION, transactionId, userId));
         if (!entity.getUser().getId().equals(userId)) {
-            throw entityAccessDenied(EntityName.TRANSACTION, entity.getId(), userId);
+            throw throwEntityAccessDenied(EntityName.TRANSACTION, entity.getId(), userId);
         }
         return entity;
     }
 
     @Override
-    public BankAccount requireOwnedBankAccount(Long bankAccountId, Long userId) {
+    public BankAccount getOwnedBankAccount(Long bankAccountId, Long userId) {
         if (bankAccountId == null || userId == null) {
             throw new IllegalArgumentException(
                     "Bank account id and user id must not be null");
         }
         var entity = bankAccountRepository.findById(bankAccountId)
                 .orElseThrow(() ->
-                        entityNotFound(EntityName.CATEGORY, bankAccountId, userId));
+                        throwEntityNotFound(EntityName.CATEGORY, bankAccountId, userId));
         if (!entity.getUser().getId().equals(userId)) {
-            throw entityAccessDenied(EntityName.TRANSACTION, entity.getId(), userId);
+            throw throwEntityAccessDenied(EntityName.TRANSACTION, entity.getId(), userId);
         }
         return entity;
 
     }
 
     @Override
-    public AccessDeniedException entityAccessDenied(EntityName entityName, Long categoryId, Long userId) {
+    public AccessDeniedException throwEntityAccessDenied(EntityName entityName, Long categoryId, Long userId) {
         return new AccessDeniedException(
                 "%s for id %d and userId %d denied".formatted(entityName.getDescription(), categoryId, userId));
     }
 
     @Override
-    public EntityNotFoundException entityNotFound(EntityName entityName, Long id, Long userId) {
+    public EntityNotFoundException throwEntityNotFound(EntityName entityName, Long id, Long userId) {
         return new EntityNotFoundException(
                 "%s for id %d and userId %d not found".formatted(entityName.getDescription(), id, userId),
                 "exception.entity.not.found.entity",
@@ -109,7 +109,7 @@ public class EntityAccessProviderImpl implements EntityAccessProvider {
     }
 
     @Override
-    public EntityNotFoundException entityNotFound(EntityName entityName, Long id) {
+    public EntityNotFoundException throwEntityNotFound(EntityName entityName, Long id) {
         return new EntityNotFoundException(
                 "%s for id %d not found".formatted(entityName.getDescription(), id),
                 "exception.entity.not.found.entity",

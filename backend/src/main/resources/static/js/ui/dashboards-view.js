@@ -8,17 +8,26 @@ import {
 import {
     showErrorMessage,
     formatCurrency,
-    formatDateTime
+    formatDateTime,
+    showApiErrors
 } from "../modules/utils.js";
 import {
     handleAddTransaction,
     populateAddTransactionModal
 } from "./fragments/add-transaction-view.js";
-import { fetchCards } from "../modules/api/cards-api.js";
-import { fetchCategories } from "../modules/api/categories-api.js";
+import {
+    fetchCards,
+    fetchCardById
+} from "../modules/api/cards-api.js";
+import {
+    fetchCategories
+} from "../modules/api/categories-api.js";
 import {
     populateTransactionDetailsModal
 } from "./fragments/show-transaction-view.js";
+import {
+    fetchBankById
+} from "../modules/api/banks-api.js";
 
 
 document.addEventListener('DOMContentLoaded', init);
@@ -28,12 +37,14 @@ let cardsCache = null;
 
 function init() {
     setupEventListeners();
-    initTooltips()
+    initTooltips();
     loadData();
 }
 
 async function loadData() {
     try {
+        loadCategories();
+        loadCards();
         const [statsRes, transactionsRes] = await Promise.all([
             fetchStats(),
             fetchTransactionsRes(),
@@ -154,43 +165,59 @@ function renderTransactions(transactions) {
         return;
     }
 
-    container.innerHTML = transactions.map(thx => `
-                    <div class="transaction-card row align-items-center border-bottom ${thx.hide ? 'opacity-50' : ''}"
-                            onclick="viewTransactionDetails(${thx.id})">
-                        <div class="col-12 col-md-8 col-lg-8 mb-1">
-                            <div class="transaction-info">
-                                <h6 class="mb-1">
-                                        ${thx.description}
-                                    ${thx.hide ? '<span class="badge bg-secondary ms-2">Скрыто</span>' : ''}
-                                </h6>
-                                ${thx.category ? `
-                                    <div class="category-badge d-inline-block">
-                                        <span class="badge" style="background-color: ${thx.category.color || '#6c757d'}; color: ${thx.category.textColor || '#000000ff'};">
-                                            ${thx.category.name}
-                                        </span>
-                                    </div>
-                                ` : ''}
+    container.innerHTML = transactions.map(thx => {
+        // Получаем категорию из кеша по ID
+        const category = getCategoryById(thx.categoryId);
+
+        return `
+            <div class="transaction-card row align-items-center border-bottom ${thx.hide ? 'opacity-50' : ''}"
+                onclick="viewTransactionDetails(${thx.id})">
+                <div class="col-12 col-md-8 col-lg-8 mb-1">
+                    <div class="transaction-info">
+                        <h6 class="mb-1">
+                            ${thx.description}
+                            ${thx.hide ? '<span class="badge bg-secondary ms-2">Скрыто</span>' : ''}
+                        </h6>
+                        ${category ? `
+                            <div class="category-badge d-inline-block">
+                                <span class="badge" style="background-color: ${category.color || '#6c757d'}; color: ${category.textColor || '#000000ff'};">
+                                    ${category.name}
+                                </span>
                             </div>
-                        </div>
-    
-                        <div class="col-12 col-md-4 col-lg-4 text-end">
-                            <div class="amount ${thx.amount >= 0 ? 'text-success' : 'text-danger'} ">
-                                <strong>
-                                ${formatCurrency(thx.amount, thx.currency.code)}
-                                </strong>
-                            </div>
-                            <small class="text-muted text-end">
-                                ${formatDateTime(thx.operationTime)}
-                            </small>
-                        </div>
+                        ` : ''}
                     </div>
-        `).join('');
+                </div>
+
+                <div class="col-12 col-md-4 col-lg-4 text-end">
+                    <div class="amount ${thx.amount >= 0 ? 'text-success' : 'text-danger'} ">
+                        <strong>
+                            ${formatCurrency(thx.amount, thx.currencyCode)}
+                        </strong>
+                    </div>
+                    <small class="text-muted text-end">
+                        ${formatDateTime(thx.operationTime)}
+                    </small>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function getCategoryById(categoryId) {
+    return categoriesCache.find(category => category.id === categoryId)
 }
 
 globalThis.viewTransactionDetails = async function (transactionId) {
     try {
         const transaction = await fetchTransactionById(transactionId);
-        populateTransactionDetailsModal(transaction);
+        const [bank, card] = await Promise.all([
+            fetchBankById(transaction.bankId),
+            fetchCardById(transaction.cardId)
+
+        ]);
+
+
+        populateTransactionDetailsModal(transaction, categoriesCache, bank, card);
 
         if (typeof bootstrap !== 'undefined') {
             const modal = new bootstrap.Modal(document.getElementById('transactionDetailsModal'));

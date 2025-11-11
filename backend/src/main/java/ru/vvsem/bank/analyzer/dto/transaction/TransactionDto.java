@@ -1,12 +1,9 @@
 package ru.vvsem.bank.analyzer.dto.transaction;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import ru.vvsem.bank.analyzer.dto.category.CategoryDto;
-import ru.vvsem.bank.analyzer.dto.currency.CurrencyDto;
-import ru.vvsem.bank.analyzer.dto.bank.BankDto;
-import ru.vvsem.bank.analyzer.dto.card.CardDto;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
 
 import java.math.BigDecimal;
@@ -34,15 +31,27 @@ public class TransactionDto {
     private boolean master;
 
     @NotNull
-    private CurrencyDto currency;
-
-    private CategoryDto category;
-
-    private CardDto card;
-
-    private BankDto bank;
-
     private Long userId;
 
+    @NotNull
     private OperationType operationType;
+
+    @NotNull
+    private Long categoryId;
+
+    @NotNull
+    private Long cardId;
+
+    @NotNull
+    private Long cardAccountId;
+
+    @NotNull
+    private String bankCode;
+
+    @NotNull
+    private String bankId;
+
+    @NotNull
+    @NotEmpty
+    private String currencyCode;
 }

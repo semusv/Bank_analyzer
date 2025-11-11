@@ -177,8 +177,8 @@ class AnalyticsServiceIntegrationTest extends BaseRepositoryTest {
         when(bankService.findById(bank.getId())).thenReturn(bank);
         when(currencyService.findById(currencyRub.getId())).thenReturn(currencyRub);
         when(currencyService.findById(currencyUsd.getId())).thenReturn(currencyUsd);
-        when(entityAccessProvider.requireOwnedCard(card1.getId(),user.getId())).thenReturn(card1);
-        when(entityAccessProvider.requireOwnedCard(card2.getId(),user.getId())).thenReturn(card2);
+        when(entityAccessProvider.getOwnedCard(card1.getId(),user.getId())).thenReturn(card1);
+        when(entityAccessProvider.getOwnedCard(card2.getId(),user.getId())).thenReturn(card2);
 
 
         // Мокаем exchange rate

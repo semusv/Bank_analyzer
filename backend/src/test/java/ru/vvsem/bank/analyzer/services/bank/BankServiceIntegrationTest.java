@@ -12,7 +12,6 @@ import ru.vvsem.bank.analyzer.dto.bank.BankDto;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.models.Bank;
-import ru.vvsem.bank.analyzer.models.Currency;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
 import ru.vvsem.bank.analyzer.repositories.BankRepository;
 import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
@@ -69,7 +68,7 @@ class BankServiceIntegrationTest extends BaseRepositoryTest {
     @DisplayName("Должен вернуть все банки")
     void shouldReturnAllBanks() {
         // When
-        List<BankDto> result = bankService.getBanks();
+        List<BankDto> result = bankService.getBankDtos();
 
         // Then
         assertThat(result).hasSize(2);
@@ -96,7 +95,7 @@ class BankServiceIntegrationTest extends BaseRepositoryTest {
         bankRepository.deleteAll();
 
         // When
-        List<BankDto> result = bankService.getBanks();
+        List<BankDto> result = bankService.getBankDtos();
 
         // Then
         assertThat(result).isEmpty();
@@ -106,7 +105,7 @@ class BankServiceIntegrationTest extends BaseRepositoryTest {
     @DisplayName("Должен корректно маппить сущность Bank в BankDto")
     void shouldCorrectlyMapBankToBankDto() {
         // When
-        List<BankDto> result = bankService.getBanks();
+        List<BankDto> result = bankService.getBankDtos();
         BankDto bankDto = result.stream()
                 .filter(b -> b.getId().equals(bank1.getId()))
                 .findFirst()
@@ -130,7 +129,7 @@ class BankServiceIntegrationTest extends BaseRepositoryTest {
     @DisplayName("Должен возвращать банки в порядке их создания")
     void shouldReturnBanksInCreationOrder() {
         // When
-        List<BankDto> result = bankService.getBanks();
+        List<BankDto> result = bankService.getBankDtos();
 
         // Then
         assertThat(result).hasSize(2);

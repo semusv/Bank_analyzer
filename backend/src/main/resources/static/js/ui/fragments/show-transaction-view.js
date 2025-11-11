@@ -10,11 +10,12 @@ import {
     updateTransaction
 } from "../../modules/api/transactions-api.js";
 
-export function populateTransactionDetailsModal(transaction, categoriesCache, viewMode = true) {
+export function populateTransactionDetailsModal(transaction, categoriesCache, bank, card, viewMode = true) {
+    const category = categoriesCache.find(category => category.id === transaction.categoryId);
     document.getElementById('detailDescription').textContent = transaction.description;
 
     // Сумма операции
-    document.getElementById('detailAmount').textContent = formatCurrency(transaction.amount, transaction.currency.code);
+    document.getElementById('detailAmount').textContent = formatCurrency(transaction.amount, transaction.currencyCode);
     document.getElementById('editAmount').value = Number.parseFloat(transaction.amount).toFixed(2);
     document.getElementById('detailAmount').classList.add(`${transaction.amount >= 0 ? 'text-success' : 'text-danger'}`);
     document.getElementById('editAmount').classList.add(`${transaction.amount >= 0 ? 'text-success' : 'text-danger'}`);
@@ -25,35 +26,33 @@ export function populateTransactionDetailsModal(transaction, categoriesCache, vi
 
     // Card
     const cardElement = document.getElementById('detailCard');
-    if (transaction.card) {
-        cardElement.innerHTML = `<span class="badge bg-primary">**** ${transaction.card.lastFourDigits}</span>`;
-        cardElement.innerHTML += ` <span class="text-muted">${transaction.card.cardName}</span>`;
+    if (card) {
+        cardElement.innerHTML = `<span class="badge bg-primary">**** ${card.lastFourDigits}</span>`;
+        cardElement.innerHTML += ` <span class="text-muted">${card.cardName}</span>`;
     } else {
         cardElement.textContent = 'Не указана';
     }
 
     // Bank
-    const bankElement = document.getElementById('detailBank');
-    if (transaction.bank) {
-        const bankElementBadge = document.getElementById('detailBankBadge');
-        bankElementBadge.innerHTML = transaction.bank.name;
-        setBankColorsForElem(transaction.bank.bankCode, bankElementBadge);
-    } else if (transaction.card) {
-        bankElement.textContent = 'Не указан';
+    const bankElementBadge = document.getElementById('detailBankBadge');
+    if (bank) {
+        bankElementBadge.innerHTML = bank.name;
+        setBankColorsForElem(bank.bankCode, bankElementBadge);
     } else {
-        bankElement.textContent = 'Не указан';
+        bankElementBadge.innerHTML = 'Не указан';
+        setBankColorsForElem("default", bankElementBadge);
     }
 
     // Category
     const categoryElement = document.getElementById('detailCategory');
-    if (transaction.category) {
-        const color = transaction.category.color || '#6c757d';
-        const textColor = transaction.category.textcolor || '#6c757d';
-        categoryElement.innerHTML = `<span class="badge" style="background-color: ${color}; color: ${textColor};">${transaction.category.name}</span>`;
+    if (transaction.categoryId) {
+        const color = category.color || '#6c757d';
+        const textColor = category.textcolor || '#6c757d';
+        categoryElement.innerHTML = `<span class="badge" style="background-color: ${color}; color: ${textColor};">${category.name}</span>`;
     } else {
         categoryElement.textContent = 'Не указана';
     }
-    fillCategoryDropdown(categoriesCache, transaction.category.id);
+    fillCategoryDropdown(categoriesCache, transaction.categoryId);
 
     document.getElementById('detailHide').checked = transaction.hide;
     document.getElementById('detailHideStatus').textContent = transaction.hide ? 'Скрыта из статистики' : 'Отображается в статистике';
@@ -78,8 +77,9 @@ export function populateTransactionDetailsModal(transaction, categoriesCache, vi
         setupEditHandlers(transaction.id);
         switchToEditMode(false);
     }
-
 }
+
+
 function fillCategoryDropdown(categoriesCache, categoryId) {
     if (!categoriesCache) {
         return;

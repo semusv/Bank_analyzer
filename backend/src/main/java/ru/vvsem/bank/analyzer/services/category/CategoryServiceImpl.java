@@ -49,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto getCategoryDtoById(Long categoryId, SecurityUser securityUser) {
-        return categoryMapper.toCategoryDto(entityAccessProviderImpl.requireOwnedCategory(
+        return categoryMapper.toCategoryDto(entityAccessProviderImpl.getOwnedCategory(
                 categoryId, securityUser.getId()));
     }
 
@@ -71,7 +71,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto updateCategory(Long categoryId, CategoryDto categoryDto, SecurityUser securityUser) {
-        Category category = entityAccessProviderImpl.requireOwnedCategory(categoryId, securityUser.getId());
+        Category category = entityAccessProviderImpl.getOwnedCategory(categoryId, securityUser.getId());
         category.setName(categoryDto.getName());
         category.setColor(categoryDto.getColor());
         category.setTextColor(categoryDto.getTextColor());
@@ -81,7 +81,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(Long categoryId, SecurityUser securityUser) {
-        Category category = entityAccessProviderImpl.requireOwnedCategory(categoryId, securityUser.getId());
+        Category category = entityAccessProviderImpl.getOwnedCategory(categoryId, securityUser.getId());
         categoryRepository.delete(category);
     }
 

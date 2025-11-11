@@ -67,13 +67,13 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Transactional
     @Override
     public void deleteAccount(Long accountId, SecurityUser securityUser) {
-        var bankAccount = entityAccessProvider.requireOwnedBankAccount(accountId, securityUser.getId());
+        var bankAccount = entityAccessProvider.getOwnedBankAccount(accountId, securityUser.getId());
         bankAccountRepository.delete(bankAccount);
     }
 
     @Override
     public void addAccountBalance(Long accountId, BigDecimal amount, SecurityUser securityUser) {
-        var bankAccount = entityAccessProvider.requireOwnedBankAccount(accountId, securityUser.getId());
+        var bankAccount = entityAccessProvider.getOwnedBankAccount(accountId, securityUser.getId());
         bankAccountRepository.updateBalance(
                 bankAccount.getBalance().add(amount),
                 accountId

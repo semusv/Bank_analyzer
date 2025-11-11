@@ -38,13 +38,13 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionDto getUserTransaction(Long transactionId, Long userId) {
         return transactionMapper.toTransactionDto(
-                entityAccessProviderImpl.requireOwnedTransaction(transactionId, userId));
+                entityAccessProviderImpl.getOwnedTransaction(transactionId, userId));
     }
 
 
     @Override
     public void deleteTransaction(Long transactionId, SecurityUser securityUser) {
-        Transaction transaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, securityUser.getId());
+        Transaction transaction = entityAccessProviderImpl.getOwnedTransaction(transactionId, securityUser.getId());
         transactionRepository.delete(transaction);
     }
 
@@ -56,14 +56,14 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDto hideTransaction(Long transactionId, Long userId) {
-        Transaction transaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, userId);
+        Transaction transaction = entityAccessProviderImpl.getOwnedTransaction(transactionId, userId);
         transaction.setHide(!transaction.isHide());
         return transactionMapper.toTransactionDto(transactionRepository.save(transaction));
     }
 
     @Override
     public TransactionDto updateTransaction(Transaction transaction, Long userId) {
-        entityAccessProviderImpl.requireOwnedTransaction(transaction.getId(), userId);
+        entityAccessProviderImpl.getOwnedTransaction(transaction.getId(), userId);
         return transactionMapper.toTransactionDto(transactionRepository.save(transaction));
     }
 

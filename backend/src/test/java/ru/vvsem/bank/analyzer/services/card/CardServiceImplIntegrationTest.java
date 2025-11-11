@@ -151,7 +151,7 @@ class CardServiceImplIntegrationTest  extends BaseRepositoryTest {
         entityManager.persistAndFlush(anotherCard);
 
         // When
-        List<CardDto> result = cardService.getCardList(securityUser);
+        List<CardDto> result = cardService.getCardListDto(securityUser);
 
         // Then
         assertThat(result).hasSize(2);
@@ -184,7 +184,7 @@ class CardServiceImplIntegrationTest  extends BaseRepositoryTest {
         );
 
         // When
-        List<CardDto> result = cardService.getCardList(anotherSecurityUser);
+        List<CardDto> result = cardService.getCardListDto(anotherSecurityUser);
 
         // Then
         assertThat(result).isEmpty();
@@ -261,8 +261,8 @@ class CardServiceImplIntegrationTest  extends BaseRepositoryTest {
         );
 
         // When - получаем карты для основного пользователя
-        List<CardDto> mainUserCards = cardService.getCardList(securityUser);
-        List<CardDto> anotherUserCards = cardService.getCardList(anotherSecurityUser);
+        List<CardDto> mainUserCards = cardService.getCardListDto(securityUser);
+        List<CardDto> anotherUserCards = cardService.getCardListDto(anotherSecurityUser);
 
         // Then
         assertThat(mainUserCards).hasSize(1);

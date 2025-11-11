@@ -7,6 +7,7 @@ import ru.vvsem.bank.analyzer.dto.transaction.NewTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.PatchTransactionData;
 import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
+import ru.vvsem.bank.analyzer.exceptions.BusinessException;
 import ru.vvsem.bank.analyzer.mappers.TransactionMapper;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.Transaction;
@@ -55,7 +56,10 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
         }
         if (revTransaction != null) {
             if (!Objects.equals(revTransaction.getCurrency().getId(), transaction.getCurrency().getId())) {
-                throw new IllegalArgumentException("Валюты карт не совпадают");
+                throw new BusinessException(
+                        "Currency mismatch between cards",
+                        "business.transaction.currency.mismatch"
+                );
             }
             transactionDtoList.add(transactionService.createTransaction(revTransaction));
         }
@@ -63,7 +67,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
         transactionDtoList
                 .forEach(transactionDto ->
                         bankAccountService.addAccountBalance(
-                                transactionDto.getCard().getAccountId(),
+                                transactionDto.getCardAccountId(),
                                 transactionDto.getAmount(), securityUser));
         return transactionDtoList;
     }
@@ -76,10 +80,10 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
         transaction.setDescription(newTransactionDto.getDescription());
         transaction.setAmount(newTransactionDto.getAmount());
         transaction.setOperationTime(newTransactionDto.getOperationTime());
-        transaction.setCategory(entityAccessProviderImpl.requireOwnedCategory(
+        transaction.setCategory(entityAccessProviderImpl.getOwnedCategory(
                 newTransactionDto.getCategoryId(),
                 user.getId()));
-        transaction.setCard(entityAccessProviderImpl.requireOwnedCard(cardId, user.getId()));
+        transaction.setCard(entityAccessProviderImpl.getOwnedCard(cardId, user.getId()));
         transaction.setCurrency(currencyService.findByCardId(transaction.getCard().getId()));
         transaction.setOperationType(newTransactionDto.getOperationType());
         if (transaction.getOperationType() == OperationType.OUTGOING) {
@@ -94,7 +98,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
     public void splitTransaction(
             Long transactionId, List<SubTransactionDto> subTransactions, SecurityUser securityUser) {
         Transaction parentTransaction = entityAccessProviderImpl
-                .requireOwnedTransaction(transactionId, securityUser.getId());
+                .getOwnedTransaction(transactionId, securityUser.getId());
 
         BigDecimal totalSubAmount = subTransactions.stream()
                 .map(SubTransactionDto::getAmount)
@@ -119,10 +123,10 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
 
     @Override
     public TransactionDto hideTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser) {
-        entityAccessProviderImpl.requireOwnedTransaction(transactionId, securityUser.getId());
+        entityAccessProviderImpl.getOwnedTransaction(transactionId, securityUser.getId());
 
         var transactionDto = transactionService.hideTransaction(transactionId, securityUser.getId());
-        var card = entityAccessProviderImpl.requireOwnedCard(transactionDto.getCard().getId(), securityUser.getId());
+        var card = entityAccessProviderImpl.getOwnedCard(transactionDto.getCardAccountId(), securityUser.getId());
         bankAccountService.addAccountBalance(card.getAccount().getId(),
                 !transactionDto.isHide()
                         ? transactionDto.getAmount()
@@ -132,8 +136,8 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
 
     @Override
     public void deleteTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser) {
-        var transaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, securityUser.getId());
-        var card = entityAccessProviderImpl.requireOwnedCard(transaction.getCard().getId(), securityUser.getId());
+        var transaction = entityAccessProviderImpl.getOwnedTransaction(transactionId, securityUser.getId());
+        var card = entityAccessProviderImpl.getOwnedCard(transaction.getCard().getId(), securityUser.getId());
         transactionService.deleteTransaction(transactionId, securityUser);
         bankAccountService.addAccountBalance(card.getAccount().getId(), transaction.getAmount().negate(), securityUser);
     }
@@ -141,11 +145,11 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
     @Override
     public TransactionDto patchTransactionWithBalanceUpdate(
             Long transactionId, PatchTransactionData patchTransactionData, SecurityUser securityUser) {
-        var transaction = entityAccessProviderImpl.requireOwnedTransaction(transactionId, securityUser.getId());
-        var card = entityAccessProviderImpl.requireOwnedCard(transaction.getCard().getId(), securityUser.getId());
+        var transaction = entityAccessProviderImpl.getOwnedTransaction(transactionId, securityUser.getId());
+        var card = entityAccessProviderImpl.getOwnedCard(transaction.getCard().getId(), securityUser.getId());
         var diffAmount = transaction.getAmount().subtract(patchTransactionData.getAmount());
         transaction.setCategory(entityAccessProviderImpl
-                .requireOwnedCategory(patchTransactionData.getCategoryId(), securityUser.getId()));
+                .getOwnedCategory(patchTransactionData.getCategoryId(), securityUser.getId()));
         transaction.setAmount(patchTransactionData.getAmount());
         transaction.setOperationTime(patchTransactionData.getOperationTime());
         if (!diffAmount.equals(BigDecimal.ZERO)) {

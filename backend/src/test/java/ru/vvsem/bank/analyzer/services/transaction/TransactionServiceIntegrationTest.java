@@ -15,7 +15,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
-import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.mappers.BankAccountMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
@@ -233,10 +232,11 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
     @DisplayName("Должен выбросить исключение при попытке получить чужую транзакцию")
     void shouldThrowExceptionWhenGettingOtherUserTransaction() {
         Long anotherUserId = anotherUser.getId();
+        Long transactionId = transaction1.getId();
         // When & Then
         assertThrows(
                 AccessDeniedException.class,
-                () -> transactionService.getUserTransaction(transaction1.getId(), anotherUserId)
+                () -> transactionService.getUserTransaction(transactionId, anotherUserId)
         );
     }
 
@@ -381,7 +381,7 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getCategory()).isNull();
+        assertThat(result.getCategoryId()).isNull();
         assertThat(result.getDescription()).isEqualTo("Salary");
     }
 }

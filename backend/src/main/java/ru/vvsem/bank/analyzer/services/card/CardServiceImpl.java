@@ -34,7 +34,7 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public CardDto createCard(NewCardDto newCardDto, SecurityUser securityUser) {
         var card = cardMapper.toEntity(newCardDto);
-        card.setAccount(entityAccessProvider.requireOwnedBankAccount(
+        card.setAccount(entityAccessProvider.getOwnedBankAccount(
                 card.getAccount().getId(), securityUser.getId()));
         card.setIssuerBank(bankService.findById(card.getAccount().getBank().getId()));
         var newCard = cardRepository.save(card);
@@ -43,17 +43,23 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public void deleteCard(Long cardId, SecurityUser securityUser) {
-        Card card = entityAccessProvider.requireOwnedCard(cardId, securityUser.getId());
+        Card card = entityAccessProvider.getOwnedCard(cardId, securityUser.getId());
         cardRepository.delete(card);
     }
 
 
     @Override
-    public List<CardDto> getCardList(SecurityUser securityUser) {
+    public List<CardDto> getCardListDto(SecurityUser securityUser) {
         return cardRepository.findByAccountUserId(securityUser.getId())
                 .stream()
                 .map(cardMapper::toCardDto)
                 .toList();
+    }
+
+    @Override
+    public CardDto getCardDtoById(Long cardId, SecurityUser securityUser) {
+        return cardMapper.toCardDto(
+                entityAccessProvider.getOwnedCard(cardId, securityUser.getId()));
     }
 
 

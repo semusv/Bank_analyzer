@@ -105,7 +105,7 @@ class BankAccountServiceIntegrationTest extends BaseRepositoryTest {
         when(customUserDetailsService.getUserById(user.getId())).thenReturn(user);
         when(bankService.findById(bank.getId())).thenReturn(bank);
         when(currencyService.findById(currency.getId())).thenReturn(currency);
-        when(entityAccessProvider.requireOwnedBankAccount(1L, user.getId())).thenAnswer(invocation -> {
+        when(entityAccessProvider.getOwnedBankAccount(1L, user.getId())).thenAnswer(invocation -> {
             var account = bankAccountRepository.findById(1L).orElse(null);
             if (account == null || !account.getUser().getId().equals(user.getId())) {
                 throw new EntityNotFoundException("Not found", "code");
@@ -159,7 +159,7 @@ class BankAccountServiceIntegrationTest extends BaseRepositoryTest {
         entityManager.detach(account);
 
         // When
-        when(entityAccessProvider.requireOwnedBankAccount(account.getId(), user.getId())).thenReturn(saved);
+        when(entityAccessProvider.getOwnedBankAccount(account.getId(), user.getId())).thenReturn(saved);
         bankAccountService.addAccountBalance(saved.getId(), addAmount, securityUser);
 
         // Then
@@ -172,7 +172,7 @@ class BankAccountServiceIntegrationTest extends BaseRepositoryTest {
     @DisplayName("Должен выбросить исключение при обновлении несуществующего счёта")
     void shouldThrowWhenUpdatingNonExistingAccount() {
         // Given
-        when(entityAccessProvider.requireOwnedBankAccount(999L, user.getId()))
+        when(entityAccessProvider.getOwnedBankAccount(999L, user.getId()))
                 .thenThrow(new EntityNotFoundException("Not found", "code"));
 
         // When & Then
@@ -227,7 +227,7 @@ class BankAccountServiceIntegrationTest extends BaseRepositoryTest {
 
         // When
         when(entityAccessProvider
-                .requireOwnedBankAccount(account.getId(), user.getId())).thenReturn(saved);
+                .getOwnedBankAccount(account.getId(), user.getId())).thenReturn(saved);
         bankAccountService.deleteAccount(saved.getId(), securityUser);
 
         // Then

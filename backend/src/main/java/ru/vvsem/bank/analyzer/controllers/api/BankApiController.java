@@ -3,8 +3,8 @@ package ru.vvsem.bank.analyzer.controllers.api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,8 +23,15 @@ public class BankApiController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<BankDto>> getUserAccounts() {
-        List<BankDto> banks = banksService.getBanks();
-        return ResponseEntity.ok(banks);
+    public List<BankDto> getBanks() {
+        return banksService.getBankDtos();
     }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public BankDto getBankById(
+            @PathVariable("id") Long bankId) {
+        return banksService.findByIdDto(bankId);
+    }
+
 }

@@ -9,9 +9,12 @@ import java.util.List;
 public interface BankService {
 
     @Transactional(readOnly = true)
-    List<BankDto> getBanks();
+    List<BankDto> getBankDtos();
 
     @Transactional(readOnly = true)
     Bank findById(Long bankId);
+
+    @Transactional(readOnly = true)
+    BankDto findByIdDto(Long bankId);
 
 }

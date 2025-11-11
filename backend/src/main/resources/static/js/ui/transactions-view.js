@@ -1,5 +1,3 @@
-
-
 import {
     fetchTransactions,
     fetchTransactionById,
@@ -131,11 +129,14 @@ async function renderTransactions(transactions) {
 
     const tempContainer = document.createElement('div');
 
-    tempContainer.innerHTML = transactions.map(thx => `
+    tempContainer.innerHTML = transactions.map(thx => {
+        const category = getCategoryById(thx.categoryId);
+        const card = getCardById(thx.cardId);
+
+        return `
                 <div class="transaction-card row align-items-center border-bottom ${thx.hide ? 'opacity-50' : ''}"
                                 data-transaction-id="${thx.id}"
-                                data-transaction-card="${thx.id}"
-                                data-bank-theme="${thx.bank.bankCode}"
+                                data-bank-theme="${thx.bankCode}"
                                 onclick="viewTransactionDetails(${thx.id})">
                     <div class="col-7 col-md-6 col-lg-6 mb-1">
                         <div class="transaction-info">
@@ -143,10 +144,10 @@ async function renderTransactions(transactions) {
                                     ${thx.description}
                                 ${thx.hide ? '<span class="badge bg-secondary ms-2">Скрыто</span>' : ''}
                             </h6>
-                            ${thx.category ? `
+                            ${category ? `
                                 <div class="category-badge d-inline-block">
-                                    <span class="badge" style="background-color: ${thx.category.color || '#6c757d'}; color: ${thx.category.textColor || '#000000ff'};">
-                                        ${thx.category.name}
+                                    <span class="badge" style="background-color: ${category.color || '#6c757d'}; color: ${category.textColor || '#000000ff'};">
+                                        ${category.name}
                                     </span>
                                 </div>
                             ` : ''}
@@ -156,7 +157,7 @@ async function renderTransactions(transactions) {
                     <div class="col-5 col-md-6 col-lg-2 text-end">
                         <div class="amount ${thx.amount >= 0 ? 'text-success' : 'text-danger'}">
                             <strong>
-                            ${formatCurrency(thx.amount, thx.currency.code)}
+                            ${formatCurrency(thx.amount, thx.currencyCode)}
                             </strong>
                         </div>
                         <small class="text-muted">
@@ -165,15 +166,11 @@ async function renderTransactions(transactions) {
                     </div>
 
                     <div class="col-12 col-md-9 col-lg-3"  >
-                        ${thx.card ? `
-                            <div class="card-info mb-2 card-header" data-bank-theme="${thx.bank.bankCode}">
-                                <i class="fas fa-credit-card"></i>
-                                <span>**** ${thx.card.lastFourDigits}</span>
-                            </div>
-                        ` : ''}
+                        <div class="card-info mb-2 card-header" data-bank-theme="${thx.bankCode}">
+                            <i class="fas fa-credit-card"></i>
+                            <span>**** ${card.lastFourDigits}</span>
+                        </div>
                     </div>
-
-
 
                     <div class="col-12 col-md-3 col-lg-1 ">
                         <div class="d-flex gap-2 flex-wrap flex-row-reverse">
@@ -183,8 +180,8 @@ async function renderTransactions(transactions) {
                         </div>
                     </div>
                 </div>
-
-    `).join('');
+        `;
+    }).join('');
 
     while (tempContainer.firstChild) {
         fragment.appendChild(tempContainer.firstChild);
@@ -195,14 +192,29 @@ async function renderTransactions(transactions) {
     container.appendChild(fragment);
 }
 
+function getCategoryById(categoryId) {
+    if (categoryId) {
+        return categoriesCache.find(category => category.id === categoryId);
+    } else {
+        return null;
+    }
+}
+
+function getCardById(cardId) {
+    if (cardId) {
+        return cardsCache.find(card => card.id === cardId);
+    } else {
+        return null;
+    }
+}
+
 async function applyBankThemesToTransactions(transactions, containerElement) {
     if (!transactions || transactions.length === 0) return;
 
     const themePromises = transactions.map(async (txn) => {
-        const { bank: { bankCode }, id, card } = txn;
-        if (!card) return;
+        const { bankCode, id } = txn;
         const cardElement = containerElement.querySelector(
-            `.transaction-card[data-transaction-card="${id}"] .card-info`
+            `.transaction-card[data-transaction-id="${id}"] .card-info`
         );
         if (cardElement) {
             await setBankColorsForElem(bankCode, cardElement);
@@ -430,7 +442,9 @@ globalThis.openAddTransactionModal = function () {
 globalThis.viewTransactionDetails = async function (transactionId) {
     try {
         const transaction = await fetchTransactionById(transactionId);
-        populateTransactionDetailsModal(transaction, categoriesCache, false);
+        const bank = banksCache.find(bank => bank.id == transaction.bankId);
+        const card = getCardById(transaction.cardId);
+        populateTransactionDetailsModal(transaction, categoriesCache, bank, card, false);
 
         if (typeof bootstrap !== 'undefined') {
             const modal = new bootstrap.Modal(document.getElementById('transactionDetailsModal'));
