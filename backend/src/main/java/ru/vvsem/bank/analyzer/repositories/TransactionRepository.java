@@ -30,9 +30,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     @Override
     @Nonnull
     @EntityGraph(value = "transaction-with-base-attributes", type = EntityGraph.EntityGraphType.LOAD)
-    default Optional<Transaction> findById(@Nonnull Long aLong) {
-        return Optional.empty();
-    }
+    Optional<Transaction> findById(@Nonnull Long aLong);
 
     @EntityGraph(value = "transaction-with-base-attributes", type = EntityGraph.EntityGraphType.LOAD)
     List<Transaction> findByUserId(Long userId);

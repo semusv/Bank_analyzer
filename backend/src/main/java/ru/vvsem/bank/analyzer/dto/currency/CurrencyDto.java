@@ -1,6 +1,7 @@
 package ru.vvsem.bank.analyzer.dto.currency;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,12 +14,14 @@ import lombok.Setter;
 public class CurrencyDto {
     private  Long id;
 
-    @NotNull
+    @NotBlank
+    @Size(min = 3,max = 3)
     private   String code;
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1,max = 1)
     private  String symbol;
 
-    @NotNull
+    @NotBlank
     private  String name;
 }

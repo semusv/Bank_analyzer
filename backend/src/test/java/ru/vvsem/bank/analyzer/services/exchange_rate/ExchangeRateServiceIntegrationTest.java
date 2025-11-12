@@ -99,6 +99,19 @@ class ExchangeRateServiceIntegrationTest extends BaseRepositoryTest {
     }
 
     @Test
+    @DisplayName("Должен конвертировать RUB в RUB без изменений с датой ")
+    void shouldConvertRubToRubWithoutChangesWithDate() {
+        // Given
+        BigDecimal amount = BigDecimal.valueOf(1000);
+
+        // When
+        BigDecimal result = exchangeRateService.convertToRub(amount, "RUB", LocalDate.now());
+
+        // Then
+        assertThat(result).isEqualByComparingTo(amount);
+    }
+
+    @Test
     @DisplayName("Должен конвертировать USD в RUB")
     void shouldConvertUsdToRub() {
         // Given
@@ -349,4 +362,6 @@ class ExchangeRateServiceIntegrationTest extends BaseRepositoryTest {
         assertThat(secondResult).isEqualByComparingTo(expectedNewResult)
                 .isNotEqualByComparingTo(firstResult);
     }
+
+
 }

@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.vvsem.bank.analyzer.dto.account.BankAccountWithCardsDto;
 import ru.vvsem.bank.analyzer.dto.account.NewBankAccountDto;
-import ru.vvsem.bank.analyzer.dto.account.BankAccountSimpleDto;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.services.bank_account.BankAccountService;
 
@@ -29,13 +29,13 @@ public class BankAccountApiController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<BankAccountSimpleDto> getUserAccounts(@AuthenticationPrincipal SecurityUser securityUser) {
+    public List<BankAccountWithCardsDto> getUserAccounts(@AuthenticationPrincipal SecurityUser securityUser) {
         return bankAccountService.getUserAccountsWithCards(securityUser);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BankAccountSimpleDto createAccount(
+    public BankAccountWithCardsDto createAccount(
             @Valid @RequestBody NewBankAccountDto newBankAccountDto,
             @AuthenticationPrincipal SecurityUser securityUser
     ) {

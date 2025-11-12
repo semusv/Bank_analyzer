@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ru.vvsem.bank.analyzer.dto.account.BankAccountSimpleDto;
+import ru.vvsem.bank.analyzer.dto.account.BankAccountWithCardsDto;
 import ru.vvsem.bank.analyzer.mappers.BankAccountMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
 import ru.vvsem.bank.analyzer.models.Bank;
@@ -185,38 +185,6 @@ class BankAccountServiceIntegrationTest extends BaseRepositoryTest {
     }
 
     @Test
-    @DisplayName("Должен получить все счета пользователя")
-    void shouldGetUserAccounts() {
-        // Given
-        var account1 = new ru.vvsem.bank.analyzer.models.BankAccount();
-        account1.setName("Acc1");
-        account1.setAccountNumber("40817810099910000001");
-        account1.setBalance(BigDecimal.valueOf(100));
-        account1.setUser(user);
-        account1.setCurrency(currency);
-        account1.setBank(bank);
-
-        var account2 = new ru.vvsem.bank.analyzer.models.BankAccount();
-        account2.setName("Acc2");
-        account2.setAccountNumber("40817810099910000002");
-        account2.setBalance(BigDecimal.valueOf(200));
-        account2.setUser(user);
-        account2.setCurrency(currency);
-        account2.setBank(bank);
-
-        bankAccountRepository.saveAllAndFlush(List.of(account1, account2));
-
-        // When
-        var result = bankAccountService.getUserBankAccount(user.getId());
-
-        // Then
-        assertThat(result).hasSize(2);
-        assertThat(result)
-                .extracting("accountNumber")
-                .containsExactlyInAnyOrder("40817810099910000001", "40817810099910000002");
-    }
-
-    @Test
     @DisplayName("Должен удалить счёт по ID")
     void shouldDeleteAccount() {
         // Given
@@ -260,7 +228,7 @@ class BankAccountServiceIntegrationTest extends BaseRepositoryTest {
         bankAccountRepository.saveAllAndFlush(List.of(account1, account2));
 
         // When
-        List<BankAccountSimpleDto> result = bankAccountService.getUserAccountsWithCards(securityUser);
+        List<BankAccountWithCardsDto> result = bankAccountService.getUserAccountsWithCards(securityUser);
 
         // Then
         assertThat(result).hasSize(2);
@@ -268,13 +236,16 @@ class BankAccountServiceIntegrationTest extends BaseRepositoryTest {
                 .extracting("accountNumber")
                 .containsExactlyInAnyOrder("40817810099910000001", "40817810099910000002");
         assertThat(result.get(0).getCards()).isNotNull(); // даже если пусто — список инициализирован
+
+
+        result.forEach(this::assertAllFieldsInitialized);
     }
 
     @Test
     @DisplayName("Должен вернуть пустой список, если у пользователя нет счетов")
     void shouldReturnEmptyList_WhenUserHasNoAccounts() {
         // When
-        List<BankAccountSimpleDto> result = bankAccountService.getUserAccountsWithCards( securityUser);
+        List<BankAccountWithCardsDto> result = bankAccountService.getUserAccountsWithCards( securityUser);
 
         // Then
         assertThat(result).isEmpty();

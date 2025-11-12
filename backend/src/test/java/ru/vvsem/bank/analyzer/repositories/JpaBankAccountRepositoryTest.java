@@ -68,6 +68,13 @@ class JpaBankAccountRepositoryTest extends BaseRepositoryTest {
         user.setName("TestName2");
         entityManager.persistAndFlush(user);
         userList.add(user);
+
+        System.out.println("------------------------------");
+        System.out.println("Setup complete");
+
+
+        entityManager.clear();
+        entityManager.flush();
     }
 
     @Test

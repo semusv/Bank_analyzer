@@ -60,9 +60,9 @@ public class CbrIntegrationConfig {
     @Bean
     @InboundChannelAdapter(channel = "exchangeRateChannel",
             poller = @Poller(fixedDelay = "${poll-interval:3600000}"))
-    public MessageSource<String> exchangeRateTrigger() {
+    public MessageSource<LocalDate> exchangeRateTrigger() {
         return () -> {
-            String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            LocalDate date = LocalDate.now();
             return MessageBuilder.withPayload(date).build();
         };
     }
@@ -73,12 +73,10 @@ public class CbrIntegrationConfig {
                 .from("exchangeRateChannel")
                 .enrichHeaders(h -> h
                         .headerExpression("cbrDate", "payload"))
-                // Преобразуем строку "dd/MM/yyyy" в LocalDate
-                .transform(payload -> LocalDate.parse((String) payload, DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                 // Проверяем, есть ли уже данные в БД
                 .filter(exchangeRateServiceImpl, "needLoadForDate", spec -> spec
                         .discardChannel("rateCheckChannel"))
-                // Обратно в строку для использования в URL
+                // В строку dd/MM/yyyy для использования в URL
                 .transform(LocalDate.class,
                         date -> date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                 // Теперь делаем HTTP-запрос

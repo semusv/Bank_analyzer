@@ -17,7 +17,6 @@ import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CategoryMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.OperationTypeMapperImpl;
-import ru.vvsem.bank.analyzer.mappers.UserMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.transaction.TransactionMapperImpl;
 import ru.vvsem.bank.analyzer.models.*;
 import ru.vvsem.bank.analyzer.models.Currency;
@@ -50,7 +49,6 @@ import static org.mockito.Mockito.when;
         OperationTypeMapperImpl.class,
         TransactionMapperImpl.class,
         BankMapperImpl.class,
-        UserMapperImpl.class,
         CardMapperImpl.class
 })
 class AnalyticsServiceIntegrationTest extends BaseRepositoryTest {

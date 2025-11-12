@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.vvsem.bank.analyzer.dto.account.BankAccountDto;
+import ru.vvsem.bank.analyzer.dto.account.BankAccountWithCardsDto;
 import ru.vvsem.bank.analyzer.dto.account.NewBankAccountDto;
 import ru.vvsem.bank.analyzer.mappers.BankAccountMapper;
 import ru.vvsem.bank.analyzer.models.BankAccount;
-import ru.vvsem.bank.analyzer.dto.account.BankAccountSimpleDto;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
 import ru.vvsem.bank.analyzer.repositories.BankAccountRepository;
@@ -36,17 +35,10 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     private final BankService bankService;
 
-    @Transactional(readOnly = true)
-    @Override
-    public List<BankAccountDto> getUserBankAccount(Long userId) {
-        List<BankAccount> accounts = bankAccountRepository.findByUserId(userId);
-        return accounts.stream()
-                .map(bankAccountMapper::toBankAccountDto).toList();
-    }
 
     @Transactional
     @Override
-    public BankAccountSimpleDto createAccount(NewBankAccountDto newBankAccountDto, SecurityUser securityUser) {
+    public BankAccountWithCardsDto createAccount(NewBankAccountDto newBankAccountDto, SecurityUser securityUser) {
         var bankAccount = bankAccountMapper.toEntity(newBankAccountDto);
         bankAccount.setBank(bankService.findById(bankAccount.getBank().getId()));
         bankAccount.setCurrency(currencyService.findById(bankAccount.getCurrency().getId()));
@@ -57,7 +49,7 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Transactional
     @Override
-    public List<BankAccountSimpleDto> getUserAccountsWithCards(SecurityUser securityUser) {
+    public List<BankAccountWithCardsDto> getUserAccountsWithCards(SecurityUser securityUser) {
         List<BankAccount> accounts = bankAccountRepository.findWithCardsAndUserAndCurrencyByUserId(securityUser.getId());
         return accounts.stream()
                 .map(bankAccountMapper::toBankAccountSimpleDto).toList();

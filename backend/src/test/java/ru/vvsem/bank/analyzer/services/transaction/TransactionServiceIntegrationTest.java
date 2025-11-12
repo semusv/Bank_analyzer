@@ -184,10 +184,6 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
         anotherUserTransaction.setHide(false);
         entityManager.persistAndFlush(anotherUserTransaction);
 
-        entityManager.flush();
-        entityManager.clear();
-
-
         System.out.println("-------------------------------------------");
         System.out.println("--------------End of setup-----------------");
         System.out.println("-------------------------------------------");
@@ -285,10 +281,12 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
         TransactionDto result = transactionService.hideTransaction(transaction1.getId(), user.getId());
 
         // Then
+        //noinspection ConstantValue
         assertThat(result.isHide()).isEqualTo(!initialHideState);
 
         // Проверяем, что состояние сохранилось в БД
         Transaction updatedTransaction = entityManager.find(Transaction.class, transaction1.getId());
+        //noinspection ConstantValue
         assertThat(updatedTransaction.isHide()).isEqualTo(!initialHideState);
     }
 

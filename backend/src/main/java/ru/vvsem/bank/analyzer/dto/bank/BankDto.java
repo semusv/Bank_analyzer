@@ -18,7 +18,6 @@ public class BankDto {
     @NotNull
     private  String bic;
 
-    private String logoUrl;
-
+    @NotNull
     private String bankCode;
 }

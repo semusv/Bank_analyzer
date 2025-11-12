@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class BankAccountSimpleDto {
+public class BankAccountWithCardsDto {
     private Long id;
 
     @NotNull

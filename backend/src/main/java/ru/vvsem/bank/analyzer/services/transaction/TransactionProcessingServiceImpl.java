@@ -179,7 +179,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
                 .getOwnedCategory(patchTransactionData.getCategoryId(), securityUser.getId()));
         transaction.setAmount(patchTransactionData.getAmount());
         transaction.setOperationTime(patchTransactionData.getOperationTime());
-        if (!diffAmount.equals(BigDecimal.ZERO)) {
+        if (diffAmount.compareTo(BigDecimal.ZERO) != 0) {
             bankAccountService.addAccountBalance(card.getAccount().getId(), diffAmount.negate(), securityUser);
         }
         return transactionService.updateTransaction(transaction, securityUser.getId());

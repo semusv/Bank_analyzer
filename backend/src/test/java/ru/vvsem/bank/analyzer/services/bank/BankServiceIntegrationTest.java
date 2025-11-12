@@ -145,12 +145,32 @@ class BankServiceIntegrationTest extends BaseRepositoryTest {
     @Test
     @DisplayName("Должен вернуть DTO банка по ID")
     void shouldReturnBankDtoByID() {
-            // When
-            BankDto result = bankService.findBankDtoById(bank1.getId());
-            // Then
-            assertThat(result.getId()).isEqualTo(bank1.getId());
+        // When
+        BankDto result = bankService.findBankDtoById(bank1.getId());
+        // Then
+        assertThat(result.getId()).isEqualTo(bank1.getId());
     }
 
+    @Test
+    @DisplayName("Должен вернуть entity банка по ID")
+    void shouldReturnBankEntityByID() {
+        // When
+        Bank result = bankService.findById(bank1.getId());
+        // Then
+        assertThat(result.getId()).isEqualTo(bank1.getId());
+    }
+
+    @Test
+    @DisplayName("Должен выкинуть исключение, если Null при получении entity банка по ID")
+    void shouldThrowExceptionWhenBankEntityIsNull() {
+
+            // Given
+            entityManager.clear();
+
+            // When
+            assertThrows(IllegalArgumentException.class,
+                    () -> bankService.findById(null));
+    }
 
     @Test
     @DisplayName("Должен вернуть валюту по ID")

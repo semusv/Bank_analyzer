@@ -1,5 +1,6 @@
 package ru.vvsem.bank.analyzer.services.transaction;
 
+import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,8 @@ import ru.vvsem.bank.analyzer.mappers.BankAccountMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CurrencyMapperImpl;
-import ru.vvsem.bank.analyzer.mappers.UserMapperImpl;
+import ru.vvsem.bank.analyzer.mappers.transaction.NewTransactionMapperImpl;
+import ru.vvsem.bank.analyzer.mappers.transaction.TransactionHierarchyMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.transaction.TransactionMapperImpl;
 import ru.vvsem.bank.analyzer.models.*;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
@@ -50,10 +52,11 @@ import static org.mockito.Mockito.when;
         EntityAccessProviderImpl.class,
         TransactionMapperImpl.class,
         TransactionSearchServiceImpl.class,
+        TransactionHierarchyMapperImpl.class,
+        NewTransactionMapperImpl.class,
         BankMapperImpl.class,
         BankAccountMapperImpl.class,
         CardMapperImpl.class,
-        UserMapperImpl.class,
         CurrencyServiceImpl.class,
         BankServiceImpl.class,
         CurrencyMapperImpl.class
@@ -91,6 +94,8 @@ class TransactionProcessingServiceIntegrationTest extends BaseRepositoryTest {
     private BankAccount account1;
     private BankAccount account2;
     private Transaction existingTransaction;
+    private Transaction parentTransaction;
+    private Transaction siblingTransaction;
 
     @BeforeEach
     void setUp() {
@@ -186,6 +191,33 @@ class TransactionProcessingServiceIntegrationTest extends BaseRepositoryTest {
         existingTransaction.setMaster(false);
         existingTransaction = entityManager.persistAndFlush(existingTransaction);
 
+        parentTransaction = new Transaction();
+        parentTransaction.setDescription("parent");
+        parentTransaction.setAmount(new BigDecimal("-1000.00"));
+        parentTransaction.setCurrency(currencyRub);
+        parentTransaction.setOperationTime(LocalDateTime.now().minusDays(1));
+        parentTransaction.setCard(card1);
+        parentTransaction.setCategory(categoryFood);
+        parentTransaction.setUser(user);
+        parentTransaction.setOperationType(OperationType.OUTGOING);
+        parentTransaction.setHide(false);
+        parentTransaction.setMaster(true);
+        parentTransaction = entityManager.persistAndFlush(parentTransaction);
+
+        siblingTransaction = new Transaction();
+        siblingTransaction.setDescription("Sibling");
+        siblingTransaction.setAmount(new BigDecimal("-1000.00"));
+        siblingTransaction.setCurrency(currencyRub);
+        siblingTransaction.setOperationTime(LocalDateTime.now().minusDays(1));
+        siblingTransaction.setCard(card1);
+        siblingTransaction.setCategory(categoryFood);
+        siblingTransaction.setUser(user);
+        siblingTransaction.setOperationType(OperationType.OUTGOING);
+        siblingTransaction.setHide(false);
+        siblingTransaction.setMaster(false);
+        siblingTransaction.setParentTransaction(parentTransaction);
+        siblingTransaction = entityManager.persistAndFlush(siblingTransaction);
+
         entityManager.flush();
         entityManager.clear();
 
@@ -265,7 +297,7 @@ class TransactionProcessingServiceIntegrationTest extends BaseRepositoryTest {
         result.forEach(resultDto ->
                 assertAllFieldsInitialized(
                         resultDto,
-                        new String[]{"parentTransactionId"}));
+                        "parentTransactionId"));
     }
 
     @Test
@@ -404,6 +436,41 @@ class TransactionProcessingServiceIntegrationTest extends BaseRepositoryTest {
     }
 
     @Test
+    @DisplayName("Должен выбросить исключение при попытке разделить дочернюю транзакцию")
+    void shouldThrowExceptionWhenSplittingChildTransaction() {
+        // Given
+        List<SubTransactionDto> subTransactions = List.of(
+                new SubTransactionDto("Food", new BigDecimal("-400.00")),
+                new SubTransactionDto("Transport", new BigDecimal("-600.00"))
+                // Сумма 700.00 вместо 1000.00
+        );
+        Long existingTransactionId = siblingTransaction.getId();
+        // When & Then
+        val exception = assertThrows(BusinessException.class,
+                () -> transactionProcessingService.splitTransaction(existingTransactionId, subTransactions, securityUser));
+        assertThat(exception.getMessageCode()).isEqualTo("business.transaction.cant.split.sub");
+
+    }
+
+    @Test
+    @DisplayName("Должен выбросить исключение при попытке разделить уже разделенную")
+    void shouldThrowExceptionWhenSplittingAlreadySplitTransaction() {
+        // Given
+        List<SubTransactionDto> subTransactions = List.of(
+                new SubTransactionDto("Food", new BigDecimal("-400.00")),
+                new SubTransactionDto("Transport", new BigDecimal("-600.00"))
+                // Сумма 700.00 вместо 1000.00
+        );
+        Long existingTransactionId = parentTransaction.getId();
+        // When & Then
+        val exception = assertThrows(BusinessException.class,
+                () -> transactionProcessingService.splitTransaction(existingTransactionId, subTransactions, securityUser));
+        assertThat(exception.getMessageCode()).isEqualTo("business.transaction.already.splitted");
+
+    }
+
+
+    @Test
     @DisplayName("Должен скрыть транзакцию и обновить баланс")
     void shouldHideTransactionAndUpdateBalance() {
         // Given
@@ -425,6 +492,32 @@ class TransactionProcessingServiceIntegrationTest extends BaseRepositoryTest {
                 initialBalance.add(existingTransaction.getAmount().abs())
         );
     }
+
+    @Test
+    @DisplayName("Должен выкинуть исключение при попытке скрыть разделенную транзакцию")
+    void shouldThrowExceptionWhenHidingSplitTransaction() {
+        // Given
+        Long existingTransactionId = parentTransaction.getId();
+        // When & Then
+        val exception = assertThrows(BusinessException.class,
+                () -> transactionProcessingService.hideTransactionWithBalanceUpdate(
+                        existingTransactionId, securityUser));
+        assertThat(exception.getMessageCode()).isEqualTo("business.transaction.unHide.already.splitted");
+    }
+
+    @Test
+    @DisplayName("Должен выкинуть исключение при попытке удалить разделенную транзакцию")
+    void shouldThrowExceptionWhenDeletingSplitTransaction() {
+        // Given
+        Long existingTransactionId = parentTransaction.getId();
+        // When & Then
+        val exception = assertThrows(BusinessException.class,
+                () -> transactionProcessingService.deleteTransactionWithBalanceUpdate(
+                        existingTransactionId, securityUser));
+        assertThat(exception.getMessageCode())
+                .isEqualTo("business.transaction.delete.already.splitted");
+    }
+
 
     @Test
     @DisplayName("Должен удалить транзакцию и обновить баланс")
