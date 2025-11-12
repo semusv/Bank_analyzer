@@ -34,7 +34,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import({
         CardServiceImpl.class,
         CardMapperImpl.class,
-        UserMapperImpl.class,
         EntityAccessProviderImpl.class,
         BankServiceImpl.class,
         BankMapperImpl.class
