@@ -43,7 +43,6 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
 
     private final CurrencyService currencyService;
 
-    @SuppressWarnings("CheckStyle")
     @Override
     public List<TransactionDto> createTransactions(NewTransactionDto dto, SecurityUser securityUser) {
         List<TransactionDto> transactionDtoList = new ArrayList<>();
@@ -57,10 +56,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
         }
         if (revTransaction != null) {
             if (!Objects.equals(revTransaction.getCurrency().getId(), transaction.getCurrency().getId())) {
-                throw new BusinessException(
-                        "Currency mismatch between cards",
-                        "business.transaction.currency.mismatch"
-                );
+                throw new BusinessException("Currency mismatch between cards", "business.transaction.currency.mismatch");
             }
             transactionDtoList.add(transactionService.createTransaction(revTransaction));
         }
@@ -95,7 +91,6 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
         return transaction;
     }
 
-    @SuppressWarnings("CheckStyle")
     @Override
     public void splitTransaction(
             Long transactionId, List<SubTransactionDto> subTransactions, SecurityUser securityUser) {
@@ -106,6 +101,21 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .setScale(2, RoundingMode.HALF_UP);
 
+        checkBeforeSplit(parentTransaction, totalSubAmount);
+
+        parentTransaction.setHide(true);
+        parentTransaction.setMaster(true);
+        transactionService.updateTransaction(parentTransaction, securityUser.getId());
+
+        for (SubTransactionDto subTransactionDto : subTransactions) {
+            if (subTransactionDto.getAmount().compareTo(BigDecimal.ZERO) != 0) {
+                Transaction subTransaction = getSubTransaction(subTransactionDto, parentTransaction);
+                transactionService.createTransaction(subTransaction);
+            }
+        }
+    }
+
+    private void checkBeforeSplit(Transaction parentTransaction, BigDecimal totalSubAmount) {
         if (!transactionService.getByParentTransactionId(parentTransaction.getId()).isEmpty()) {
             throw new BusinessException(
                     "Can't split already splitted transaction",
@@ -120,17 +130,6 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
         }
         if (!totalSubAmount.equals(parentTransaction.getAmount())) {
             throw new IllegalArgumentException("Сумма дочерних транзакций не равна сумме родительской");
-        }
-
-        parentTransaction.setHide(true);
-        parentTransaction.setMaster(true);
-        transactionService.updateTransaction(parentTransaction, securityUser.getId());
-
-        for (SubTransactionDto subTransactionDto : subTransactions) {
-            if (subTransactionDto.getAmount().compareTo(BigDecimal.ZERO) != 0) {
-                Transaction subTransaction = getSubTransaction(subTransactionDto, parentTransaction);
-                transactionService.createTransaction(subTransaction);
-            }
         }
     }
 

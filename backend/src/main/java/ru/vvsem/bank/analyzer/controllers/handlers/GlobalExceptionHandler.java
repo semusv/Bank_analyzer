@@ -20,10 +20,7 @@ import ru.vvsem.bank.analyzer.exceptions.BusinessException;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 import ru.vvsem.bank.analyzer.providers.ErrorHandlingProvider;
 
-import java.util.Set;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-
 
 @RestControllerAdvice
 @AllArgsConstructor

@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
-import ru.vvsem.bank.analyzer.models.enums.Role;
 import ru.vvsem.bank.analyzer.repositories.UserRepository;
-
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
