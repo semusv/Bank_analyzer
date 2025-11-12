@@ -109,7 +109,7 @@ public class TransactionApiController {
     public List<TransactionDto> createTransaction(
             @Valid @RequestBody NewTransactionDto newTransactionDto,
             @AuthenticationPrincipal SecurityUser securityUser) {
-        return transactionProcessingService.createTransaction(newTransactionDto, securityUser);
+        return transactionProcessingService.createTransactions(newTransactionDto, securityUser);
     }
 
 

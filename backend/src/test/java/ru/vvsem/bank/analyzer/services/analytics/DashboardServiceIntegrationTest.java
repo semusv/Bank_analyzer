@@ -16,7 +16,7 @@ import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.mappers.BankAccountMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
-import ru.vvsem.bank.analyzer.mappers.TransactionMapperImpl;
+import ru.vvsem.bank.analyzer.mappers.transaction.TransactionMapperImpl;
 import ru.vvsem.bank.analyzer.models.*;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
 import ru.vvsem.bank.analyzer.repositories.TransactionRepository;
@@ -140,6 +140,10 @@ class DashboardServiceIntegrationTest extends BaseRepositoryTest {
         card1.setLastFourDigits("1111");
         card1.setAccount(account1);
         entityManager.persistAndFlush(card1);
+
+        entityManager.flush();
+        entityManager.clear();
+
     }
 
     @Test

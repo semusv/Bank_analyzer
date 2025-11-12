@@ -15,6 +15,6 @@ public interface BankService {
     Bank findById(Long bankId);
 
     @Transactional(readOnly = true)
-    BankDto findByIdDto(Long bankId);
+    BankDto findBankDtoById(Long bankId);
 
 }

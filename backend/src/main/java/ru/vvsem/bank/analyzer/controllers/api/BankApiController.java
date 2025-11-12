@@ -31,7 +31,7 @@ public class BankApiController {
     @ResponseStatus(HttpStatus.OK)
     public BankDto getBankById(
             @PathVariable("id") Long bankId) {
-        return banksService.findByIdDto(bankId);
+        return banksService.findBankDtoById(bankId);
     }
 
 }

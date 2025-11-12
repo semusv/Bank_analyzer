@@ -1,7 +1,5 @@
 package ru.vvsem.bank.analyzer.services.transaction;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +15,8 @@ import ru.vvsem.bank.analyzer.dto.transaction.TransactionFilterDto;
 import ru.vvsem.bank.analyzer.mappers.BankAccountMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
-import ru.vvsem.bank.analyzer.mappers.TransactionMapperImpl;
+import ru.vvsem.bank.analyzer.mappers.transaction.TransactionHierarchyMapperImpl;
+import ru.vvsem.bank.analyzer.mappers.transaction.TransactionMapperImpl;
 import ru.vvsem.bank.analyzer.models.*;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
@@ -42,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         DashboardServiceImpl.class,
         BankMapperImpl.class,
         TransactionMapperImpl.class,
+        TransactionHierarchyMapperImpl.class,
         BankAccountMapperImpl.class,
         CardMapperImpl.class,
         EntityAccessProviderImpl.class,
@@ -73,16 +73,9 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
     private Card card2;
     private Bank bank1;
     private Bank bank2;
-    private Transaction transaction1;
-    private Transaction transaction2;
-    private Transaction transaction3;
-    private Transaction transaction4;
+    private Transaction transactionParent;
 
 
-    private Logger sqlLogger;
-    private Logger binderLogger;
-    private Level originalSqlLevel;
-    private Level originalBinderLevel;
 
     @BeforeEach
     void setUp() {
@@ -178,7 +171,7 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
         LocalDateTime now = LocalDateTime.now();
 
         // Создаём тестовые транзакции
-        transaction1 = createTransaction(
+        createTransaction(
                 "Grocery shopping at supermarket",
                 new BigDecimal("-1500.00"),
                 now.minusDays(5),
@@ -188,7 +181,7 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
                 OperationType.OUTGOING
         );
 
-        transaction2 = createTransaction(
+        createTransaction(
                 "Monthly salary",
                 new BigDecimal("50000.00"),
                 now.minusDays(3),
@@ -198,7 +191,7 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
                 OperationType.INCOMING
         );
 
-        transaction3 = createTransaction(
+        createTransaction(
                 "Restaurant dinner",
                 new BigDecimal("-2500.00"),
                 now.minusDays(2),
@@ -208,11 +201,11 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
                 OperationType.OUTGOING
         );
 
-        transaction4 = createTransaction(
+        createTransaction(
                 "Online shopping",
                 new BigDecimal("-3000.00"),
                 now.minusDays(1),
-                null,
+                categorySalary,
                 card2,
                 user,
                 OperationType.OUTGOING
@@ -223,11 +216,52 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
                 "Other user transaction",
                 new BigDecimal("-100.00"),
                 now,
-                null,
+                categoryFood,
                 card1,
                 anotherUser,
                 OperationType.OUTGOING
         );
+
+        //нужна еще родительская транзакция и ее дочернии
+        transactionParent = createTransaction(
+                "parent",
+                new BigDecimal("-100.00"),
+                now,
+                categoryFood,
+                card1,
+                user,
+                OperationType.OUTGOING,
+                true,
+                null
+        );
+        //дочерняя транзакция 1
+        createTransaction(
+                "sibling 1",
+                new BigDecimal("-60.00"),
+                now,
+                categoryFood,
+                card1,
+                user,
+                OperationType.OUTGOING,
+                false,
+                transactionParent
+        );
+        //дочерняя транзакция 2
+        createTransaction(
+                "sibling 2",
+                new BigDecimal("-40.00"),
+                now,
+                categoryFood,
+                card1,
+                user,
+                OperationType.OUTGOING,
+                false,
+                transactionParent
+        );
+
+
+        entityManager.flush();
+        entityManager.clear();
 
         System.out.println("-------------------------------------------");
         System.out.println("-------------------------------------------");
@@ -244,9 +278,35 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
         Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
-        assertThat(result.getContent()).hasSize(4);
-        assertThat(result.getTotalElements()).isEqualTo(4);
+        assertThat(result.getContent()).hasSize(5);
+        assertThat(result.getTotalElements()).isEqualTo(5);
         assertThat(result.getTotalPages()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Нужно проверить что возвращаются транзакции с дочерними и родительскими")
+    void shouldReturnTransactionsWithSiblings() {
+        // Given
+        TransactionFilterDto filter = TransactionFilterDto.builder().build();
+        // When
+        Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
+        List<TransactionDtoWithSiblings> transactions = result.getContent();
+
+        transactions.forEach( transactionDtoWithSiblingsDto ->
+                assertAllFieldsInitialized(
+                        transactionDtoWithSiblingsDto,
+                        "parentTransactionId", "subTransactions"
+                ));
+
+        for (TransactionDtoWithSiblings transaction : transactions) {
+            if (transaction.getId().equals(transactionParent.getId())) {
+                assertThat(transaction.getSubTransactions()).hasSize(2);
+                for (TransactionDtoWithSiblings transactionDtoWithSiblings : transaction.getSubTransactions()) {
+                    assertAllFieldsInitialized(transactionDtoWithSiblings, "subTransactions" );
+                }
+            }
+        }
+
     }
 
     @Test
@@ -261,10 +321,10 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
         Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
-        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getContent()).hasSize(3);
         assertThat(result.getContent())
                 .extracting(TransactionDtoWithSiblings::getDescription)
-                .containsExactlyInAnyOrder("Grocery shopping at supermarket", "Restaurant dinner");
+                .containsExactlyInAnyOrder("Grocery shopping at supermarket", "Restaurant dinner", "parent");
     }
 
     @Test
@@ -279,10 +339,10 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
         Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
-        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getContent()).hasSize(3);
         assertThat(result.getContent())
                 .extracting(TransactionDtoWithSiblings::getDescription)
-                .containsExactlyInAnyOrder("Grocery shopping at supermarket", "Monthly salary");
+                .containsExactlyInAnyOrder("Grocery shopping at supermarket", "Monthly salary", "parent");
     }
 
     @Test
@@ -371,9 +431,9 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
 
         // Then
         assertThat(page1.getContent()).hasSize(2);
-        assertThat(page1.getTotalElements()).isEqualTo(4);
-        assertThat(page1.getTotalPages()).isEqualTo(2);
-        assertThat(page1.getNumber()).isEqualTo(0);
+        assertThat(page1.getTotalElements()).isEqualTo(5);
+        assertThat(page1.getTotalPages()).isEqualTo(3);
+        assertThat(page1.getNumber()).isZero();
         assertThat(page1.getSize()).isEqualTo(2);
 
         // When - вторая страница с 2 элементами
@@ -383,6 +443,7 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
         assertThat(page2.getContent()).hasSize(2);
         assertThat(page2.getNumber()).isEqualTo(1);
     }
+
 
     @Test
     @DisplayName("Должен возвращать пустой результат когда нет совпадений")
@@ -412,7 +473,7 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
         Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
-        assertThat(result.getContent()).hasSize(4);
+        assertThat(result.getContent()).hasSize(5);
     }
 
     @Test
@@ -432,7 +493,7 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
         Page<TransactionDtoWithSiblings> result = transactionSearchService.searchTransactions(securityUser, filter, 0, 10);
 
         // Then
-        assertThat(result.getContent()).hasSize(4);
+        assertThat(result.getContent()).hasSize(5);
     }
 
     @Test
@@ -449,6 +510,8 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
         assertThat(content).isSortedAccordingTo((t1, t2) ->
                 t2.getOperationTime().compareTo(t1.getOperationTime())
         );
+
+        assertAllFieldsInitialized(content);
     }
 
     @Test
@@ -479,6 +542,31 @@ class TransactionSearchServiceIntegrationTest extends BaseRepositoryTest {
         transaction.setUser(user);
         transaction.setOperationType(operationType);
         transaction.setHide(false);
+        return entityManager.persistAndFlush(transaction);
+    }
+
+    private Transaction createTransaction(
+            String description,
+            BigDecimal amount,
+            LocalDateTime operationTime,
+            Category category,
+            Card card,
+            User user,
+            OperationType operationType,
+            boolean master,
+            Transaction parent) {
+        Transaction transaction = new Transaction();
+        transaction.setDescription(description);
+        transaction.setAmount(amount);
+        transaction.setCurrency(currencyRub);
+        transaction.setOperationTime(operationTime);
+        transaction.setCard(card);
+        transaction.setCategory(category);
+        transaction.setUser(user);
+        transaction.setOperationType(operationType);
+        transaction.setHide(false);
+        transaction.setMaster(master);
+        transaction.setParentTransaction(parent);
         return entityManager.persistAndFlush(transaction);
     }
 }

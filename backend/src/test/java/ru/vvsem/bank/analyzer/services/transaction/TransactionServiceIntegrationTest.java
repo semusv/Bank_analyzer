@@ -19,7 +19,9 @@ import ru.vvsem.bank.analyzer.dto.transaction.TransactionDtoWithSiblings;
 import ru.vvsem.bank.analyzer.mappers.BankAccountMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
-import ru.vvsem.bank.analyzer.mappers.TransactionMapperImpl;
+import ru.vvsem.bank.analyzer.mappers.transaction.NewTransactionMapperImpl;
+import ru.vvsem.bank.analyzer.mappers.transaction.TransactionHierarchyMapperImpl;
+import ru.vvsem.bank.analyzer.mappers.transaction.TransactionMapperImpl;
 import ru.vvsem.bank.analyzer.models.*;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
@@ -33,6 +35,7 @@ import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,6 +48,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         DashboardServiceImpl.class,
         BankMapperImpl.class,
         TransactionMapperImpl.class,
+        TransactionHierarchyMapperImpl.class,
+        NewTransactionMapperImpl.class,
         BankAccountMapperImpl.class,
         CardMapperImpl.class,
         EntityAccessProviderImpl.class,
@@ -179,6 +184,10 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
         anotherUserTransaction.setHide(false);
         entityManager.persistAndFlush(anotherUserTransaction);
 
+        entityManager.flush();
+        entityManager.clear();
+
+
         System.out.println("-------------------------------------------");
         System.out.println("--------------End of setup-----------------");
         System.out.println("-------------------------------------------");
@@ -195,6 +204,16 @@ class TransactionServiceIntegrationTest extends BaseRepositoryTest {
         assertThat(result)
                 .extracting(TransactionDto::getDescription)
                 .containsExactlyInAnyOrder("Grocery shopping", "Salary");
+        for (TransactionDto transactionDto : result) {
+            if (Objects.equals(transactionDto.getId(), transaction1.getId())) {
+                assertAllFieldsInitialized(transactionDto, "subTransactions", "parentTransactionId");
+            }
+            if (Objects.equals(transactionDto.getId(), transaction2.getId())) {
+                assertAllFieldsInitialized(transactionDto, "subTransactions", "parentTransactionId", "categoryId");
+            }
+
+        }
+
     }
 
     @Test

@@ -1,5 +1,10 @@
 package ru.vvsem.bank.analyzer.repositories;
 
+import jakarta.annotation.Nonnull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -14,10 +19,22 @@ import java.util.Optional;
 public interface TransactionRepository extends JpaRepository<Transaction, Long>,
         JpaSpecificationExecutor<Transaction> {
 
+    @Override
+    @Nonnull
+    @EntityGraph(value = "transaction-with-all-relations", type = EntityGraph.EntityGraphType.LOAD)
+    Page<Transaction> findAll(Specification<Transaction> spec, @Nonnull Pageable pageable);
+
+    @EntityGraph(value = "transaction-with-base-attributes", type = EntityGraph.EntityGraphType.LOAD)
     List<Transaction> findByParentTransactionId(Long parentTransactionId);
 
-    Optional<Transaction> findByIdAndUserId(Long transactionId, Long userId);
+    @Override
+    @Nonnull
+    @EntityGraph(value = "transaction-with-base-attributes", type = EntityGraph.EntityGraphType.LOAD)
+    default Optional<Transaction> findById(@Nonnull Long aLong) {
+        return Optional.empty();
+    }
 
+    @EntityGraph(value = "transaction-with-base-attributes", type = EntityGraph.EntityGraphType.LOAD)
     List<Transaction> findByUserId(Long userId);
 
     @Query("SELECT COUNT(t) " +

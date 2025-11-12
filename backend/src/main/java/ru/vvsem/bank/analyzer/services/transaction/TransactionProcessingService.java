@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface TransactionProcessingService {
     @Transactional
-    List<TransactionDto> createTransaction(NewTransactionDto dto, SecurityUser securityUser);
+    List<TransactionDto> createTransactions(NewTransactionDto dto, SecurityUser securityUser);
 
     @Transactional
     void splitTransaction(Long transactionId, List<SubTransactionDto> subTransactions, SecurityUser securityUser);

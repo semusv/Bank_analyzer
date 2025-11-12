@@ -12,12 +12,13 @@ import ru.vvsem.bank.analyzer.dto.transaction.NewTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.PatchTransactionData;
 import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
+import ru.vvsem.bank.analyzer.exceptions.BusinessException;
 import ru.vvsem.bank.analyzer.mappers.BankAccountMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CurrencyMapperImpl;
-import ru.vvsem.bank.analyzer.mappers.TransactionMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.UserMapperImpl;
+import ru.vvsem.bank.analyzer.mappers.transaction.TransactionMapperImpl;
 import ru.vvsem.bank.analyzer.models.*;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
@@ -57,7 +58,7 @@ import static org.mockito.Mockito.when;
         BankServiceImpl.class,
         CurrencyMapperImpl.class
 })
-class TransactionProcessingServiceImplIntegrationTest extends BaseRepositoryTest {
+class TransactionProcessingServiceIntegrationTest extends BaseRepositoryTest {
 
     @Autowired
     private TransactionProcessingService transactionProcessingService;
@@ -185,6 +186,9 @@ class TransactionProcessingServiceImplIntegrationTest extends BaseRepositoryTest
         existingTransaction.setMaster(false);
         existingTransaction = entityManager.persistAndFlush(existingTransaction);
 
+        entityManager.flush();
+        entityManager.clear();
+
         System.out.println("---------------------------------------");
         System.out.println("Setup complete");
         System.out.println("---------------------------------------");
@@ -207,7 +211,7 @@ class TransactionProcessingServiceImplIntegrationTest extends BaseRepositoryTest
         BigDecimal initialBalance = account1.getBalance();
 
         // When
-        List<TransactionDto> result = transactionProcessingService.createTransaction(dto, securityUser);
+        List<TransactionDto> result = transactionProcessingService.createTransactions(dto, securityUser);
 
         // Then
         entityManager.flush();
@@ -242,7 +246,7 @@ class TransactionProcessingServiceImplIntegrationTest extends BaseRepositoryTest
 
         // When
         when(userService.getUserById(securityUser.getId())).thenReturn(user);
-        List<TransactionDto> result = transactionProcessingService.createTransaction(dto, securityUser);
+        List<TransactionDto> result = transactionProcessingService.createTransactions(dto, securityUser);
         entityManager.flush();
         entityManager.clear();
 
@@ -257,6 +261,11 @@ class TransactionProcessingServiceImplIntegrationTest extends BaseRepositoryTest
         BankAccount updatedAccount = entityManager.find(BankAccount.class, account1.getId());
         BigDecimal expectedBalance = initialBalance.add(amount);
         assertThat(updatedAccount.getBalance()).isEqualByComparingTo(expectedBalance);
+        //assertAllFieldsInitialized (и список полей для исключения в виде массива)
+        result.forEach(resultDto ->
+                assertAllFieldsInitialized(
+                        resultDto,
+                        new String[]{"parentTransactionId"}));
     }
 
     @Test
@@ -277,7 +286,7 @@ class TransactionProcessingServiceImplIntegrationTest extends BaseRepositoryTest
         BigDecimal initialBalance2 = account2.getBalance();
 
         // When
-        List<TransactionDto> result = transactionProcessingService.createTransaction(dto, securityUser);
+        List<TransactionDto> result = transactionProcessingService.createTransactions(dto, securityUser);
         entityManager.flush();
         entityManager.clear();
 
@@ -336,8 +345,11 @@ class TransactionProcessingServiceImplIntegrationTest extends BaseRepositoryTest
 
         // When & Then
         when(userService.getUserById(securityUser.getId())).thenReturn(user);
-        assertThrows(IllegalArgumentException.class,
-                () -> transactionProcessingService.createTransaction(dto, securityUser));
+        var exception = assertThrows(BusinessException.class,
+                () -> transactionProcessingService.createTransactions(dto, securityUser));
+
+        assertThat(exception.getMessageCode()).isEqualTo("business.transaction.currency.mismatch");
+
     }
 
     @Test
@@ -521,6 +533,8 @@ class TransactionProcessingServiceImplIntegrationTest extends BaseRepositoryTest
     void shouldHandleHideAndUnhideTransaction() {
         // Given
         BigDecimal initialBalance = account1.getBalance();
+        entityManager.flush();
+        entityManager.clear();
 
         // First hide
         TransactionDto hiddenResult = transactionProcessingService.hideTransactionWithBalanceUpdate(

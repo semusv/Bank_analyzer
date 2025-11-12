@@ -79,6 +79,10 @@ class ExchangeRateServiceIntegrationTest extends BaseRepositoryTest {
         eurRateToday.setValue(BigDecimal.valueOf(100));
         eurRateToday.setVunitRate(BigDecimal.valueOf(100));
         entityManager.persistAndFlush(eurRateToday);
+
+        entityManager.flush();
+        entityManager.clear();
+
     }
 
     @Test

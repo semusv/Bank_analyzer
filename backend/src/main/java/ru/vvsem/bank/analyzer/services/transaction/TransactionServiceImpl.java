@@ -7,7 +7,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDtoWithSiblings;
-import ru.vvsem.bank.analyzer.mappers.TransactionMapper;
+import ru.vvsem.bank.analyzer.mappers.transaction.TransactionHierarchyMapper;
+import ru.vvsem.bank.analyzer.mappers.transaction.TransactionMapper;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.Transaction;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
@@ -23,6 +24,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
 
     private final TransactionMapper transactionMapper;
+
+    private final TransactionHierarchyMapper transactionHierarchyMapper;
 
     private final EntityAccessProviderImpl entityAccessProviderImpl;
 
@@ -52,7 +55,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Page<TransactionDtoWithSiblings> searchTransactions(Specification<Transaction> criteria, Pageable pageable) {
         Page<Transaction> transactions = transactionRepository.findAll(criteria, pageable);
-        return transactions.map(transactionMapper::toTransactionDtoWithSiblings);
+        return transactions.map(transactionHierarchyMapper::toDto);
     }
 
     @Override

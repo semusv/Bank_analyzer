@@ -62,6 +62,10 @@ class BankServiceIntegrationTest extends BaseRepositoryTest {
         bank2.setBankCode("tinkoff");
         bank2.setBic("044525974");
         bank2 = entityManager.persistAndFlush(bank2);
+
+        entityManager.flush();
+        entityManager.clear();
+
     }
 
     @Test
@@ -138,6 +142,14 @@ class BankServiceIntegrationTest extends BaseRepositoryTest {
         assertThat(result.get(1).getName()).isEqualTo("Тинькофф");
     }
 
+    @Test
+    @DisplayName("Должен вернуть DTO банка по ID")
+    void shouldReturnBankDtoByID() {
+            // When
+            BankDto result = bankService.findBankDtoById(bank1.getId());
+            // Then
+            assertThat(result.getId()).isEqualTo(bank1.getId());
+    }
 
 
     @Test

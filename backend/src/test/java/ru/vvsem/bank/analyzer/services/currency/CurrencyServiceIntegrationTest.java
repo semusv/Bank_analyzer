@@ -16,7 +16,6 @@ import ru.vvsem.bank.analyzer.models.Bank;
 import ru.vvsem.bank.analyzer.models.BankAccount;
 import ru.vvsem.bank.analyzer.models.Card;
 import ru.vvsem.bank.analyzer.models.Currency;
-import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
@@ -50,7 +49,6 @@ class CurrencyServiceIntegrationTest extends BaseRepositoryTest {
     private Currency currencyUsd;
     private Currency currencyEur;
 
-    private SecurityUser securityUser;
     private User user;
     private Bank bank;
     private BankAccount account1;
@@ -78,10 +76,6 @@ class CurrencyServiceIntegrationTest extends BaseRepositoryTest {
         user.setSurname("User");
         user = entityManager.persistAndFlush(user);
 
-        securityUser = new SecurityUser(
-                user.getId(), user.getLogin(), user.getPassword(), null,
-                true, true, true, true
-        );
 
         // Создаём банк
         bank = new Bank();
@@ -116,6 +110,10 @@ class CurrencyServiceIntegrationTest extends BaseRepositoryTest {
         existingCard.setAccount(account1);
         existingCard.setIssuerBank(bank);
         existingCard = entityManager.persistAndFlush(existingCard);
+
+        entityManager.flush();
+        entityManager.clear();
+
     }
 
     @Test

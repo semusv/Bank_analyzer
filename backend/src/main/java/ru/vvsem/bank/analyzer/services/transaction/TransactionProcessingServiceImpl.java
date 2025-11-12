@@ -8,12 +8,12 @@ import ru.vvsem.bank.analyzer.dto.transaction.PatchTransactionData;
 import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDto;
 import ru.vvsem.bank.analyzer.exceptions.BusinessException;
-import ru.vvsem.bank.analyzer.mappers.TransactionMapper;
+import ru.vvsem.bank.analyzer.mappers.transaction.TransactionMapper;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.Transaction;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
-import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
+import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
 import ru.vvsem.bank.analyzer.services.bank_account.BankAccountService;
 import ru.vvsem.bank.analyzer.services.card.CardService;
 import ru.vvsem.bank.analyzer.services.currency.CurrencyService;
@@ -33,7 +33,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
 
     private final BankAccountService bankAccountService;
 
-    private final EntityAccessProviderImpl entityAccessProviderImpl;
+    private final EntityAccessProvider entityAccessProvider;
 
     private final CustomUserDetailsService userService;
 
@@ -45,7 +45,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
 
     @SuppressWarnings("CheckStyle")
     @Override
-    public List<TransactionDto> createTransaction(NewTransactionDto dto, SecurityUser securityUser) {
+    public List<TransactionDto> createTransactions(NewTransactionDto dto, SecurityUser securityUser) {
         List<TransactionDto> transactionDtoList = new ArrayList<>();
         Transaction revTransaction = null;
         User user = userService.getUserById(securityUser.getId());
@@ -81,10 +81,10 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
         transaction.setDescription(newTransactionDto.getDescription());
         transaction.setAmount(newTransactionDto.getAmount());
         transaction.setOperationTime(newTransactionDto.getOperationTime());
-        transaction.setCategory(entityAccessProviderImpl.getOwnedCategory(
+        transaction.setCategory(entityAccessProvider.getOwnedCategory(
                 newTransactionDto.getCategoryId(),
                 user.getId()));
-        transaction.setCard(entityAccessProviderImpl.getOwnedCard(cardId, user.getId()));
+        transaction.setCard(entityAccessProvider.getOwnedCard(cardId, user.getId()));
         transaction.setCurrency(currencyService.findByCardId(transaction.getCard().getId()));
         transaction.setOperationType(newTransactionDto.getOperationType());
         if (transaction.getOperationType() == OperationType.OUTGOING) {
@@ -99,7 +99,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
     @Override
     public void splitTransaction(
             Long transactionId, List<SubTransactionDto> subTransactions, SecurityUser securityUser) {
-        Transaction parentTransaction = entityAccessProviderImpl
+        Transaction parentTransaction = entityAccessProvider
                 .getOwnedTransaction(transactionId, securityUser.getId());
         BigDecimal totalSubAmount = subTransactions.stream()
                 .map(SubTransactionDto::getAmount)
@@ -136,7 +136,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
 
     @Override
     public TransactionDto hideTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser) {
-        Transaction transaction = entityAccessProviderImpl.getOwnedTransaction(transactionId, securityUser.getId());
+        Transaction transaction = entityAccessProvider.getOwnedTransaction(transactionId, securityUser.getId());
 
         if (!transactionService.getByParentTransactionId(transaction.getId()).isEmpty()) {
             throw new BusinessException(
@@ -146,8 +146,8 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
         }
 
         var transactionDto = transactionService.hideTransaction(transactionId, securityUser.getId());
-        var card = entityAccessProviderImpl.getOwnedCard(transactionDto.getCardAccountId(), securityUser.getId());
-        bankAccountService.addAccountBalance(card.getAccount().getId(),
+        var account = entityAccessProvider.getOwnedBankAccount(transactionDto.getCardAccountId(), securityUser.getId());
+        bankAccountService.addAccountBalance(account.getId(),
                 !transactionDto.isHide()
                         ? transactionDto.getAmount()
                         : transactionDto.getAmount().negate(), securityUser);
@@ -156,8 +156,8 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
 
     @Override
     public void deleteTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser) {
-        var transaction = entityAccessProviderImpl.getOwnedTransaction(transactionId, securityUser.getId());
-        var card = entityAccessProviderImpl.getOwnedCard(transaction.getCard().getId(), securityUser.getId());
+        var transaction = entityAccessProvider.getOwnedTransaction(transactionId, securityUser.getId());
+        var card = entityAccessProvider.getOwnedCard(transaction.getCard().getId(), securityUser.getId());
 
         if (!transactionService.getByParentTransactionId(transaction.getId()).isEmpty()) {
             throw new BusinessException(
@@ -172,10 +172,10 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
     @Override
     public TransactionDto patchTransactionWithBalanceUpdate(
             Long transactionId, PatchTransactionData patchTransactionData, SecurityUser securityUser) {
-        var transaction = entityAccessProviderImpl.getOwnedTransaction(transactionId, securityUser.getId());
-        var card = entityAccessProviderImpl.getOwnedCard(transaction.getCard().getId(), securityUser.getId());
+        var transaction = entityAccessProvider.getOwnedTransaction(transactionId, securityUser.getId());
+        var card = entityAccessProvider.getOwnedCard(transaction.getCard().getId(), securityUser.getId());
         var diffAmount = transaction.getAmount().subtract(patchTransactionData.getAmount());
-        transaction.setCategory(entityAccessProviderImpl
+        transaction.setCategory(entityAccessProvider
                 .getOwnedCategory(patchTransactionData.getCategoryId(), securityUser.getId()));
         transaction.setAmount(patchTransactionData.getAmount());
         transaction.setOperationTime(patchTransactionData.getOperationTime());

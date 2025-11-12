@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.card.CardDto;
 import ru.vvsem.bank.analyzer.dto.card.NewCardDto;
 import ru.vvsem.bank.analyzer.mappers.CardMapper;
-import ru.vvsem.bank.analyzer.mappers.UserMapper;
 import ru.vvsem.bank.analyzer.models.Card;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
@@ -21,8 +20,6 @@ import java.util.List;
 @Slf4j
 public class CardServiceImpl implements CardService {
     private final CardRepository cardRepository;
-
-    private final UserMapper userMapper;
 
     private final CardMapper cardMapper;
 

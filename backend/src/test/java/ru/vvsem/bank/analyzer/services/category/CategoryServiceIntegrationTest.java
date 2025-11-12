@@ -110,6 +110,10 @@ class CategoryServiceIntegrationTest extends BaseRepositoryTest {
         anotherUserCategory.setUser(anotherUser);
         entityManager.persistAndFlush(anotherUserCategory);
 
+        entityManager.flush();
+        entityManager.clear();
+
+
         // Мокаем конфиг цветов
         when(categoryColorConfig.getBackgroundColorsList()).thenReturn(List.of("#FF0000", "#00FF00", "#0000FF"));
         when(categoryColorConfig.getTextColorsList()).thenReturn(List.of("#FFFFFF", "#000000"));

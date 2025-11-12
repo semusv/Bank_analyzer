@@ -12,8 +12,12 @@ import ru.vvsem.bank.analyzer.dto.card.CardDto;
 import ru.vvsem.bank.analyzer.dto.card.NewCardDto;
 import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
-import ru.vvsem.bank.analyzer.mappers.UserMapperImpl;
-import ru.vvsem.bank.analyzer.models.*;
+import ru.vvsem.bank.analyzer.models.Bank;
+import ru.vvsem.bank.analyzer.models.BankAccount;
+import ru.vvsem.bank.analyzer.models.Card;
+import ru.vvsem.bank.analyzer.models.Currency;
+import ru.vvsem.bank.analyzer.models.SecurityUser;
+import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProvider;
 import ru.vvsem.bank.analyzer.providers.EntityAccessProviderImpl;
 import ru.vvsem.bank.analyzer.repositories.BaseRepositoryTest;
@@ -35,7 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         BankServiceImpl.class,
         BankMapperImpl.class
 })
-class CardServiceImplIntegrationTest  extends BaseRepositoryTest {
+class CardServiceImplIntegrationTest extends BaseRepositoryTest {
 
     @Autowired
     private CardService cardService;
@@ -116,6 +120,10 @@ class CardServiceImplIntegrationTest  extends BaseRepositoryTest {
         existingCard.setAccount(account1);
         existingCard.setIssuerBank(bank);
         existingCard = entityManager.persistAndFlush(existingCard);
+
+        entityManager.flush();
+        entityManager.clear();
+
     }
 
     @Test
@@ -271,6 +279,24 @@ class CardServiceImplIntegrationTest  extends BaseRepositoryTest {
         assertThat(anotherUserCards).hasSize(1);
         assertThat(anotherUserCards.get(0).getCardName()).isEqualTo("Another User Card");
     }
+
+    @Test
+    @DisplayName("Должен вернуть DTO для существующей карты по ID")
+    void shouldReturnCardDtoForExistingCard() {
+
+        CardDto cardDto = cardService.getCardDtoById(existingCard.getId(), securityUser);
+        assertThat(cardDto).isNotNull();
+        assertThat(cardDto.getId()).isEqualTo(existingCard.getId());
+        assertThat(cardDto.getCardName()).isEqualTo(existingCard.getCardName());
+        assertThat(cardDto.getLastFourDigits()).isEqualTo(existingCard.getLastFourDigits());
+
+        assertAllFieldsInitialized(cardDto);
+    }
+
+
+
+
+
 
     @Test
     @DisplayName("Должен корректно маппить все поля при создании карты")

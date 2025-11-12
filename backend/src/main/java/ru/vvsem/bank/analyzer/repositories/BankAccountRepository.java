@@ -21,10 +21,10 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, Long> 
     @Query("update BankAccount b set b.balance = ?1 where b.id = ?2")
     int updateBalance(BigDecimal balance, Long bankAccountId);
 
-    @EntityGraph(attributePaths = {"cards", "user", "currency", "bank"})
+    @EntityGraph(attributePaths = {"card", "user", "currency", "bank"})
     Optional<BankAccount> findByIdAndUserId(Long id, Long userId);
 
-    @EntityGraph(attributePaths = {"cards", "user", "currency", "bank"})
+    @EntityGraph(attributePaths = {"card", "user", "currency", "bank"})
     List<BankAccount> findByUserId(Long userId);
 
     @Query("SELECT NEW ru.vvsem.bank.analyzer.dto.currency.CurrencyAmountDto(b.currency.code, SUM(b.balance)) " +
@@ -34,6 +34,6 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, Long> 
            "ORDER BY b.currency.code")
     List<CurrencyAmountDto> calculateTotalBalanceByUserId(@Param("userId") Long userId);
 
-    @EntityGraph(attributePaths = {"cards", "user", "currency", "bank"})
+    @EntityGraph(attributePaths = {"card", "user", "currency", "bank"})
     List<BankAccount> findWithCardsAndUserAndCurrencyByUserId(Long userId);
 }

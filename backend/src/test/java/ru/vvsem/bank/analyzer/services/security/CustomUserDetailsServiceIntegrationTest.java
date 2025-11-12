@@ -2,7 +2,6 @@ package ru.vvsem.bank.analyzer.services.security;
 
 
 import jakarta.validation.ConstraintViolationException;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.context.TestPropertySource;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.models.enums.Role;
@@ -67,6 +65,10 @@ class CustomUserDetailsServiceIntegrationTest extends BaseRepositoryTest {
         existingUser.setSurname("User");
         existingUser.setRoles(Set.of(Role.USER));
         existingUser = entityManager.persistAndFlush(existingUser);
+
+        entityManager.flush();
+        entityManager.clear();
+
     }
 
     @Test

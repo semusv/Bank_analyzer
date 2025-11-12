@@ -17,8 +17,8 @@ import ru.vvsem.bank.analyzer.mappers.BankMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CardMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.CategoryMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.OperationTypeMapperImpl;
-import ru.vvsem.bank.analyzer.mappers.TransactionMapperImpl;
 import ru.vvsem.bank.analyzer.mappers.UserMapperImpl;
+import ru.vvsem.bank.analyzer.mappers.transaction.TransactionMapperImpl;
 import ru.vvsem.bank.analyzer.models.*;
 import ru.vvsem.bank.analyzer.models.Currency;
 import ru.vvsem.bank.analyzer.models.enums.OperationType;
@@ -171,6 +171,10 @@ class AnalyticsServiceIntegrationTest extends BaseRepositoryTest {
 
         entityManager.persistAndFlush(card1);
         entityManager.persistAndFlush(card2);
+
+        entityManager.flush();
+        entityManager.clear();
+
 
         //
         when(customUserDetailsService.getUserById(user.getId())).thenReturn(user);

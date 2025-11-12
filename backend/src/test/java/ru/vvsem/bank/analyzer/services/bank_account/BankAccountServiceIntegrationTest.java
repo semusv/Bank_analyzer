@@ -98,6 +98,10 @@ class BankAccountServiceIntegrationTest extends BaseRepositoryTest {
         user.setRoles(Set.of(Role.USER));
         user = userRepository.saveAndFlush(user);
 
+        entityManager.flush();
+        entityManager.clear();
+
+
         // Настраиваем моки
         securityUser = new SecurityUser(
                 user.getId(), user.getLogin(), user.getPassword(), user.getAuthorities(),

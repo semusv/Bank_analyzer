@@ -37,7 +37,7 @@ public class BankServiceImpl implements BankService {
     }
 
     @Override
-    public BankDto findByIdDto(Long bankId) {
+    public BankDto findBankDtoById(Long bankId) {
         return bankMapper.toBankDto(findByIdEntity(bankId));
     }
 

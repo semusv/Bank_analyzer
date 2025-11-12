@@ -8,6 +8,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.AssertTrue;
@@ -32,6 +35,67 @@ import java.util.List;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+
+@NamedEntityGraph(
+        name = "transaction-with-all-relations",
+        attributeNodes = {
+                @NamedAttributeNode("currency"),
+                @NamedAttributeNode("category"),
+                @NamedAttributeNode(value = "card", subgraph = "card-subgraph"),
+                @NamedAttributeNode("user"),
+                @NamedAttributeNode(value = "subTransactions", subgraph = "subtransaction-subgraph")
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "card-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode(value = "account", subgraph = "account-subgraph"),
+                                @NamedAttributeNode("issuerBank")
+                        }
+                ),
+                @NamedSubgraph(
+                        name = "account-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("bank"),
+                                @NamedAttributeNode("currency")
+                        }
+                ),
+                @NamedSubgraph(
+                        name = "subtransaction-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("currency"),
+                                @NamedAttributeNode("category"),
+                                @NamedAttributeNode(value = "card", subgraph = "card-subgraph")
+                                // НЕ включаем subTransactions.subTransactions - это предотвращает рекурсию
+                        }
+                )
+        }
+)
+@NamedEntityGraph(
+        name = "transaction-with-base-attributes",
+        attributeNodes = {
+                @NamedAttributeNode("currency"),
+                @NamedAttributeNode("category"),
+                @NamedAttributeNode(value = "card", subgraph = "card-subgraph"),
+                @NamedAttributeNode("user")
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "card-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode(value = "account", subgraph = "account-subgraph"),
+                                @NamedAttributeNode("issuerBank")
+                        }
+                ),
+                @NamedSubgraph(
+                        name = "account-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("bank"),
+                                @NamedAttributeNode("currency")
+                        }
+                )
+        }
+)
 public class Transaction extends AbstractBaseEntity {
 
     @NotNull

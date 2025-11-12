@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -80,39 +80,6 @@ class JpaTransactionRepositoryTest extends BaseRepositoryTest {
         category.setUser(user);
         entityManager.persistAndFlush(category);
         categoryList.add(category);
-    }
-
-    @DisplayName("Должен найти транзакцию по id и userId")
-    @Test
-    void shouldFindByIdAndUserId_WhenTransactionExists() {
-        // given
-        Transaction transaction = createAndPersistTransaction(
-                userList.get(0), BigDecimal.valueOf(1000), rub, LocalDateTime.now());
-
-        entityManager.persistAndFlush(transaction);
-
-        // When
-        Optional<Transaction> result = transactionRepository
-                .findByIdAndUserId(transaction.getId(), userList.get(0).getId());
-
-        // Then
-        assertThat(result).isPresent();
-        assertThat(result.get().getAmount()).isEqualByComparingTo(BigDecimal.valueOf(1000));
-    }
-
-    @Test
-    @DisplayName("Должен вернуть пустой Optional, если транзакция не найдена по id и userId")
-    void shouldNotFindByIdAndUserId_WhenWrongUser() {
-        // Given
-        Transaction transaction = createAndPersistTransaction(
-                userList.get(0), BigDecimal.valueOf(1000), rub, LocalDateTime.now());
-        Long otherUserId = 999L;
-
-        // When
-        Optional<Transaction> result = transactionRepository.findByIdAndUserId(transaction.getId(), otherUserId);
-
-        // Then
-        assertThat(result).isEmpty();
     }
 
     @Test
