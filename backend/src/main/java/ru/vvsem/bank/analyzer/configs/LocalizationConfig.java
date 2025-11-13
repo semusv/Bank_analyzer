@@ -32,3 +32,4 @@ public class LocalizationConfig implements WebMvcConfigurer {
         registry.addInterceptor(localeChangeInterceptor());
     }
 }
+

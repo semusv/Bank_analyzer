@@ -44,7 +44,7 @@ public class BankAccountServiceImpl implements BankAccountService {
         bankAccount.setCurrency(currencyService.findById(bankAccount.getCurrency().getId()));
         bankAccount.setUser(userService.getUserById(securityUser.getId()));
 
-        return bankAccountMapper.toBankAccountSimpleDto(bankAccountRepository.save(bankAccount));
+        return bankAccountMapper.toBankAccountWithCardsDto(bankAccountRepository.save(bankAccount));
     }
 
     @Transactional
@@ -52,7 +52,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     public List<BankAccountWithCardsDto> getUserAccountsWithCards(SecurityUser securityUser) {
         List<BankAccount> accounts = bankAccountRepository.findWithCardsAndUserAndCurrencyByUserId(securityUser.getId());
         return accounts.stream()
-                .map(bankAccountMapper::toBankAccountSimpleDto).toList();
+                .map(bankAccountMapper::toBankAccountWithCardsDto).toList();
 
     }
 

@@ -51,4 +51,6 @@ public class MainPageController {
         model.addAttribute("activePage", "dashboard");
         return "dashboard";
     }
+
+
 }

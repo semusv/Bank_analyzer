@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.RequestToViewNameTranslator;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import ru.vvsem.bank.analyzer.exceptions.BusinessException;
 import ru.vvsem.bank.analyzer.exceptions.CustomExceptionWithCode;
@@ -24,11 +25,13 @@ import ru.vvsem.bank.analyzer.providers.ErrorHandlingProvider;
 
 import java.util.concurrent.TimeoutException;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "ru.vvsem.bank.analyzer.controllers.api")
 @AllArgsConstructor
 public class GlobalExceptionHandler {
 
     private final ErrorHandlingProvider errorHandlingProvider;
+
+    private final RequestToViewNameTranslator requestToViewNameTranslator;
 
     // 400 - Method argument type mismatch
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -98,6 +101,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 "error.no.handler.found",
                 ((ServletWebRequest) request).getRequest().getRequestURI());
+
     }
 
     // 404 - Empty result data access

@@ -16,6 +16,12 @@ import ru.vvsem.bank.analyzer.dto.account.BankAccountWithCardsDto;
         uses = {CardMapper.class})
 public interface BankAccountMapper {
 
+    @Mapping(source = "currencyId", target = "currency.id")
+    @Mapping(source = "bankId", target = "bank.id")
+    @Mapping(source = "initialBalance", target = "balance")
+    BankAccount toEntity(NewBankAccountDto newBankAccountDto);
+
+
     @AfterMapping
     default void linkCards(@MappingTarget BankAccount bankAccount) {
         bankAccount.getCards().forEach(card -> card.setAccount(bankAccount));
@@ -29,11 +35,8 @@ public interface BankAccountMapper {
     BankAccount toEntity(BankAccountWithCardsDto bankAccountWithCardsDto);
 
     @InheritInverseConfiguration(name = "toEntity")
-    BankAccountWithCardsDto toBankAccountSimpleDto(BankAccount bankAccount);
+    BankAccountWithCardsDto toBankAccountWithCardsDto(BankAccount bankAccount);
 
 
-    @Mapping(source = "currencyId", target = "currency.id")
-    @Mapping(source = "bankId", target = "bank.id")
-    @Mapping(source = "initialBalance", target = "balance")
-    BankAccount toEntity(NewBankAccountDto newBankAccountDto);
+
 }

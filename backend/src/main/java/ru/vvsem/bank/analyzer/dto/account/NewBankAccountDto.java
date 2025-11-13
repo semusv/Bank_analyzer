@@ -17,15 +17,20 @@ import java.math.BigDecimal;
 @Setter
 public class NewBankAccountDto {
 
-    @NotBlank(message = "{validation.BankAccount.accountName.notBlank}")
-    @Size(max = 50, message = "{validation.BankAccount.accountName.size}")
+    @NotBlank(message =
+            "{validation.BankAccount.accountName.notBlank}")
+    @Size(max = 50, message =
+            "{validation.BankAccount.accountName.size}")
     private String name;
 
-    @NotBlank(message = "{validation.BankAccount.accountNumber.notBlank}")
-    @Size(min = 20, max = 20, message = "{validation.BankAccount.accountNumber.size}")
+    @NotBlank(message =
+            "{validation.BankAccount.accountNumber.notBlank}")
+    @Size(min = 20, max = 20, message =
+            "{validation.BankAccount.accountNumber.size}")
     private String accountNumber;
 
-    @NotNull(message = "{validation.BankAccount.bankId.notNull}")
+    @NotNull(message =
+            "{validation.BankAccount.bankId.notNull}")
     private Long bankId;
 
     @NotNull(message = "{validation.BankAccount.currencyId.notNull}")

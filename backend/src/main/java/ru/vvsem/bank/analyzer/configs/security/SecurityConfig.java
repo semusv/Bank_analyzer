@@ -26,10 +26,8 @@ import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 
 import java.util.Arrays;
 
-//@Configuration
-//@EnableWebSecurity
 @RequiredArgsConstructor
-public class SessionSecurityConfig {
+public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
 
