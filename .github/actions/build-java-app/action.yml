@@ -1,0 +1,26 @@
+name: 'Build Java Application'
+description: 'Build Java application with Maven using JDK 17'
+
+inputs:
+  java-version:
+    description: 'Java version to use'
+    required: false
+    default: '17'
+  distribution:
+    description: 'Java distribution'
+    required: false
+    default: 'temurin'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ inputs.java-version }}
+        distribution: ${{ inputs.distribution }}
+        cache: maven
+
+    - name: Build application
+      shell: bash
+      run: mvn verify --no-transfer-progress

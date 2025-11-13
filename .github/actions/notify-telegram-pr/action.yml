@@ -1,0 +1,58 @@
+name: 'Notify Telegram about PR build status'
+description: 'Send notification to Telegram about PR build status'
+
+inputs:
+  bot-token:
+    description: 'Telegram bot token'
+    required: true
+  chat-id:
+    description: 'Telegram chat ID'
+    required: true
+  build-result:
+    description: 'Result of the build job'
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Prepare Telegram message
+      shell: bash
+      run: |
+        # Информация о проекте
+        PROJECT_NAME=$GITHUB_REPOSITORY
+        BRANCH="${{ github.event.pull_request.head.ref }}"
+        TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+        PR_TITLE="${{ github.event.pull_request.title }}"
+        PR_BODY="${{ github.event.pull_request.body }}"
+        PR_NUMBER=${{ github.event.pull_request.number }}
+        PR_URL="${{ github.event.pull_request.html_url }}"
+        AUTHOR="${{ github.event.pull_request.user.login }}"
+        WORKFLOW_URL="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+        
+        # Проверяем статус сборки
+        if [[ "${{ inputs.build-result }}" == "failure" ]]; then
+          STATUS="❌ Ошибка сборки"
+        else
+          STATUS="✅ Успешная сборка"
+        fi
+
+        # Формируем сообщение
+        MESSAGE="📦 Проект: *$PROJECT_NAME*%0A"
+        MESSAGE+="🔄 Ветка: *$BRANCH → $TARGET_BRANCH*%0A"
+        MESSAGE+="📝 Заголовок: *$PR_TITLE*%0A"
+        MESSAGE+="📄 Описание: *$PR_BODY*%0A"
+        MESSAGE+="👤 Автор: *$AUTHOR*%0A"
+        MESSAGE+="🔗 [Ссылка на PR]($PR_URL)%0A%0A"
+        MESSAGE+="⚙️ Статус: *$STATUS*%0A%0A"
+        MESSAGE+="🔍 [Подробнее]($WORKFLOW_URL)"
+        
+        echo "TELEGRAM_MESSAGE=$MESSAGE" >> $GITHUB_ENV
+
+    - name: Notify Telegram
+      shell: bash
+      run: |
+        curl -s -X POST "https://api.telegram.org/bot${{ inputs.bot-token }}/sendMessage" \
+          -d chat_id=${{ inputs.chat-id }} \
+          -d text="${{ env.TELEGRAM_MESSAGE }}" \
+          -d parse_mode="Markdown"
