@@ -10,6 +10,10 @@ inputs:
     description: 'Java distribution'
     required: false
     default: 'temurin'
+  working-directory:
+    description: 'Directory containing pom.xml'
+    required: false
+    default: './'
 
 runs:
   using: "composite"
@@ -23,4 +27,5 @@ runs:
 
     - name: Build application
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: mvn verify --no-transfer-progress
