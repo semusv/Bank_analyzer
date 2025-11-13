@@ -3,10 +3,10 @@ package ru.vvsem.bank.analyzer.controllers.api;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.vvsem.bank.analyzer.dto.auth.LoginRequestDto;
-import ru.vvsem.bank.analyzer.models.User;
+import ru.vvsem.bank.analyzer.dto.auth.RegisterFormDto;
 import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
 import ru.vvsem.bank.analyzer.utils.security.JwtTokenUtil;
 
@@ -40,7 +40,7 @@ public class AuthController {
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     public Map<?, ?> login(
-            @RequestBody LoginRequestDto request,
+            @Valid  @RequestBody LoginRequestDto request,
             HttpServletResponse response) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -61,6 +61,7 @@ public class AuthController {
         return Map.of("token", token);
     }
 
+
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
     public void logout(
@@ -74,16 +75,9 @@ public class AuthController {
         response.addCookie(jwtCookie);
     }
 
-
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
-        try {
-            userDetailsService.registerUser(user);
-            return ResponseEntity.ok(Map.of("message", "Регистрация успешна"));
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
-        }
+    @ResponseStatus(HttpStatus.OK)
+    public void register(@Valid @RequestBody RegisterFormDto registerDto) {
+        userDetailsService.registerUser(registerDto);
     }
-
-
 }

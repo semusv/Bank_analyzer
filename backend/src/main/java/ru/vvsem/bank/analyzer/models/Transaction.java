@@ -66,7 +66,6 @@ import java.util.List;
                                 @NamedAttributeNode("currency"),
                                 @NamedAttributeNode("category"),
                                 @NamedAttributeNode(value = "card", subgraph = "card-subgraph")
-                                // НЕ включаем subTransactions.subTransactions - это предотвращает рекурсию
                         }
                 )
         }

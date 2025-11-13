@@ -8,8 +8,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.vvsem.bank.analyzer.dto.auth.RegisterFormDto;
+import ru.vvsem.bank.analyzer.exceptions.RegistrationException;
+import ru.vvsem.bank.analyzer.mappers.RegisterFormMapper;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
+import ru.vvsem.bank.analyzer.models.enums.Role;
 import ru.vvsem.bank.analyzer.repositories.UserRepository;
 
 @Service
@@ -19,6 +23,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     private final PasswordService passwordService;
+
+    private final RegisterFormMapper registerFormMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -38,19 +44,36 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Transactional
+    public void registerUser(RegisterFormDto registerFormDto) {
+        User user = registerFormMapper.toEntity(registerFormDto);
+
+        registerInDb(user);
+    }
+
+    @Transactional
     public void registerUser(User user) {
+
+        registerInDb(user);
+    }
+
+    private void registerInDb(User user) {
         if (userRepository.existsByLogin(user.getLogin())) {
-            throw new IllegalArgumentException("User with login " + user.getLogin() + " already exists");
+            throw new RegistrationException(
+                    "User with login %s already exists".formatted(user.getLogin()),
+                    "registration.login.already.exist");
         }
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("User with email " + user.getEmail() + " already exists");
+            throw new RegistrationException(
+                    "User with email %s already exists".formatted(user.getEmail()),
+                    "registration.email.already.exist");
         }
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
-            user.setRoles(java.util.Set.of(ru.vvsem.bank.analyzer.models.enums.Role.USER));
+            user.setRoles(java.util.Set.of(Role.USER));
         }
         user.setPassword(passwordService.encodePassword(user.getPassword()));
         userRepository.save(user);
     }
+
 
     @Transactional(readOnly = true)
     public User getCurrentUser() {

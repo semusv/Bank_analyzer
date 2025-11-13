@@ -5,7 +5,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
@@ -26,7 +25,6 @@ public class MainPageController {
     public String login(
             @RequestParam(value = "error", required = false) String error,
             @RequestParam(value = "logout", required = false) String logout,
-            @RequestParam(value = "expired", required = false) String expired,
             Model model) {
         if (error != null) {
             model.addAttribute("error", "Неверный логин или пароль");
@@ -41,19 +39,6 @@ public class MainPageController {
     public String registerForm(Model model) {
         model.addAttribute("user", new User());
         return "register";
-    }
-
-    @PostMapping("/register")
-    public String register(User user, Model model) {
-        try {
-            userService.registerUser(user);
-            model.addAttribute("success", "Регистрация прошла успешно! Теперь вы можете войти.");
-            return "login";
-        } catch (Exception e) {
-            model.addAttribute("error", "Ошибка регистрации: " + e.getMessage());
-            model.addAttribute("user", user);
-            return "register";
-        }
     }
 
     @GetMapping("/dashboard")

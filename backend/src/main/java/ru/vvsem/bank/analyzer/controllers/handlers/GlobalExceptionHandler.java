@@ -17,7 +17,9 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import ru.vvsem.bank.analyzer.exceptions.BusinessException;
+import ru.vvsem.bank.analyzer.exceptions.CustomExceptionWithCode;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
+import ru.vvsem.bank.analyzer.exceptions.RegistrationException;
 import ru.vvsem.bank.analyzer.providers.ErrorHandlingProvider;
 
 import java.util.concurrent.TimeoutException;
@@ -111,6 +113,7 @@ public class GlobalExceptionHandler {
                 "error.data.not.found");
     }
 
+
     // 500 - Internal Server Error
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGenericException(
@@ -123,6 +126,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "error.internal.server");
     }
+
 
     // 503 - Database access errors
     @ExceptionHandler(DataAccessException.class)
@@ -153,9 +157,14 @@ public class GlobalExceptionHandler {
     }
 
     //BusinessException
-    @ExceptionHandler(BusinessException.class)
+    //RegistrationException
+    @ExceptionHandler(
+            value = {
+                    BusinessException.class,
+                    RegistrationException.class
+            })
     public ResponseEntity<Object> handleBusinessException(
-            BusinessException ex,
+            CustomExceptionWithCode ex,
             WebRequest request) {
 
         return errorHandlingProvider.handleError(
@@ -184,6 +193,7 @@ public class GlobalExceptionHandler {
                 "error.transaction.failed",
                 ex.getMostSpecificCause().getMessage());
     }
+
 
     private ResponseEntity<Object> handleConstraintViolation(
             ConstraintViolationException ex,

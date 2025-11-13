@@ -76,11 +76,12 @@
             </li>
         </ul>
 
-        <!-- Дополнительный раздел (опционально) -->
+        <!-- Дополнительный раздел-->
         <div class="border-top mt-4 pt-3">
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link text-muted" href="/help">
+                    <a th:class="${activePage == 'help'} ? 'nav-link active text-muted' : 'nav-link text-muted'"
+                        href="/help">
                         <i class="fas fa-question-circle me-2"></i> Помощь
                     </a>
                 </li>

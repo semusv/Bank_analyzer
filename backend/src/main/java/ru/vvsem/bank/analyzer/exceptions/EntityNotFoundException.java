@@ -3,15 +3,14 @@ package ru.vvsem.bank.analyzer.exceptions;
 import lombok.Getter;
 
 @Getter
-public class EntityNotFoundException extends RuntimeException {
+public class EntityNotFoundException  extends CustomExceptionWithCode {
 
-    private final String messageCode;
 
-    private final transient Object[] messageArgs;
+    public EntityNotFoundException(String messageCode, Object[] messageArgs) {
+        super(messageCode, messageArgs);
+    }
 
     public EntityNotFoundException(String message, String messageCode, Object... messageArgs) {
-        super(message);
-        this.messageCode = messageCode;
-        this.messageArgs = messageArgs;
+        super(message, messageCode, messageArgs);
     }
 }

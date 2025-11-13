@@ -243,6 +243,19 @@
                 </configuration>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <!-- Копируем README.md в ресурсы при сборке -->
+            <resource>
+                <directory>..</directory>
+                <includes>
+                    <include>README.md</include>
+                </includes>
+                <targetPath>.</targetPath>
+            </resource>
+        </resources>
     </build>
 
 </project>

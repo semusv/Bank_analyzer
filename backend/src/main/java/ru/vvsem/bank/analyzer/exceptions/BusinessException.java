@@ -1,21 +1,17 @@
 package ru.vvsem.bank.analyzer.exceptions;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-public class BusinessException extends RuntimeException {
+public class BusinessException extends CustomExceptionWithCode {
 
-  private final String messageCode;
-
-  private final transient Object[] messageArgs;
+  public BusinessException(String messageCode, Object[] messageArgs) {
+    super(messageCode, messageArgs);
+  }
 
   public BusinessException(String message, String messageCode, Object... messageArgs) {
-    super(message);
-    this.messageCode = messageCode;
-    this.messageArgs = messageArgs;
+    super(message, messageCode, messageArgs);
   }
 }

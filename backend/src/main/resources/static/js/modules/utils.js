@@ -141,7 +141,7 @@ export function showApiErrors(error) {
 
     if (error.status === 400 && Array.isArray(error.errors) && error.errors.length > 0) {
         error.errors.forEach(errorDet => {
-            showErrorMessage(errorDet.field + ' ' + errorDet.message);
+            showErrorMessage(errorDet.message);
         });
     } else {
         showErrorMessage(error.message);

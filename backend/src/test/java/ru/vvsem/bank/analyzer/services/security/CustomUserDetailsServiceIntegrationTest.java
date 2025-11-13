@@ -15,6 +15,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import ru.vvsem.bank.analyzer.dto.auth.RegisterFormDto;
+import ru.vvsem.bank.analyzer.exceptions.RegistrationException;
+import ru.vvsem.bank.analyzer.mappers.RegisterFormMapperImpl;
 import ru.vvsem.bank.analyzer.models.SecurityUser;
 import ru.vvsem.bank.analyzer.models.User;
 import ru.vvsem.bank.analyzer.models.enums.Role;
@@ -32,7 +35,8 @@ import static org.mockito.Mockito.when;
 @Import({
         CustomUserDetailsService.class,
         PasswordServiceImpl.class,
-        BCryptPasswordEncoder.class
+        BCryptPasswordEncoder.class,
+        RegisterFormMapperImpl.class
 })
 class CustomUserDetailsServiceIntegrationTest extends BaseRepositoryTest {
 
@@ -109,7 +113,7 @@ class CustomUserDetailsServiceIntegrationTest extends BaseRepositoryTest {
     @DisplayName("Должен зарегистрировать нового пользователя")
     void shouldRegisterNewUser() {
         // Given
-        User newUser = new User();
+        RegisterFormDto newUser = new RegisterFormDto();
         newUser.setLogin("newuser");
         newUser.setEmail("new@example.com");
         newUser.setPassword("plainpassword");
@@ -140,7 +144,7 @@ class CustomUserDetailsServiceIntegrationTest extends BaseRepositoryTest {
     @DisplayName("Должен выбросить исключение при регистрации с существующим логином")
     void shouldThrowExceptionWhenRegisteringWithExistingLogin() {
         // Given
-        User duplicateUser = new User();
+        RegisterFormDto duplicateUser = new RegisterFormDto();
         duplicateUser.setLogin("existinguser"); // Существующий логин
         duplicateUser.setEmail("different@example.com");
         duplicateUser.setPassword("password");
@@ -148,8 +152,8 @@ class CustomUserDetailsServiceIntegrationTest extends BaseRepositoryTest {
         duplicateUser.setSurname("User");
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        RegistrationException exception = assertThrows(
+                RegistrationException.class,
                 () -> customUserDetailsService.registerUser(duplicateUser)
         );
 
@@ -160,7 +164,7 @@ class CustomUserDetailsServiceIntegrationTest extends BaseRepositoryTest {
     @DisplayName("Должен выбросить исключение при регистрации с существующим email")
     void shouldThrowExceptionWhenRegisteringWithExistingEmail() {
         // Given
-        User duplicateUser = new User();
+        RegisterFormDto duplicateUser = new RegisterFormDto();
         duplicateUser.setLogin("differentuser");
         duplicateUser.setEmail("existing@example.com"); // Существующий email
         duplicateUser.setPassword("password");
@@ -168,8 +172,8 @@ class CustomUserDetailsServiceIntegrationTest extends BaseRepositoryTest {
         duplicateUser.setSurname("User");
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        RegistrationException exception = assertThrows(
+                RegistrationException.class,
                 () -> customUserDetailsService.registerUser(duplicateUser)
         );
 
@@ -180,13 +184,13 @@ class CustomUserDetailsServiceIntegrationTest extends BaseRepositoryTest {
     @DisplayName("Должен установить роль USER по умолчанию")
     void shouldSetDefaultUserRole() {
         // Given
-        User newUser = new User();
+        RegisterFormDto newUser = new RegisterFormDto();
         newUser.setLogin("defaultroleuser");
         newUser.setEmail("defaultrole@example.com");
         newUser.setPassword("password");
         newUser.setName("Default");
         newUser.setSurname("Role");
-        newUser.setRoles(null); // Явно устанавливаем null
+
 
         // When
         customUserDetailsService.registerUser(newUser);

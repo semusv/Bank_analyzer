@@ -14,6 +14,7 @@ export async function handleAddTransaction(event) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
+    form.checkValidity();
 
     const transactionData = {
         description: formData.get('description'),
