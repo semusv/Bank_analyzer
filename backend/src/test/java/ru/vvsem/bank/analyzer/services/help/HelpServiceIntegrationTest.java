@@ -54,8 +54,13 @@ class HelpServiceIntegrationTest {
 
         // Then
         assertThat(actualContent).isNotEmpty();
-        assertThat(actualContent.trim()).isEqualTo(expectedContent.trim());
+        assertThat(normalizeLineEndings(actualContent))
+                .isEqualTo(normalizeLineEndings(expectedContent));
         assertThat(actualContent).contains("Какой-то контент");
+    }
+
+    private String normalizeLineEndings(String text) {
+        return text.replace("\r\n", "\n").replace("\r", "\n").trim();
     }
 
     @Test
