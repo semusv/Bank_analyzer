@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.vvsem.bank.analyzer.components.security.JwtTokenUtil;
 import ru.vvsem.bank.analyzer.dto.auth.LoginRequestDto;
 import ru.vvsem.bank.analyzer.dto.auth.RegisterFormDto;
 import ru.vvsem.bank.analyzer.services.security.CustomUserDetailsService;
-import ru.vvsem.bank.analyzer.utils.security.JwtTokenUtil;
 
 import java.util.Map;
 

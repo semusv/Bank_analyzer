@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.utils.security;
+package ru.vvsem.bank.analyzer.components.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 

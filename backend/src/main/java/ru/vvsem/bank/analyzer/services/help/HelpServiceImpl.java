@@ -1,41 +1,33 @@
 package ru.vvsem.bank.analyzer.services.help;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import ru.vvsem.bank.analyzer.exceptions.BusinessException;
+import ru.vvsem.bank.analyzer.components.readers.ClassPathFileReader;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class HelpServiceImpl implements HelpService {
 
+    private final ClassPathFileReader fileReader;
+
     @Override
-    public String getReadme() {
-        ClassPathResource resource = new ClassPathResource("README.md");
-        if (!resource.exists()) {
+    public String getReadme(@NotNull String fileName) {
+
+        if (!fileReader.fileExists(fileName)) {
             throw new EntityNotFoundException(
-                    "File not found",
-                    "exception.entity.not.found.readme"
+                    "File not found: " + fileName,
+                    "exception.entity.not.found.readme",
+                    Map.of("fileName", fileName)
             );
         }
-        try (InputStream inputStream = resource.getInputStream()) {
-            return new BufferedReader(
-                    new InputStreamReader(inputStream, StandardCharsets.UTF_8)
-            ).lines().reduce("", (acc, line) -> acc + line + "\n");
-        } catch (IOException e) {
-            throw new BusinessException(
-                    "Can't read README.md",
-                    "business.help.readme.cant.read"
-            );
-        }
+
+        return fileReader.readFile(fileName);
     }
 }

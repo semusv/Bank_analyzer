@@ -1,4 +1,4 @@
-package ru.vvsem.bank.analyzer.utils.security;
+package ru.vvsem.bank.analyzer.components.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

@@ -8,13 +8,7 @@ spring:
     ansi:
       enabled: ALWAYS
 
-  datasource:
-    url: jdbc:tc:postgresql:16:///bank_analyzer_test
-    username: test
-    password: test
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      max-lifetime: 10000
+
 
   jpa:
     hibernate:
