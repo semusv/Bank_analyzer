@@ -2,6 +2,8 @@ package ru.vvsem.bank.analyzer.services.analytics;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.DashboardStatsDto;
@@ -84,7 +86,10 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<TransactionDto> getRecentTransactions(SecurityUser securityUser, int limit) {
         User user = userService.getUserById(securityUser.getId());
-        var transactions = transactionRepository.findTopNByUserIdOrderByOperationTimeDesc(user.getId(), limit);
+        var transactions = transactionRepository
+                .findTopNByUserIdOrderByOperationTimeDesc(
+                        user.getId(),
+                        PageRequest.of(0, limit));
         return transactions
                 .stream()
                 .map(transactionMapper::toTransactionDto)

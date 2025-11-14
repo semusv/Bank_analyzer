@@ -42,6 +42,7 @@ async function init() {
     try {
         await Promise.all([
             loadCategories(),
+            setDefaultDateRange30Days(),
             loadCards(),
             loadBanks(),
             loadCurrencies()
@@ -244,81 +245,16 @@ async function applyBankThemesToTransactions(transactions, containerElement) {
         console.error('Failed to apply bank themes:', error);
     }
 }
-
-// async function renderTransactions(transactions) {
-//     const container = document.getElementById('transactionsContainer');
-
-//     if (!transactions || transactions.length === 0) {
-//         renderEmptyState();
-//         return;
-//     }
-
-//     const fragment = document.createDocumentFragment();
-
-//     const tempContainer = document.createElement('div');
-
-//     tempContainer.innerHTML = transactions.map(thx => {
-//         const category = getCategoryById(thx.categoryId);
-//         const card = getCardById(thx.cardId);
-
-//         return `
-//                 <div class="transaction-card row align-items-center border-bottom ${thx.hide ? 'opacity-50' : ''}"
-//                                 data-transaction-id="${thx.id}"
-//                                 data-bank-theme="${thx.bankCode}"
-//                                 onclick="viewTransactionDetails(${thx.id})">
-//                     <div class="col-7 col-md-6 col-lg-6 mb-1">
-//                         <div class="transaction-info">
-//                             <h6 class="mb-1">
-//                                     ${thx.description}
-//                                 ${thx.hide ? '<span class="badge bg-secondary ms-2">Скрыто</span>' : ''}
-//                             </h6>
-//                             ${category ? `
-//                                 <div class="category-badge d-inline-block">
-//                                     <span class="badge" style="background-color: ${category.color || '#6c757d'}; color: ${category.textColor || '#000000ff'};">
-//                                         ${category.name}
-//                                     </span>
-//                                 </div>
-//                             ` : ''}
-//                         </div>
-//                     </div>
-
-//                     <div class="col-5 col-md-6 col-lg-2 text-end">
-//                         <div class="amount ${thx.amount >= 0 ? 'text-success' : 'text-danger'}">
-//                             <strong>
-//                             ${formatCurrency(thx.amount, thx.currencyCode)}
-//                             </strong>
-//                         </div>
-//                         <small class="text-muted">
-//                             ${formatDateTime(thx.operationTime)}
-//                         </small>
-//                     </div>
-
-//                     <div class="col-12 col-md-9 col-lg-3"  >
-//                         <div class="card-info mb-2 card-header" data-bank-theme="${thx.bankCode}">
-//                             <i class="fas fa-credit-card"></i>
-//                             <span>**** ${card.lastFourDigits}</span>
-//                         </div>
-//                     </div>
-
-//                     <div class="col-12 col-md-3 col-lg-1 ">
-//                         <div class="d-flex gap-2 flex-wrap flex-row-reverse">
-//                             <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteTransactionById(${thx.id})">
-//                                 <i class="fas fa-trash"></i>
-//                             </button>
-//                         </div>
-//                     </div>
-//                 </div>
-//         `;
-//     }).join('');
-
-//     while (tempContainer.firstChild) {
-//         fragment.appendChild(tempContainer.firstChild);
-//     }
-//     await applyBankThemesToTransactions(transactions, fragment);
-
-//     container.innerHTML = '';
-//     container.appendChild(fragment);
-// }
+function setDefaultDateRange30Days() {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - 30);
+    const toYmd = (d) => d.toISOString().slice(0, 10);
+    const startInput = document.getElementById('filterStartDate');
+    const endInput = document.getElementById('filterEndDate');
+    if (startInput && !startInput.value) startInput.value = toYmd(start);
+    if (endInput && !endInput.value) endInput.value = toYmd(end);
+}
 
 function getCategoryById(categoryId) {
     if (categoryId) {
@@ -462,6 +398,7 @@ async function handleFilterSubmit(event) {
 
 async function clearFilters() {
     document.getElementById('filterForm').reset();
+    setDefaultDateRange30Days();
     const currentFilters = gatherFiltersFromForm();
     await loadTransactions(0, currentFilters); // Reset to first page
 }

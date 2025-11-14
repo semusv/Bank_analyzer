@@ -34,7 +34,7 @@ public class DashboardsApiController {
     @ResponseStatus(HttpStatus.OK)
     public List<TransactionDto> getRecentTransactions(
             @AuthenticationPrincipal SecurityUser securityUser,
-            @RequestParam(defaultValue = "5") int limit) {
+            @RequestParam(defaultValue = "10") int limit) {
         return dashboardService.getRecentTransactions(securityUser, limit);
     }
 

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.vvsem.bank.analyzer.dto.currency.CurrencyAmountDto;
@@ -225,7 +226,10 @@ class JpaTransactionRepositoryTest extends BaseRepositoryTest {
         Transaction t3 = createAndPersistTransaction(userList.get(0), BigDecimal.valueOf(300), rub, time3);
 
         // When
-        List<Transaction> result = transactionRepository.findTopNByUserIdOrderByOperationTimeDesc(userList.get(0).getId(), 2);
+        List<Transaction> result = transactionRepository
+                .findTopNByUserIdOrderByOperationTimeDesc(
+                        userList.get(0).getId(),
+                        PageRequest.of(0, 2));
 
         // Then
         assertThat(result).hasSize(2);

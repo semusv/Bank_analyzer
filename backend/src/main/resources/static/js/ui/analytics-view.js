@@ -53,10 +53,6 @@ function populateFilters() {
                     await setBankColorsForBtn(bankCode, btn, false);
                 }
             });
-
-
-            // привести к активному виду
-            await setBankColorsForBtn(card.bankCode, btn, true);
             chipContainer.appendChild(btn);
         });
     }
@@ -114,6 +110,7 @@ async function clearFilters() {
         btn.classList.remove('btn-outline-primary');
         btn.classList.add('btn-primary');
     });
+    selectAllCards()
     await refreshCharts();
 }
 
@@ -277,19 +274,30 @@ function formatLabelDate(isoDate) {
 // Кнопки выбрать/снять все для карт
 document.addEventListener('click', (e) => {
     if (e.target?.id === 'selectAllCards') {
-        document.querySelectorAll('#filterCardsChips .chip').forEach(async btn => {
-            const bankCode = btn.dataset.bankCode;
-            await setBankColorsForBtn(bankCode, btn, true);
-            btn.classList.add('active');
-        });
+        selectAllCards()
+
     }
     if (e.target?.id === 'deselectAllCards') {
-        document.querySelectorAll('#filterCardsChips .chip').forEach(async btn => {
-            const bankCode = btn.dataset.bankCode;
-            await setBankColorsForBtn(bankCode, btn, false);
-            btn.classList.remove('active');
-        });
+        deSelectAllCards()
     }
 });
+
+function selectAllCards() {
+    document.querySelectorAll('#filterCardsChips .chip').forEach(async btn => {
+        const bankCode = btn.dataset.bankCode;
+        await setBankColorsForBtn(bankCode, btn, true);
+        btn.classList.add('active');
+    });
+}
+
+function deSelectAllCards() {
+    document.querySelectorAll('#filterCardsChips .chip').forEach(async btn => {
+        const bankCode = btn.dataset.bankCode;
+        await setBankColorsForBtn(bankCode, btn, false);
+        btn.classList.remove('active');
+    });
+}
+
+
 
 

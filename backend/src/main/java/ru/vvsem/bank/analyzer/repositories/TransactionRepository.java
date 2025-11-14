@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import ru.vvsem.bank.analyzer.dto.currency.CurrencyAmountDto;
 import ru.vvsem.bank.analyzer.models.Transaction;
 
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long>,
         JpaSpecificationExecutor<Transaction> {
 
@@ -59,11 +61,14 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
            "WHERE t.user.id = :userId AND t.amount < 0 AND t.operationTime BETWEEN :start AND :end " +
            "GROUP BY t.currency.code")
     List<CurrencyAmountDto> calculateMonthlyExpense(@Param("userId") Long userId,
-                                              @Param("start") LocalDateTime start,
-                                              @Param("end") LocalDateTime end);
+                                                    @Param("start") LocalDateTime start,
+                                                    @Param("end") LocalDateTime end);
 
     @Query("SELECT t " +
            "FROM Transaction t " +
-           "WHERE t.user.id = :userId and t.hide = false  ORDER BY t.operationTime DESC LIMIT :limit")
-    List<Transaction> findTopNByUserIdOrderByOperationTimeDesc(@Param("userId") Long userId, @Param("limit") int limit);
+           "WHERE t.user.id = :userId and t.hide = false " +
+           "ORDER BY t.operationTime DESC ")
+    List<Transaction> findTopNByUserIdOrderByOperationTimeDesc(
+            @Param("userId") Long userId,
+            Pageable pageable);
 }
