@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1762699970636-1
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: VARCHAR(50)
+            columnName: bank_code
+            tableName: banks
+            validate: true
+

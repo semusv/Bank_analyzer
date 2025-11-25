@@ -1,0 +1,71 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025-08-11--0001-currencies-data
+      author: vvsemenov
+      context: test
+      runOnChange: true
+      changes:
+        - loadData:
+            file: csv/2025-08-11--0001-currencies.csv
+            relativeToChangelogFile: true
+            separator: ";"
+            quotchar: '"'
+            encoding: UTF-8
+            tableName: currencies
+            primaryKey: id
+            columns:
+              - column:
+                  name: code
+              - column:
+                  name: symbol
+              - column:
+                  name: name
+
+  - changeSet:
+      id: 2025-08-11--0002-banks-data
+      author: vvsemenov
+      context: test
+      runOnChange: true
+      changes:
+        - loadData:
+            file: csv/2025-08-11--0002-banks.csv
+            relativeToChangelogFile: true
+            separator: ";"
+            quotchar: '"'
+            encoding: UTF-8
+            tableName: banks
+            primaryKey: id
+            columns:
+              - column:
+                  name: name
+              - column:
+                  name: bic
+              - column:
+                  name: logo_url
+              - column:
+                  name: bank_code
+  - changeSet:
+      id: 2025-08-11--0003-users-data
+      author: vvsemenov
+      context: test
+      runOnChange: true
+      changes:
+        - loadData:
+            file: csv/2025-08-11--0003-users.csv
+            relativeToChangelogFile: true
+            separator: ";"
+            quotchar: '"'
+            encoding: UTF-8
+            tableName: users
+            primaryKey: id
+            columns:
+              - surname:
+                  name: surname
+              - column:
+                  name: email
+              - column:
+                  name: password
+              - column:
+                  name: telegram_chat_id
+              - login:
+                  name: login

@@ -1,0 +1,218 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1758724557596-21
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: balance
+                  type: DECIMAL(19, 2)
+                  defaultValue: 0
+            tableName: bank_accounts
+  - changeSet:
+      id: 1758724557596-22
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: balance
+            tableName: bank_accounts
+  - changeSet:
+      id: 1758724557596-1
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - modifyDataType:
+            columnName: account_number
+            newDataType: VARCHAR(34)
+            tableName: bank_accounts
+  - changeSet:
+      id: 1758724557596-2
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - modifyDataType:
+            columnName: color
+            newDataType: VARCHAR(7)
+            tableName: categories
+  - changeSet:
+      id: 1758724557596-3
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: created_at
+            tableName: bank_accounts
+            validate: true
+  - changeSet:
+      id: 1758724557596-4
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: created_at
+            tableName: banks
+            validate: true
+  - changeSet:
+      id: 1758724557596-5
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: created_at
+            tableName: budgets
+            validate: true
+  - changeSet:
+      id: 1758724557596-6
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: created_at
+            tableName: cards
+            validate: true
+  - changeSet:
+      id: 1758724557596-7
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: created_at
+            tableName: categories
+            validate: true
+  - changeSet:
+      id: 1758724557596-8
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: created_at
+            tableName: currencies
+            validate: true
+  - changeSet:
+      id: 1758724557596-9
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: created_at
+            tableName: transactions
+            validate: true
+  - changeSet:
+      id: 1758724557596-10
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: created_at
+            tableName: users
+            validate: true
+  - changeSet:
+      id: 1758724557596-11
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - modifyDataType:
+            columnName: name
+            newDataType: VARCHAR(100)
+            tableName: currencies
+  - changeSet:
+      id: 1758724557596-12
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - modifyDataType:
+            columnName: symbol
+            newDataType: VARCHAR(3)
+            tableName: currencies
+  - changeSet:
+      id: 1758724557596-13
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: updated_at
+            tableName: bank_accounts
+            validate: true
+  - changeSet:
+      id: 1758724557596-14
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: updated_at
+            tableName: banks
+            validate: true
+  - changeSet:
+      id: 1758724557596-15
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: updated_at
+            tableName: budgets
+            validate: true
+  - changeSet:
+      id: 1758724557596-16
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: updated_at
+            tableName: cards
+            validate: true
+  - changeSet:
+      id: 1758724557596-17
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: updated_at
+            tableName: categories
+            validate: true
+  - changeSet:
+      id: 1758724557596-18
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: updated_at
+            tableName: currencies
+            validate: true
+  - changeSet:
+      id: 1758724557596-19
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: updated_at
+            tableName: transactions
+            validate: true
+  - changeSet:
+      id: 1758724557596-20
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: TIMESTAMP
+            columnName: updated_at
+            tableName: users
+            validate: true
+

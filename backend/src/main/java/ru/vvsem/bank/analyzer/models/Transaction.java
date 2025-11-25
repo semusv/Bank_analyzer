@@ -8,14 +8,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,10 +24,10 @@ import ru.vvsem.bank.analyzer.models.enums.OperationType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
-@Builder
 @Entity
 @Table(name = "transactions")
 @Getter
@@ -35,32 +35,95 @@ import java.util.List;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+
+@NamedEntityGraph(
+        name = "transaction-with-all-relations",
+        attributeNodes = {
+                @NamedAttributeNode("currency"),
+                @NamedAttributeNode("category"),
+                @NamedAttributeNode(value = "card", subgraph = "card-subgraph"),
+                @NamedAttributeNode("user"),
+                @NamedAttributeNode(value = "subTransactions", subgraph = "subtransaction-subgraph")
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "card-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode(value = "account", subgraph = "account-subgraph"),
+                                @NamedAttributeNode("issuerBank")
+                        }
+                ),
+                @NamedSubgraph(
+                        name = "account-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("bank"),
+                                @NamedAttributeNode("currency")
+                        }
+                ),
+                @NamedSubgraph(
+                        name = "subtransaction-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("currency"),
+                                @NamedAttributeNode("category"),
+                                @NamedAttributeNode(value = "card", subgraph = "card-subgraph")
+                        }
+                )
+        }
+)
+@NamedEntityGraph(
+        name = "transaction-with-base-attributes",
+        attributeNodes = {
+                @NamedAttributeNode("currency"),
+                @NamedAttributeNode("category"),
+                @NamedAttributeNode(value = "card", subgraph = "card-subgraph"),
+                @NamedAttributeNode("user")
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "card-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode(value = "account", subgraph = "account-subgraph"),
+                                @NamedAttributeNode("issuerBank")
+                        }
+                ),
+                @NamedSubgraph(
+                        name = "account-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("bank"),
+                                @NamedAttributeNode("currency")
+                        }
+                )
+        }
+)
 public class Transaction extends AbstractBaseEntity {
 
-    @Column(name = "description")
     @NotNull
-    private String description; // "Пятерочка Магнит"
+    @Column(name = "description", nullable = false)
+    private String description;// "Пятерочка Магнит"
 
-    @Column(name = "amount", precision = 19, scale = 2)
     @NotNull
+    @Column(name = "amount", precision = 19, scale = 2, nullable = false)
     private BigDecimal amount; // 100.00
 
-    @Column(name = "operation_time")
     @NotNull
-    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "operation_time", nullable = false)
     private LocalDateTime operationTime;
 
     @Column(name = "hide", nullable = false)
-    private boolean hide; // Исключить из аналитики
+    private boolean hide = false; // Исключить из аналитики
 
     @Column(name = "master", nullable = false)
-    private boolean master; //главная транзакция или подтранзакция
+    private boolean master = false;  //главная транзакция или подтранзакция
 
-    // Связи
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "operation_type", nullable = false)
+    private OperationType operationType ;
+
+    /* FK‑связи */
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "currency_id")
-    @NotNull
+    @JoinColumn(name = "currency_id", nullable = false)
     private Currency currency;
 
     @ToString.Exclude
@@ -73,36 +136,32 @@ public class Transaction extends AbstractBaseEntity {
     @JoinColumn(name = "card_id")
     private Card card;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "operation_type")
-    private OperationType operationType = OperationType.CARD;
-
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_transaction_id")
     private Transaction parentTransaction; // Для подтранзакций
 
-    @OneToMany(mappedBy = "parentTransaction", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parentTransaction", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.LAZY)
     @ToString.Exclude
-    private List<Transaction> subTransactions;
+    private List<Transaction> subTransactions = new ArrayList<>();
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    @NotNull
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     // Валидация суммы подтранзакций
-    @AssertTrue
+    @AssertTrue(message = "Сумма дочерних транзакций не совпадает с суммой родительской")
     public boolean isSubTransactionsSumValid() {
-        if (subTransactions.isEmpty()) {
+        if (subTransactions == null || subTransactions.isEmpty()) {
             return true;
         }
 
         BigDecimal sum = subTransactions.stream()
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         return sum.compareTo(amount) == 0;
     }
 

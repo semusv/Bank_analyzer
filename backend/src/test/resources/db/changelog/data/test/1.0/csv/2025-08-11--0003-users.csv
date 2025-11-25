@@ -1,0 +1,4 @@
+name;surname;email;password;telegram_chat_id;login
+Ivan;Ivanov;ivan@example.com;$2a$12$ZHJCqXzGGMtiUfVQdam9A.W3N7S.MCbfpnodD6YqilebhynvcGP8.;123456789;login_01
+Petr;Petrov;petr@example.com;$2a$12$ZHJCqXzGGMtiUfVQdam9A.W3N7S.MCbfpnodD6YqilebhynvcGP8.;234567890;login_02
+Sergey;Sergeev;sergey@example.com;$2a$12$ZHJCqXzGGMtiUfVQdam9A.W3N7S.MCbfpnodD6YqilebhynvcGP8.;345678901;login_03

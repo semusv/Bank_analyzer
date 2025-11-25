@@ -6,14 +6,13 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
 import java.util.List;
 
-@Builder
 @Entity
 @Table(name = "banks")
 @Getter
@@ -24,15 +23,19 @@ import java.util.List;
 public class Bank extends AbstractBaseEntity {
 
     @NotNull
-    @Column(name = "name" , unique = true)
+    @Column(name = "name", nullable = false, unique = true)
     private String name; // "Тинькофф", "Сбербанк"
 
     @NotNull
-    @Column(name = "bic", unique = true, length = 9)
+    @Column(name = "bic", nullable = false, unique = true, length = 9)
     private String bic; // БИК банка
 
-    @Column(name = "logoUrl")
-    private String logoUrl; // Ссылка на логотип
+    @Column(name = "bank_code", length = 50)
+    @NotNull
+    private String bankCode;
+
+    @Column(name = "logo_url")
+    private String logoUrl;
 
     @OneToMany(mappedBy = "bank")
     @ToString.Exclude

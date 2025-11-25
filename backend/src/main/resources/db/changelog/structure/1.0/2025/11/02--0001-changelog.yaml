@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1762115518740-1
+      author: Semenov V
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_exchange_rates
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: currency_code
+                  type: VARCHAR(3)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: currency_date
+                  type: DATE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: nominal
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: value
+                  type: DECIMAL(10, 6)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: vunit_rate
+                  type: DECIMAL(10, 6)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: currency_name
+                  type: VARCHAR(100)
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                  name: updated_at
+                  type: TIMESTAMP
+              - column:
+                  name: version
+                  type: INT
+            tableName: exchange_rates
+

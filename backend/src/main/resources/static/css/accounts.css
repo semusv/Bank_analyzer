@@ -1,0 +1,319 @@
+/* Account Cards Styles */
+.account-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    animation: slideInUp 0.5s ease-out;
+}
+
+.account-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    border-color: #007bff;
+}
+
+
+.account-card .card-header {
+    background: linear-gradient(135deg, var(--bankDefault-primary, #007bff) 0%, var(--bankDefault-secondary, #0056b3) 100%);
+    color: white;
+    border-bottom: none;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 0.75rem 1rem;
+}
+
+/* Динамические цвета для банков через CSS переменные */
+.account-card[data-bank="ВТБ"] .card-header {
+    background: linear-gradient(135deg, var(--vtb-primary) 0%, var(--vtb-secondary) 100%);
+}
+
+.account-card[data-bank="Сбербанк"] .card-header {
+    background: linear-gradient(135deg, var(--sberbank-primary) 0%, var(--sberbank-secondary) 100%);
+}
+
+.account-card[data-bank="Тинькофф"] .card-header {
+    background: linear-gradient(135deg, var(--tinkoff-primary) 0%, var(--tinkoff-secondary) 100%);
+    color: #333;
+}
+
+.account-card[data-bank="Альфа-Банк"] .card-header {
+    background: linear-gradient(135deg, var(--alpha-primary) 0%, var(--alpha-secondary) 100%);
+}
+
+/* .account-card .card-header {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    border-bottom: none;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 0.75rem 1rem;
+} */
+
+.account-card .card-header h6 {
+    font-weight: 600;
+    margin: 0;
+}
+
+.account-card .card-header .badge {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: white;
+    font-size: 0.7rem;
+}
+
+.account-card .card-body {
+    padding: 1.25rem;
+}
+
+.account-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.account-card .card-text {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+/* Balance Section */
+.balance-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #dee2e6;
+}
+
+.balance-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #28a745;
+    text-align: center;
+    margin: 0;
+}
+
+/* Cards Section */
+.cards-section {
+    border-top: 1px solid #e9ecef;
+    padding-top: 1rem;
+}
+
+.cards-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.card-item {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 0.75rem;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+}
+
+.card-item:hover {
+    background: #e9ecef;
+    border-color: #007bff;
+}
+
+.card-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-info-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.card-name {
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.85rem;
+}
+
+.card-number {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 0.75rem;
+}
+
+/* Кнопка удаления карты */
+.btn-icon-delete {
+    background-color: transparent !important;
+    border: 1px solid #dc3545 !important;
+    color: #dc3545 !important;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 4px !important;
+    transition: all 0.2s ease !important;
+    flex-shrink: 0;
+}
+
+.btn-icon-delete:hover {
+    background-color: #dc3545 !important;
+    color: #fff !important;
+    transform: scale(1.1);
+}
+
+.btn-icon-delete:active {
+    transform: scale(0.95);
+}
+
+/* No Cards State */
+.no-cards {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+}
+
+.no-cards .btn {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+}
+
+/* Card Footer */
+.account-card .card-footer {
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    border-radius: 0 0 12px 12px !important;
+    padding: 0.75rem 1rem;
+}
+
+.account-card .card-footer .btn {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+}
+
+/* Empty State */
+.text-center.py-5 {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 2px dashed #dee2e6;
+    margin: 2rem 0;
+}
+
+.text-center.py-5 .fa-3x {
+    opacity: 0.5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .account-card .card-body {
+        padding: 1rem;
+    }
+
+    .balance-amount {
+        font-size: 1.25rem;
+    }
+
+    .card-info {
+        flex-wrap: wrap;
+    }
+
+    .card-info-left {
+        flex: 1 1 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .account-card .card-footer {
+        padding: 0.75rem;
+    }
+
+    .account-card .card-footer .d-flex {
+        flex-direction: column;
+        gap: 0.5rem !important;
+    }
+
+    .account-card .card-footer .btn {
+        width: 100%;
+        border-radius: 6px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .account-card .card-header {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .account-card .card-header h6 {
+        font-size: 0.85rem;
+    }
+
+    .account-card .card-header .badge {
+        font-size: 0.65rem;
+    }
+
+    .card-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .card-info-left {
+        width: 100%;
+    }
+
+    .btn-icon-delete {
+        align-self: flex-end;
+    }
+
+    .cards-title {
+        font-size: 0.85rem;
+    }
+
+    .card-name {
+        font-size: 0.8rem;
+    }
+
+    .card-number {
+        font-size: 0.7rem;
+    }
+
+    /* Скрыть текст на кнопках footer на мобильных устройствах */
+    .card-footer .btn-text {
+        display: none;
+    }
+
+    .card-footer .btn {
+        padding: 0.5rem !important;
+        min-width: 44px;
+    }
+}
+
+/* Loading State */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Animation for new cards */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

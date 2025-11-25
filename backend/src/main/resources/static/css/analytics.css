@@ -1,0 +1,41 @@
+        /* Небольшие доработки для гармоничного размещения графиков */
+        .chart-card {
+            min-height: 420px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 340px;
+        }
+
+        .chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .25rem;
+            max-height: 110px;
+            overflow: auto;
+            padding: .25rem;
+            border: 1px solid rgba(0, 0, 0, .125);
+            border-radius: .375rem;
+        }
+
+        .chip-group .chip {
+            cursor: pointer;
+        }
+
+        .chip-actions {
+            margin-top: .5rem;
+        }
+
+
+        .tooltip-inner {
+            max-width: 300px;
+            text-align: left;
+            background-color: #2c3e50;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .tooltip.bs-tooltip-top .tooltip-arrow::before {
+            border-top-color: #2c3e50;
+        }

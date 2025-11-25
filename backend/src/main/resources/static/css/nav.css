@@ -1,0 +1,36 @@
+/* ------- Top navigation bar ------- */
+.navbar {
+    z-index: 1030;
+    /* чтобы лежал поверх sidebar */
+}
+
+.navbar-brand i {
+    margin-right: .5rem;
+}
+
+.navbar-nav .btn-sm {
+    min-width: 70px;
+}
+
+/* ------- Sidebar ------- */
+.sidebar {
+    /* min-height: calc(100vh - 56px); */
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+}
+
+.sidebar .nav-link {
+    font-weight: 500;
+    color: #495057;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar .nav-link i {
+    margin-right: .75rem;
+}
+
+.sidebar .nav-link.active {
+    color: #0d6efd;
+    background-color: #e9ecef;
+}

@@ -1,0 +1,17 @@
+/* -------- Grid & Container helpers ---------- */
+html,
+body {
+    height: 100%;
+}
+
+.container-fluid,
+.row {
+    max-width: 1200px;
+    /* если нужно ограничить максимальную ширину */
+}
+
+main.main-content {
+    min-height: calc(100vh - 56px);
+    /* 56px - высота topnav */
+    padding-top: 1rem;
+}

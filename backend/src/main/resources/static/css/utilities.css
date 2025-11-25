@@ -1,0 +1,22 @@
+/* dividers */
+.border-bottom {
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* spacers */
+.pt-3 {
+    padding-top: 1rem !important;
+}
+
+.pb-2 {
+    padding-bottom: .5rem !important;
+}
+
+/* mx‑+, my‑+ */
+.mr-2 {
+    margin-right: .5rem !important;
+}
+
+.ml-2 {
+    margin-left: .5rem !important;
+}

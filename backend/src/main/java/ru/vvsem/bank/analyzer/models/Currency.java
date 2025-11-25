@@ -5,13 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Builder
 @Entity
 @Table(name = "currencies")
 @Getter
@@ -22,14 +20,14 @@ import lombok.ToString;
 public class Currency extends AbstractBaseEntity {
 
     @NotNull
-    @Column(name = "code", unique = true, length = 3)
+    @Column(name = "code", nullable = false, unique = true, length = 3)
     private String code; // "USD", "EUR", "RUB"
 
     @NotNull
-    @Column(name = "symbol")
+    @Column(name = "symbol", nullable = false, length = 3)
     private String symbol; // "$", "€", "₽"
 
     @NotNull
-    @Column(name = "name")
+    @Column(name = "name", nullable = false, length = 100)
     private String name; // "Доллар США", "Евро"
 }

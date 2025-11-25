@@ -1,0 +1,79 @@
+name: bank_analyzer
+
+services:
+  bank-app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
+    depends_on:
+      pg-db:
+        condition: service_healthy
+    networks:
+      - bank_analyzer-network
+    env_file: .env
+    command: >
+      sh -c "
+      echo 'Waiting for PostgreSQL to be ready...' &&
+      sleep 35 &&
+      ./bank-app"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  pg-db:
+    image: postgres:16
+    container_name: pg-db-bank
+    restart: unless-stopped
+    networks:
+      - bank_analyzer-network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "admin", "-d", "bank_analyze" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 10
+    env_file: .env
+    environment:
+      PGDATA: /var/lib/postgresql/data
+
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pg-admin-bank
+    restart: unless-stopped
+    depends_on:
+      pg-db:
+        condition: service_healthy
+    networks:
+      - bank_analyzer-network
+    ports:
+      - "5050:80"
+    volumes:
+      - ./docker/pgadmin_data:/var/lib/pgadmin
+      - ./docker/pgadmin_data/servers.json:/pgadmin4/servers.json
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/misc/ping"]
+      interval: 10s
+      timeout: 5s
+      start_period: 20s
+      retries: 5
+    env_file: .env
+
+networks:
+  bank_analyzer-network:
+    driver: bridge
+    attachable: true
+    external: false
+
+volumes:
+  pgdata:
+  pgadmin_data:

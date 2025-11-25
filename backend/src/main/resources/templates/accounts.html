@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+
+<head th:replace="~{layout :: head}">
+    <title>Счета и карты - Bank Analyzer</title>
+</head>
+
+<body>
+    <div th:replace="~{layout :: topnav}"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{layout :: sidebar}"></div>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <!-- Заголовок и кнопка добавления -->
+                <div
+                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-credit-card"></i> Счета и карты
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-sm btn-primary" onclick="openAddAccountModal()">
+                            <i class="fas fa-plus"></i> Добавить счет
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Сообщения -->
+                <div id="alertContainer"></div>
+
+                <!-- Список счетов -->
+                <div class="row" id="accountsContainer">
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <output class="spinner-border text-primary" aria-label="Загрузка данных">
+                                <span class="visually-hidden">Загрузка данных...</span>
+                            </output>
+                            <p class="mt-2 text-muted">Загрузка счетов...</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Подключаем модальные окна как фрагменты -->
+    <div th:replace="~{fragments/add-account-modal}"></div>
+    <div th:replace="~{fragments/add-card-modal}"></div>
+
+    <!-- Уведомления -->
+    <div class="notification-container" id="notification-container"></div>
+
+    <!-- Скрипты -->
+    <div th:replace="~{layout :: scripts}"></div>
+    <script type="module" th:src="@{/js/ui/accounts-view.js}"></script>
+</body>
+
+</html>

@@ -1,0 +1,192 @@
+/* Transactions Page Styles */
+.transaction-card {
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.transaction-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.transaction-card.opacity-50 {
+    opacity: 0.6;
+}
+
+.transaction-info h6 {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.transaction-info small {
+    font-size: 0.875rem;
+}
+
+.card-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+
+.amount {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.category-badge .badge {
+    border: none;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+/* Sub-transaction styles */
+.sub-transaction-item {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+.sub-transaction-item:hover {
+    background-color: #e9ecef;
+}
+
+/* Filters section */
+#filterForm .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+/* Modal adjustments */
+.modal-body label {
+    color: #495057;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .transaction-card .row>div {
+        margin-bottom: 1rem;
+    }
+
+    .transaction-card .d-flex {
+        flex-wrap: wrap;
+    }
+
+    .transaction-card .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-info {
+        flex-wrap: wrap;
+    }
+
+    .amount {
+        font-size: 1rem;
+    }
+
+    #filterForm .col-12 {
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .transaction-card {
+        font-size: 0.9rem;
+    }
+
+    .transaction-info h6 {
+        font-size: 1rem;
+    }
+
+    .amount {
+        font-size: 0.95rem;
+    }
+}
+
+/* Loading state */
+#transactionsContainer .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Empty state */
+#transactionsContainer .text-center {
+    padding: 3rem 1rem;
+}
+
+/* Filter section responsive */
+@media (max-width: 992px) {
+    .d-flex.align-items-end {
+        margin-top: 1rem;
+    }
+
+    .d-flex.align-items-end button {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Badge adjustments */
+.badge.bg-secondary {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Button groups */
+.btn-group-vertical .btn {
+    margin-bottom: 0.25rem;
+}
+
+/* Modal footer adjustments */
+.modal-footer {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.modal-footer button {
+    flex: 1 1 auto;
+}
+
+@media (max-width: 576px) {
+    .modal-footer button {
+        width: 100%;
+    }
+}
+
+
+.buttons-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.buttons-grid button {
+    width: 100%;
+}
+
+/* Если кнопка "Разделить" должна занимать всю ширину */
+.buttons-grid button:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+}
+
+.sub-transaction {
+    border-left: 2px solid #3d6288;
+    transition: background-color 0.2s ease;
+}
+
+.main-transaction {
+    transition: background-color 0.2s ease;
+}
+
+.sub-transaction:hover {
+    background-color: #e9ecef;
+}
+
+.transaction-card {
+    transition: all 0.2s ease;
+    padding: 0.75rem 0;
+}
+
+.transaction-card:hover {
+    background-color: #f8f9fa;
+}

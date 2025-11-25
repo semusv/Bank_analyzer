@@ -1,0 +1,17 @@
+name: Notify PR Comments
+
+on:
+  pull_request_review_comment: # Триггерим при комментариях к коду
+  issue_comment: # Триггерим при обычных комментариях в PR
+  pull_request_review:  # Триггерим при review
+
+jobs:
+  notify-comment:
+    runs-on: ubuntu-latest
+    if: github.event.comment.user.login != github.actor
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/notify-telegram-comment
+        with:
+          bot-token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat-id: ${{ secrets.TELEGRAM_CHAT_ID }}

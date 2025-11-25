@@ -1,0 +1,62 @@
+name: 'Telegram PR Notifier'
+description: 'Notify about PR comments, reviews and approvals'
+inputs:
+  bot-token:
+    description: 'Telegram bot token'
+    required: true
+  chat-id:
+    description: 'Telegram chat ID'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Prepare message
+      shell: bash
+      run: |
+        # Общие данные
+        PROJECT_NAME="$GITHUB_REPOSITORY"
+        PR_NUMBER="${{ github.event.pull_request.number || github.event.issue.number }}"
+        PR_TITLE="${{ github.event.pull_request.title || github.event.issue.title }}"
+        PR_URL="${{ github.event.pull_request.html_url || github.event.issue.html_url }}"
+
+        # Определяем тип события
+        if [[ "${{ github.event_name }}" == "pull_request_review" ]]; then
+          if [[ "${{ github.event.review.state }}" == "approved" ]]; then
+            EVENT_TYPE="✅ APPROVE"
+            AUTHOR="${{ github.event.review.user.login }}"
+            BODY="${{ github.event.review.body || 'Без комментария' }}"
+          else
+            EVENT_TYPE="👀 REVIEW"
+            AUTHOR="${{ github.event.review.user.login }}"
+            BODY="${{ github.event.review.body || 'Без комментария' }}"
+          fi
+        elif [[ "${{ github.event_name }}" == "pull_request_review_comment" ]]; then
+          EVENT_TYPE="💬 CODE COMMENT"
+          AUTHOR="${{ github.event.comment.user.login }}"
+          BODY="${{ github.event.comment.body }}"
+        else
+          EVENT_TYPE="📝 GENERAL COMMENT"
+          AUTHOR="${{ github.event.comment.user.login }}"
+          BODY="${{ github.event.comment.body }}"
+        fi
+
+        # Формируем сообщение
+        MESSAGE="📦 *Проект*: $PROJECT_NAME%0A"
+        MESSAGE+="🔢 *PR*: #$PR_NUMBER%0A"
+        MESSAGE+="📌 *Заголовок*: $PR_TITLE%0A"
+        MESSAGE+="👤 *Автор*: $AUTHOR%0A"
+        MESSAGE+="✉️ *Тип*: $EVENT_TYPE%0A%0A"
+        [ -n "$BODY" ] && MESSAGE+="📄 *Текст*:%0A$BODY%0A%0A"
+        MESSAGE+="🔗 *Ссылка*: [Открыть PR]($PR_URL)"
+
+        echo "TELEGRAM_MESSAGE=$MESSAGE" >> $GITHUB_ENV
+
+    - name: Send to Telegram
+      shell: bash
+      run: |
+        curl -s -X POST "https://api.telegram.org/bot${{ inputs.bot-token }}/sendMessage" \
+          -d chat_id="${{ inputs.chat-id }}" \
+          -d text="$TELEGRAM_MESSAGE" \
+          -d parse_mode="Markdown" \
+          -d disable_web_page_preview="true"

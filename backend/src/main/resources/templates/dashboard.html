@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+
+<head th:replace="~{layout :: head}">
+    <title>Дашборд - Bank Analyzer</title>
+</head>
+
+<body>
+    <div th:replace="~{layout :: topnav}"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{layout :: sidebar}"></div>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <!-- Заголовок и быстрые действия -->
+                <div
+                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-tachometer-alt"></i> Дашборд
+
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-sm btn-outline-secondary" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i> Обновить
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Статистика -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white bg-primary">
+                            <div class="card-body">
+                                <h5 class="card-title">Общий баланс</h5>
+                                <h2 id="totalBalance" data-bs-toggle="tooltip" data-placement="top" data-html="true"
+                                    title="Загрузка...">
+                                    0 ₽
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white bg-success">
+                            <div class="card-body">
+                                <h5 class="card-title">Доходы (мес)</h5>
+                                <h2 id="monthlyIncome" data-bs-toggle="tooltip" data-placement="top" data-html="true"
+                                    title="Загрузка...">
+                                    0 ₽
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white bg-danger">
+                            <div class="card-body">
+                                <h5 class="card-title">Расходы (мес)</h5>
+                                <h2 id="monthlyExpense" data-bs-toggle="tooltip" data-placement="top" data-html="true"
+                                    title="Загрузка...">
+                                    0 ₽
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Последние транзакции -->
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card rounded">
+                            <div class="card-header">
+                                <h5>Последние транзакции</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="recentTransactions">
+                                    <p class="text-muted">Загрузка...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Быстрые действия -->
+                    <div class="col-md-4">
+                        <div class="card rounded">
+                            <div class="card-header">
+                                <h5>Быстрые действия</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary" onclick="openAddTransactionModal()">
+                                        <i class="fas fa-plus"></i> Новая транзакция
+                                    </button>
+                                    <a href="/accounts" class="btn btn-outline-secondary">
+                                        <i class="fas fa-credit-card"></i> Управление счетами
+                                    </a>
+                                    <a href="/analytics" class="btn btn-outline-info">
+                                        <i class="fas fa-chart-bar"></i> Аналитика
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div th:replace="~{layout :: scripts}"></div>
+
+    <!-- Подключаем модальные окна как фрагменты -->
+    <div th:replace="~{fragments/add-transaction-modal}"></div>
+    <div th:replace="~{fragments/show-transaction-modal}"></div>
+    <!-- Уведомления -->
+    <div class="notification-container" id="notification-container"></div>
+
+    <script type="module" th:src="@{/js/ui/dashboards-view.js}"></script>
+</body>
+
+</html>

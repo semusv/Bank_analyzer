@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+
+<head th:replace="~{layout :: head}">
+    <title>Транзакции - Bank Analyzer</title>
+    <link th:href="@{/css/transactions.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div th:replace="~{layout :: topnav}"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{layout :: sidebar}"></div>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <!-- Заголовок и кнопка добавления -->
+                <div
+                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-exchange-alt"></i> Транзакции
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-sm btn-primary" onclick="openAddTransactionModal()">
+                            <i class="fas fa-plus"></i> Добавить транзакцию
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Сообщения -->
+                <div id="alertContainer"></div>
+
+                <!-- Фильтры -->
+                <div class="card mb-4 rounded">
+                    <div class="card-header">
+                        <h5 class="mb-0">Фильтры</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="filterForm">
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <label for="filterStartDate" class="form-label">Дата с</label>
+                                    <input type="date" class="form-control" id="filterStartDate" name="startDate">
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <label for="filterEndDate" class="form-label">Дата по</label>
+                                    <input type="date" class="form-control" id="filterEndDate" name="endDate">
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <label for="filterCard" class="form-label">Карта</label>
+                                    <select class="form-select" id="filterCard" name="cardId">
+                                        <option value="">Все карты</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <label for="filterBank" class="form-label">Банк</label>
+                                    <select class="form-select" id="filterBank" name="bankId">
+                                        <option value="">Все банки</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <label for="filterCategory" class="form-label">Категория</label>
+                                    <select class="form-select" id="filterCategory" name="categoryId">
+                                        <option value="">Все категории</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <label for="filterDescription" class="form-label">Описание</label>
+                                    <input type="text" class="form-control" id="filterDescription" name="description"
+                                        placeholder="Поиск по описанию">
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-6 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary me-2">
+                                        <i class="fas fa-filter"></i> Применить
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="clearFilters">
+                                        <i class="fas fa-times"></i> Очистить
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Список транзакций -->
+                <div id="transactionsContainer">
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <output class="spinner-border text-primary" aria-label="Загрузка данных">
+                                <span class="visually-hidden">Загрузка данных...</span>
+                            </output>
+                            <p class="mt-2 text-muted">Загрузка транзакций...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Пагинация -->
+                <div id="paginationContainer" class="mt-4"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Подключаем модальные окна как фрагменты -->
+    <div th:replace="~{fragments/add-transaction-modal}"></div>
+    <div th:replace="~{fragments/show-transaction-modal}"></div>
+    <div th:replace="~{fragments/split-transaction-modal}"></div>
+    <!-- Уведиоления-->
+    <div class="notification-container" id="notification-container"></div>
+
+    <div th:replace="~{layout :: scripts}"></div>
+
+    <script type="module" th:src="@{/js/ui/transactions-view.js}"></script>
+    <script type="module" th:src="@{/js/ui/fragments/add-transaction-view.js}"></script>
+</body>
+
+</html>

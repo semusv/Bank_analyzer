@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<!-- Модальное окно разделения транзакции -->
+<div class="modal fade" id="splitTransactionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Разделить транзакцию</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="splitTransactionForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="totalAmountDisplay">Общая сумма:</label>
+                        <p class="mb-3 fw-bold amount text-success" id="totalAmountDisplay"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="remainingAmount">Осталось разделить:</label>
+                        <p class="mb-3 fw-bold amount text-bg-info" id="remainingAmount"></p>
+                    </div>
+
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Введите подтранзакции. Сумма всех подтранзакций должна равняться сумме основной транзакции.
+                    </div>
+                    <div id="subTransactionsContainer"></div>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addSubTransaction()">
+                        <i class="fas fa-plus"></i> Добавить подтранзакцию
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Разделить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

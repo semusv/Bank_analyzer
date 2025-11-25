@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+
+<head th:replace="~{layout :: head}">
+    <title>Помощь - Bank Analyzer</title>
+    <link th:href="@{/css/help.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div th:replace="~{layout :: topnav}"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{layout :: sidebar}"></div>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <!-- Заголовок -->
+                <div
+                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-question-circle"></i> Помощь
+                    </h1>
+                </div>
+
+                <!-- Контейнер для Markdown-контента -->
+                <article id="help-content" class="markdown-content">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Загрузка справки...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Загрузка руководства...</p>
+                    </div>
+                </article>
+            </main>
+        </div>
+    </div>
+    <!-- Скрипты -->
+    <div th:replace="~{layout :: scripts}"></div>
+
+    <!-- Сообщения -->
+    <div class="notification-container" id="notification-container"></div>
+    <!-- Скрипты -->
+    <script type="module" th:src="@{/js/ui/help-view.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</body>
+
+</html>

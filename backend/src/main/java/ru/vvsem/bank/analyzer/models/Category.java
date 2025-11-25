@@ -8,13 +8,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Builder
 @Entity
 @Table(name = "categories")
 @Getter
@@ -24,17 +22,19 @@ import lombok.ToString;
 @NoArgsConstructor
 public class Category extends AbstractBaseEntity {
 
-    @Column(name = "name")
     @NotNull
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "color")
+    @Column(name = "color", length = 7)          // HEX → 7 символов
     private String color; // HEX-код
+
+    @Column(name = "textcolor", length = 7)          // HEX → 7 символов
+    private String textColor; // HEX-код
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    @NotNull
+    @JoinColumn(name = "user_id", nullable = false)
     private User user; // Персональные категории
 
 }

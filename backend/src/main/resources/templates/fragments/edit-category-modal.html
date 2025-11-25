@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
+<div class="modal fade" id="editCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Редактировать категорию</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editCategoryForm">
+                <div class="modal-body">
+                    <input type="hidden" id="editCategoryId" name="id">
+
+                    <div class="mb-3">
+                        <label for="editCategoryName" class="form-label">Название *</label>
+                        <input type="text" class="form-control" id="editCategoryName" name="name" required
+                               placeholder="Например: Продукты">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Цвет фона *</label>
+                        <div id="editBackgroundColorPicker" class="color-picker-grid mb-2"></div>
+                        <input type="color" class="form-control form-control-color" id="editBackgroundColor"
+                               name="backgroundColor" title="Выберите цвет фона">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Цвет текста *</label>
+                        <div id="editTextColorPicker" class="color-picker-grid mb-2"></div>
+                        <input type="color" class="form-control form-control-color" id="editTextColor"
+                               name="textColor" title="Выберите цвет текста">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Предпросмотр</label>
+                        <div class="category-preview" id="editCategoryPreview">
+                            <span class="badge" id="editPreviewBadge">Название категории</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

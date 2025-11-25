@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 1753099873269-1
-      author: semva (generated)
+      author: Semenov V
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - addColumn:

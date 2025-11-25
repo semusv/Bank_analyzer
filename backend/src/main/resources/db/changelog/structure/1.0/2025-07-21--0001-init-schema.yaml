@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 2025-07-21--0001-currencies
-      author: vvsemenov
+      author: Semenov V
       comment: Создание таблицы currencies
       changes:
         - createTable:
@@ -46,7 +46,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 2025-07-21--0002-banks
-      author: vvsemenov
+      author: Semenov V
       comment: Создание таблицы banks
       changes:
         - createTable:
@@ -90,7 +90,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 2025-07-21--0003-users
-      author: vvsemenov
+      author: Semenov V
       comment: Создание таблицы users
       changes:
         - createTable:
@@ -145,7 +145,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 2025-07-21--0004-categories
-      author: vvsemenov
+      author: Semenov V
       comment: Создание таблицы categories
       changes:
         - createTable:
@@ -189,7 +189,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 2025-07-21--0005-bank_accounts
-      author: vvsemenov
+      author: Semenov V
       comment: Создание таблицы bank_accounts
       changes:
         - createTable:
@@ -250,7 +250,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 2025-07-21--0006-cards
-      author: vvsemenov
+      author: Semenov V
       comment: Создание таблицы cards
       changes:
         - createTable:
@@ -303,7 +303,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 2025-07-21--0007-budgets
-      author: vvsemenov
+      author: Semenov V
       comment: Создание таблицы budgets
       changes:
         - createTable:
@@ -350,7 +350,7 @@ databaseChangeLog:
                   defaultValue: 0
   - changeSet:
       id: 2025-07-21--0008-transactions
-      author: vvsemenov
+      author: Semenov V
       comment: Создание таблицы transactions
       changes:
         - createTable:
