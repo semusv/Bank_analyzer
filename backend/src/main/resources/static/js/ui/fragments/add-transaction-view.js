@@ -165,6 +165,29 @@ function changeOperationType(radio) {
     const amountInput = document.getElementById('addAmount');
     amountInput.classList.remove('text-danger', 'text-success', 'text-info');
 
+    // Сброс всех полей при смене типа операции
+    const form = radio.closest('form');
+    if (form) {
+        // Сбрасываем только нужные поля, не сбрасывая всю форму (чтобы не терять operationTime и др.)
+        document.getElementById('addCategoryId').value = '';
+        document.getElementById('categoryDropdownBtn').textContent = 'Выберите категорию';
+        document.getElementById('categoryDropdownBtn').style.backgroundColor = '';
+        document.getElementById('categoryDropdownBtn').style.color = '';
+
+        document.getElementById('addCardId').value = '';
+        document.getElementById('cardDropdownBtn').textContent = 'Выберите карту';
+        document.getElementById('cardDropdownBtn').style.background = '';
+        document.getElementById('cardDropdownBtn').style.color = '';
+
+        document.getElementById('addRevCardId').value = '';
+        document.getElementById('revCardDropdownBtn').textContent = 'Выберите карту';
+        document.getElementById('revCardDropdownBtn').style.background = '';
+        document.getElementById('revCardDropdownBtn').style.color = '';
+
+        amountInput.value = '';
+    }
+
+
     if (radio.value == 0) {
         amountInput.classList.add('text-danger');
     } else if (radio.value == 1) {

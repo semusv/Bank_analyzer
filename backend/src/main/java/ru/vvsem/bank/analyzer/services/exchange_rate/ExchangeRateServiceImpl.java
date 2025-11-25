@@ -11,7 +11,6 @@ import ru.vvsem.bank.analyzer.models.ExchangeRate;
 import ru.vvsem.bank.analyzer.models.xml.ValCurs;
 import ru.vvsem.bank.analyzer.models.xml.Valute;
 import ru.vvsem.bank.analyzer.repositories.ExchangeRateRepository;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;

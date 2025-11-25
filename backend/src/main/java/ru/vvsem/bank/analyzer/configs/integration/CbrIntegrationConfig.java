@@ -71,11 +71,13 @@ public class CbrIntegrationConfig {
     public IntegrationFlow cbrExchangeRateFlow(ExchangeRateService exchangeRateServiceImpl) {
         return IntegrationFlow
                 .from("exchangeRateChannel")
+                // Добавляем дату в заголовки
                 .enrichHeaders(h -> h
                         .headerExpression("cbrDate", "payload"))
                 // Проверяем, есть ли уже данные в БД
-                .filter(exchangeRateServiceImpl, "needLoadForDate", spec -> spec
-                        .discardChannel("rateCheckChannel"))
+                .filter(exchangeRateServiceImpl, "needLoadForDate",
+                        spec -> spec
+                                .discardChannel("rateCheckChannel"))
                 // В строку dd/MM/yyyy для использования в URL
                 .transform(LocalDate.class,
                         date -> date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
@@ -85,7 +87,9 @@ public class CbrIntegrationConfig {
                         .httpMethod(HttpMethod.GET)
                         .expectedResponseType(byte[].class)
                         .uriVariable("date", "payload"))
+                //Преобразуем в объект из XML
                 .transform(new UnmarshallingTransformer(jaxb2Marshaller()))
+                //Передаем на обработку
                 .channel("exchangeRateProcessingChannel")
                 .get();
     }
