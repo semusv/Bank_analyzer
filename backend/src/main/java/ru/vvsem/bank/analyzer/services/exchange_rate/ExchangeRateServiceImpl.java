@@ -3,6 +3,7 @@ package ru.vvsem.bank.analyzer.services.exchange_rate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.RequestToViewNameTranslator;
 import ru.vvsem.bank.analyzer.dto.currency.CurrencyAmountDto;
 import ru.vvsem.bank.analyzer.exceptions.EntityNotFoundException;
@@ -33,6 +34,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     private final RequestToViewNameTranslator requestToViewNameTranslator;
 
     @Override
+    @Transactional(readOnly = true)
     public void processExchangeRates(ValCurs valCurs) {
         log.info("Processing exchange rates for date: {}", valCurs.getDate());
 
@@ -52,6 +54,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean needLoadForDate(LocalDate date) {
         return !exchangeRateRepository.existsByCurrencyDate(date);
     }
@@ -69,6 +72,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
 
     //    convertToRub(currencyAmountDto.getAmount(), currencyAmountDto.getCurrencyCode()
     @Override
+    @Transactional(readOnly = true)
     public BigDecimal convertToRub(BigDecimal amount, String currencyCode, LocalDate date) {
         if (CURRENCY_CODE_RUB.equals(currencyCode)) {
             return amount;

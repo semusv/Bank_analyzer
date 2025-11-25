@@ -5,7 +5,7 @@ cbr:
     poll-interval: 3600000
 
 jwt:
-  secret: 518725ThisIsMy*VVSsecret-+KeyForBankAnalyzer16843
+  secret: ${JWT_SECRET}
   token.expiration.seconds: 3600  # 1 час
   cookie.expiration.seconds: 3600
 

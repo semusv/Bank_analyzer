@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.analytics.SeriesFilterDto;
 import ru.vvsem.bank.analyzer.dto.analytics.CategoryBreakdownDto;
 import ru.vvsem.bank.analyzer.dto.analytics.TimeSeriesDto;
@@ -52,6 +53,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final CategoryMapper categoryMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<TimeSeriesDto> getTimeSeries(
             SeriesFilterDto filter,
             SecurityUser securityUser) {
@@ -104,6 +106,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<CategoryBreakdownDto> getCategoryBreakdown(SeriesFilterDto filter,
                                                            SecurityUser securityUser) {
         // Получаем категории пользователя

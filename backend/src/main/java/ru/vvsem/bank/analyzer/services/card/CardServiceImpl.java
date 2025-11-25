@@ -39,6 +39,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
+    @Transactional
     public void deleteCard(Long cardId, SecurityUser securityUser) {
         Card card = entityAccessProvider.getOwnedCard(cardId, securityUser.getId());
         cardRepository.delete(card);
@@ -46,6 +47,7 @@ public class CardServiceImpl implements CardService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<CardDto> getCardListDto(SecurityUser securityUser) {
         return cardRepository.findByAccountUserId(securityUser.getId())
                 .stream()
@@ -54,6 +56,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CardDto getCardDtoById(Long cardId, SecurityUser securityUser) {
         return cardMapper.toCardDto(
                 entityAccessProvider.getOwnedCard(cardId, securityUser.getId()));

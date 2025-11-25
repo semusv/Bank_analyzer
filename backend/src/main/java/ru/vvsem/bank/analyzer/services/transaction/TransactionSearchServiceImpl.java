@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionDtoWithSiblings;
 import ru.vvsem.bank.analyzer.dto.transaction.TransactionFilterDto;
 import ru.vvsem.bank.analyzer.mappers.transaction.TransactionMapper;
@@ -31,6 +32,7 @@ public class TransactionSearchServiceImpl implements TransactionSearchService {
     private final TransactionServiceImpl transactionService;
 
     @Override
+    @Transactional(readOnly = true)
     public Page<TransactionDtoWithSiblings> searchTransactions(
             SecurityUser securityUser,
             TransactionFilterDto filter,

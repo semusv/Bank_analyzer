@@ -72,7 +72,7 @@ networks:
   bank_analyzer-network:
     driver: bridge
     attachable: true
-    external: false  # Лучше сделать false, если сеть создается здесь
+    external: false
 
 volumes:
   pgdata:

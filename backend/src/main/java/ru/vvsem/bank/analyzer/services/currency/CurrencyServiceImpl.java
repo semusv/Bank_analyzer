@@ -2,6 +2,7 @@ package ru.vvsem.bank.analyzer.services.currency;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.currency.CurrencyDto;
 import ru.vvsem.bank.analyzer.mappers.CurrencyMapper;
 import ru.vvsem.bank.analyzer.models.Currency;
@@ -22,6 +23,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     private final EntityAccessProvider entityAccessProvider;
 
     @Override
+    @Transactional(readOnly = true)
     public List<CurrencyDto> getAllCurrencyDto() {
         return currencyRepository.findAll()
                 .stream()
@@ -30,6 +32,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Currency findByCardId(Long cardId) {
         if (cardId == null) {
             throw new IllegalArgumentException(
@@ -41,6 +44,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Currency findById(Long currencyId) {
         if (currencyId == null) {
             throw new IllegalArgumentException(

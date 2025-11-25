@@ -47,7 +47,7 @@ public class BankAccountServiceImpl implements BankAccountService {
         return bankAccountMapper.toBankAccountWithCardsDto(bankAccountRepository.save(bankAccount));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public List<BankAccountWithCardsDto> getUserAccountsWithCards(SecurityUser securityUser) {
         List<BankAccount> accounts = bankAccountRepository.findWithCardsAndUserAndCurrencyByUserId(securityUser.getId());

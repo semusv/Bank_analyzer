@@ -3,6 +3,7 @@ package ru.vvsem.bank.analyzer.services.transaction;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.vvsem.bank.analyzer.dto.transaction.NewTransactionDto;
 import ru.vvsem.bank.analyzer.dto.transaction.PatchTransactionData;
 import ru.vvsem.bank.analyzer.dto.transaction.SubTransactionDto;
@@ -44,6 +45,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
     private final CurrencyService currencyService;
 
     @Override
+    @Transactional
     public List<TransactionDto> createTransactions(NewTransactionDto dto, SecurityUser securityUser) {
         List<TransactionDto> transactionDtoList = new ArrayList<>();
         Transaction revTransaction = null;
@@ -92,6 +94,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
     }
 
     @Override
+    @Transactional
     public void splitTransaction(
             Long transactionId, List<SubTransactionDto> subTransactions, SecurityUser securityUser) {
         Transaction parentTransaction = entityAccessProvider
@@ -134,6 +137,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
     }
 
     @Override
+    @Transactional
     public TransactionDto hideTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser) {
         Transaction transaction = entityAccessProvider.getOwnedTransaction(transactionId, securityUser.getId());
 
@@ -154,6 +158,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
     }
 
     @Override
+    @Transactional
     public void deleteTransactionWithBalanceUpdate(Long transactionId, SecurityUser securityUser) {
         var transaction = entityAccessProvider.getOwnedTransaction(transactionId, securityUser.getId());
         var card = entityAccessProvider.getOwnedCard(transaction.getCard().getId(), securityUser.getId());
@@ -169,6 +174,7 @@ public class TransactionProcessingServiceImpl implements TransactionProcessingSe
     }
 
     @Override
+    @Transactional
     public TransactionDto patchTransactionWithBalanceUpdate(
             Long transactionId, PatchTransactionData patchTransactionData, SecurityUser securityUser) {
         var transaction = entityAccessProvider.getOwnedTransaction(transactionId, securityUser.getId());

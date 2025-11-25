@@ -20,7 +20,7 @@ public class HelpApiController {
     @GetMapping("/readme")
     @ResponseStatus(HttpStatus.OK)
     public String getReadme() {
-        return helpService.getReadme("Readme.md");
+        return helpService.getReadme("README.md");
     }
 
 }
